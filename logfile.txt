@@ -1,0 +1,409 @@
+Running DeepFaceLive.
+Localization for @QFileSource.frame_index not found.
+Localization for @QFileSource.frame_count not found.
+Localization for @QFaceAnimator.anim_mode not found.
+Localization for @QFaceAnimator.run not found.
+Localization for @QFaceAnimator.run not found.
+Localization for @QFaceSwapInsight.swap_mode not found.
+Localization for @QFaceSwapInsight.run not found.
+Localization for @QFaceSwapInsight.run not found.
+Localization for @QMaskManager.mask_type not found.
+Localization for @QMaskManager.mask_intensity not found.
+Localization for @QMaskManager.custom_mask_path not found.
+Localization for @QMaskManager.upload_mask not found.
+Localization for @QMaskManager.module_title not found.
+Localization for @QMultiPlatformStreamer.avg_fps not found.
+Localization for @QMultiPlatformStreamer.enable_obs_virtual_camera not found.
+Localization for @QMultiPlatformStreamer.enable_obs_ndi not found.
+Localization for @QMultiPlatformStreamer.enable_discord not found.
+Localization for @QMultiPlatformStreamer.enable_zoom not found.
+Localization for @QMultiPlatformStreamer.enable_teams not found.
+Localization for @QMultiPlatformStreamer.enable_skype not found.
+Localization for @QMultiPlatformStreamer.enable_custom_rtmp not found.
+Localization for @QMultiPlatformStreamer.enable_custom_udp not found.
+Localization for @QMultiPlatformStreamer.custom_rtmp_url not found.
+Localization for @QMultiPlatformStreamer.custom_udp_addr not found.
+Localization for @QMultiPlatformStreamer.module_title not found.
+Localization for @QEnhancedRecorder.auto_start_recording not found.
+Localization for @QEnhancedRecorder.recording_format not found.
+Localization for @QEnhancedRecorder.recording_quality not found.
+Localization for @QEnhancedRecorder.recording_duration not found.
+Localization for @QEnhancedRecorder.recording_fps not found.
+Localization for @QEnhancedRecorder.is_recording not found.
+Localization for @QEnhancedRecorder.module_title not found.
+Initializing FileSource with default_state=True
+Initializing CameraSource with default_state=False
+Initializing FaceDetector with default_state=True
+Initializing FaceMarker with default_state=True
+Initializing FaceAligner with default_state=True
+Initializing FaceAnimator with default_state=False
+Initializing FaceSwapInsight with default_state=False
+Initializing FaceSwapDFM with default_state=True
+Initializing FrameAdjuster with default_state=True
+Initializing FaceMerger with default_state=True
+Initializing StreamOutput with default_state=True
+Initializing StreamFaceLabs with default_state=True
+Initializing MaskManager with default_state=True
+Initializing MultiPlatformStreamer with default_state=True
+Initializing EnhancedRecorder with default_state=True
+FileSource: Force enabling file source for testing
+CameraSource: Force enabling camera source for testing
+FaceDetector: Force enabling face detector for testing
+FaceAligner: Force enabling face aligner for testing
+FaceSwapDFM: Force enabling face swap DFM for testing
+FaceMerger: Force enabling face merger for testing
+QBCFrameViewer: Received new frame with bcd_id=0
+QBCFrameViewer: BCD is None for id=0
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['Compatible', 'DirectShow', 'Microsoft Media Foundation', 'GStreamer']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: Compatible
+Added choice 1: DirectShow
+Added choice 2: Microsoft Media Foundation
+Added choice 3: GStreamer
+QComboBoxCSWDynamicSingleSwitch: Selected 1, choice: 1
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 2 for choice 1
+FaceSwapDFM error: module 'modelhub.onnx' has no attribute 'FaceSwap' Traceback (most recent call last):
+  File "C:\Users\son-l\Desktop\DeepFaceLive\DeepFaceLive-master\xlib\mp\csw\CSWBase.py", line 472, in _start_proc
+    self.on_start(*worker_start_args, **worker_start_kwargs)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\son-l\Desktop\DeepFaceLive\DeepFaceLive-master\apps\DeepFaceLive\backend\FaceSwapDFM.py", line 69, in on_start
+    devices = onnx_models.FaceSwap.get_available_devices()
+              ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'modelhub.onnx' has no attribute 'FaceSwap'
+
+EnhancedRecorder error: 'Host' object has no attribute 'call_on_number' Traceback (most recent call last):
+  File "C:\Users\son-l\Desktop\DeepFaceLive\DeepFaceLive-master\xlib\mp\csw\CSWBase.py", line 472, in _start_proc
+    self.on_start(*worker_start_args, **worker_start_kwargs)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\son-l\Desktop\DeepFaceLive\DeepFaceLive-master\apps\DeepFaceLive\backend\EnhancedRecorder.py", line 52, in on_start
+    cs.auto_start.call_on_number(self.on_cs_auto_start)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Host' object has no attribute 'call_on_number'
+
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ("0 : Son's S24 Ultra (Windows Virtual Camera)", '1 : GoPro Webcam', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15')
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: 0 : Son's S24 Ultra (Windows Virtual Camera)
+Added choice 1: 1 : GoPro Webcam
+Added choice 2: 2
+Added choice 3: 3
+Added choice 4: 4
+Added choice 5: 5
+Added choice 6: 6
+Added choice 7: 7
+Added choice 8: 8
+Added choice 9: 9
+Added choice 10: 10
+Added choice 11: 11
+Added choice 12: 12
+Added choice 13: 13
+Added choice 14: 14
+Added choice 15: 15
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0 : Son's S24 Ultra (Windows Virtual Camera)
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 1 for choice 0
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['320x240', '640x480', '720x480', '1280x720', '1280x960', '1366x768', '1920x1080']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: 0
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 0 for choice 0
+Added choice 0: 320x240
+Added choice 1: 640x480
+Added choice 2: 720x480
+Added choice 3: 1280x720
+Added choice 4: 1280x960
+Added choice 5: 1366x768
+Added choice 6: 1920x1080
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['0 degrees', '90 degrees', '180 degrees', '270 degrees']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: 0
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 0 for choice 0
+Added choice 0: 0 degrees
+Added choice 1: 90 degrees
+Added choice 2: 180 degrees
+Added choice 3: 270 degrees
+QBCFrameViewer: Received new frame with bcd_id=1
+QBCFrameViewer: Displaying frame Camera_0_000001 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=2
+QBCFrameViewer: Displaying frame Camera_0_000002 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=3
+QBCFrameViewer: Displaying frame Camera_0_000003 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=4
+QBCFrameViewer: Displaying frame Camera_0_000004 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=5
+QBCFrameViewer: Displaying frame Camera_0_000005 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=6
+QBCFrameViewer: Displaying frame Camera_0_000007 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=7
+QBCFrameViewer: Displaying frame Camera_0_000009 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=8
+QBCFrameViewer: Displaying frame Camera_0_000011 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=9
+QBCFrameViewer: Displaying frame Camera_0_000012 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=10
+QBCFrameViewer: Displaying frame Camera_0_000013 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=11
+QBCFrameViewer: Displaying frame Camera_0_000014 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['Compatible', 'DirectShow', 'Microsoft Media Foundation', 'GStreamer']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: Compatible
+Added choice 1: DirectShow
+Added choice 2: Microsoft Media Foundation
+Added choice 3: GStreamer
+QComboBoxCSWDynamicSingleSwitch: Selected 1, choice: 1
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 2 for choice 1
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ("0 : Son's S24 Ultra (Windows Virtual Camera)", '1 : GoPro Webcam', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15')
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: 0 : Son's S24 Ultra (Windows Virtual Camera)
+Added choice 1: 1 : GoPro Webcam
+Added choice 2: 2
+Added choice 3: 3
+Added choice 4: 4
+Added choice 5: 5
+Added choice 6: 6
+Added choice 7: 7
+Added choice 8: 8
+Added choice 9: 9
+Added choice 10: 10
+Added choice 11: 11
+Added choice 12: 12
+Added choice 13: 13
+Added choice 14: 14
+Added choice 15: 15
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['320x240', '640x480', '720x480', '1280x720', '1280x960', '1366x768', '1920x1080']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: 0
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 0 for choice 0
+Added choice 0: 320x240
+Added choice 1: 640x480
+Added choice 2: 720x480
+Added choice 3: 1280x720
+Added choice 4: 1280x960
+Added choice 5: 1366x768
+Added choice 6: 1920x1080
+QComboBoxCSWDynamicSingleSwitch: Selected 1, choice: 1
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 1 for choice 1
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 0 for choice 0
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['Compatible', 'DirectShow', 'Microsoft Media Foundation', 'GStreamer']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: Compatible
+Added choice 1: DirectShow
+Added choice 2: Microsoft Media Foundation
+Added choice 3: GStreamer
+QComboBoxCSWDynamicSingleSwitch: Selected 1, choice: 1
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 2 for choice 1
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ("0 : Son's S24 Ultra (Windows Virtual Camera)", '1 : GoPro Webcam', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15')
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: 0 : Son's S24 Ultra (Windows Virtual Camera)
+Added choice 1: 1 : GoPro Webcam
+Added choice 2: 2
+Added choice 3: 3
+Added choice 4: 4
+Added choice 5: 5
+Added choice 6: 6
+Added choice 7: 7
+Added choice 8: 8
+Added choice 9: 9
+Added choice 10: 10
+Added choice 11: 11
+Added choice 12: 12
+Added choice 13: 13
+Added choice 14: 14
+Added choice 15: 15
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['320x240', '640x480', '720x480', '1280x720', '1280x960', '1366x768', '1920x1080']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: 0
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 0 for choice 0
+Added choice 0: 320x240
+Added choice 1: 640x480
+Added choice 2: 720x480
+Added choice 3: 1280x720
+Added choice 4: 1280x960
+Added choice 5: 1366x768
+Added choice 6: 1920x1080
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+Localization for @QFileSource.frame_index not found.
+Localization for @QFileSource.frame_count not found.
+Localization for @QFaceAnimator.anim_mode not found.
+Localization for @QFaceAnimator.run not found.
+Localization for @QFaceAnimator.run not found.
+Localization for @QFaceSwapInsight.swap_mode not found.
+Localization for @QFaceSwapInsight.run not found.
+Localization for @QFaceSwapInsight.run not found.
+Localization for @QMaskManager.mask_type not found.
+Localization for @QMaskManager.mask_intensity not found.
+Localization for @QMaskManager.custom_mask_path not found.
+Localization for @QMaskManager.upload_mask not found.
+Localization for @QMaskManager.module_title not found.
+Localization for @QMultiPlatformStreamer.avg_fps not found.
+Localization for @QMultiPlatformStreamer.enable_obs_virtual_camera not found.
+Localization for @QMultiPlatformStreamer.enable_obs_ndi not found.
+Localization for @QMultiPlatformStreamer.enable_discord not found.
+Localization for @QMultiPlatformStreamer.enable_zoom not found.
+Localization for @QMultiPlatformStreamer.enable_teams not found.
+Localization for @QMultiPlatformStreamer.enable_skype not found.
+Localization for @QMultiPlatformStreamer.enable_custom_rtmp not found.
+Localization for @QMultiPlatformStreamer.enable_custom_udp not found.
+Localization for @QMultiPlatformStreamer.custom_rtmp_url not found.
+Localization for @QMultiPlatformStreamer.custom_udp_addr not found.
+Localization for @QMultiPlatformStreamer.module_title not found.
+Localization for @QEnhancedRecorder.auto_start_recording not found.
+Localization for @QEnhancedRecorder.recording_format not found.
+Localization for @QEnhancedRecorder.recording_quality not found.
+Localization for @QEnhancedRecorder.recording_duration not found.
+Localization for @QEnhancedRecorder.recording_fps not found.
+Localization for @QEnhancedRecorder.is_recording not found.
+Localization for @QEnhancedRecorder.module_title not found.
+Initializing FileSource with default_state=True
+Initializing CameraSource with default_state=False
+Initializing FaceDetector with default_state=True
+Initializing FaceMarker with default_state=True
+Initializing FaceAligner with default_state=True
+Initializing FaceAnimator with default_state=False
+Initializing FaceSwapInsight with default_state=False
+Initializing FaceSwapDFM with default_state=True
+Initializing FrameAdjuster with default_state=True
+Initializing FaceMerger with default_state=True
+Initializing StreamOutput with default_state=True
+Initializing StreamFaceLabs with default_state=True
+Initializing MaskManager with default_state=True
+Initializing MultiPlatformStreamer with default_state=True
+Initializing EnhancedRecorder with default_state=True
+FileSource: Force enabling file source for testing
+CameraSource: Force enabling camera source for testing
+FaceDetector: Force enabling face detector for testing
+FaceAligner: Force enabling face aligner for testing
+FaceSwapDFM: Force enabling face swap DFM for testing
+FaceMerger: Force enabling face merger for testing
+QBCFrameViewer: Received new frame with bcd_id=0
+QBCFrameViewer: BCD is None for id=0
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['Compatible', 'DirectShow', 'Microsoft Media Foundation', 'GStreamer']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: Compatible
+Added choice 1: DirectShow
+Added choice 2: Microsoft Media Foundation
+Added choice 3: GStreamer
+QComboBoxCSWDynamicSingleSwitch: Selected 1, choice: 1
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 2 for choice 1
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ("0 : Son's S24 Ultra (Windows Virtual Camera)", '1 : GoPro Webcam', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15')
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: 0 : Son's S24 Ultra (Windows Virtual Camera)
+Added choice 1: 1 : GoPro Webcam
+Added choice 2: 2
+Added choice 3: 3
+Added choice 4: 4
+Added choice 5: 5
+Added choice 6: 6
+Added choice 7: 7
+Added choice 8: 8
+Added choice 9: 9
+Added choice 10: 10
+Added choice 11: 11
+Added choice 12: 12
+Added choice 13: 13
+Added choice 14: 14
+Added choice 15: 15
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['320x240', '640x480', '720x480', '1280x720', '1280x960', '1366x768', '1920x1080']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: 0
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 0 for choice 0
+Added choice 0: 320x240
+Added choice 1: 640x480
+Added choice 2: 720x480
+Added choice 3: 1280x720
+Added choice 4: 1280x960
+Added choice 5: 1366x768
+Added choice 6: 1920x1080
+FaceSwapDFM error: module 'modelhub.onnx' has no attribute 'FaceSwap' Traceback (most recent call last):
+  File "C:\Users\son-l\Desktop\DeepFaceLive\DeepFaceLive-master\xlib\mp\csw\CSWBase.py", line 472, in _start_proc
+    self.on_start(*worker_start_args, **worker_start_kwargs)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\son-l\Desktop\DeepFaceLive\DeepFaceLive-master\apps\DeepFaceLive\backend\FaceSwapDFM.py", line 69, in on_start
+    devices = onnx_models.FaceSwap.get_available_devices()
+              ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'modelhub.onnx' has no attribute 'FaceSwap'
+
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 1, choice_idx: 0
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0 : Son's S24 Ultra (Windows Virtual Camera)
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 1 for choice 0
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['Compatible', 'DirectShow', 'Microsoft Media Foundation', 'GStreamer']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: Compatible
+Added choice 1: DirectShow
+Added choice 2: Microsoft Media Foundation
+Added choice 3: GStreamer
+QComboBoxCSWDynamicSingleSwitch: Selected 1, choice: 1
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 2 for choice 1
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ("0 : Son's S24 Ultra (Windows Virtual Camera)", '1 : GoPro Webcam', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15')
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: -1
+Added choice 0: 0 : Son's S24 Ultra (Windows Virtual Camera)
+Added choice 1: 1 : GoPro Webcam
+Added choice 2: 2
+Added choice 3: 3
+Added choice 4: 4
+Added choice 5: 5
+Added choice 6: 6
+Added choice 7: 7
+Added choice 8: 8
+Added choice 9: 9
+Added choice 10: 10
+Added choice 11: 11
+Added choice 12: 12
+Added choice 13: 13
+Added choice 14: 14
+Added choice 15: 15
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0 : Son's S24 Ultra (Windows Virtual Camera)
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 1 for choice 0
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['320x240', '640x480', '720x480', '1280x720', '1280x960', '1366x768', '1920x1080']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: 0
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 0 for choice 0
+Added choice 0: 320x240
+Added choice 1: 640x480
+Added choice 2: 720x480
+Added choice 3: 1280x720
+Added choice 4: 1280x960
+Added choice 5: 1366x768
+Added choice 6: 1920x1080
+QComboBoxCSWDynamicSingleSwitch: Setting choices: ['0 degrees', '90 degrees', '180 degrees', '270 degrees']
+QComboBoxCSWDynamicSingleSwitch: Combo changed to index 0, choice_idx: 0
+QComboBoxCSWDynamicSingleSwitch: Selected 0, choice: 0
+QComboBoxCSWDynamicSingleSwitch: Set combo index to 0 for choice 0
+Added choice 0: 0 degrees
+Added choice 1: 90 degrees
+Added choice 2: 180 degrees
+Added choice 3: 270 degrees
+QBCFrameViewer: Received new frame with bcd_id=1
+QBCFrameViewer: Displaying frame Camera_0_000001 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=2
+QBCFrameViewer: Displaying frame Camera_0_000002 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=3
+QBCFrameViewer: Displaying frame Camera_0_000003 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=4
+QBCFrameViewer: Displaying frame Camera_0_000004 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=5
+QBCFrameViewer: Displaying frame Camera_0_000008 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=6
+QBCFrameViewer: Displaying frame Camera_0_000009 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=7
+QBCFrameViewer: Displaying frame Camera_0_000013 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=8
+QBCFrameViewer: Displaying frame Camera_0_000014 with shape (180, 320, 3), dtype uint8, min 0, max 254
+QBCFrameViewer: Received new frame with bcd_id=9
+QBCFrameViewer: Displaying frame Camera_0_000018 with shape (180, 320, 3), dtype uint8, min 0, max 255
+QBCFrameViewer: Received new frame with bcd_id=10
+QBCFrameViewer: Displaying frame Camera_0_000019 with shape (180, 320, 3), dtype uint8, min 0, max 255
+QBCFrameViewer: Received new frame with bcd_id=11
+QBCFrameViewer: Displaying frame Camera_0_000020 with shape (180, 320, 3), dtype uint8, min 0, max 255
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
+QComboBoxCSWDynamicSingleSwitch: Selected None, choice: None
