@@ -89,8 +89,15 @@ class MPWorker:
                         self._process_working_count -= 1
                     else:
                         self._on_host_sub_message(process_id, name, *args, **kwargs)
-            except:
-                ...
+            except (EOFError, OSError, BrokenPipeError) as e:
+                # Handle pipe communication errors gracefully
+                print(f"Pipe communication error in process {process_id}: {e}")
+                # Remove broken pipe from active pipes if needed
+                continue
+            except Exception as e:
+                # Handle other unexpected errors
+                print(f"Unexpected error processing messages from process {process_id}: {e}")
+                continue
 
     def _send_msg(self, name, *args, process_id=-1, **kwargs):
         """
@@ -103,8 +110,12 @@ class MPWorker:
             for i, pipe in enumerate(self._pipes):
                 if process_id == -1 or i == process_id:
                     pipe.send( (name, args, kwargs) )
-        except:
-            ...
+        except (EOFError, OSError, BrokenPipeError) as e:
+            # Handle pipe communication errors gracefully
+            print(f"Failed to send message '{name}' to process {process_id}: {e}")
+        except Exception as e:
+            # Handle other unexpected errors
+            print(f"Unexpected error sending message '{name}' to process {process_id}: {e}")
 
     def _sub_process(self, process_id, process_count, pipe, sub_args):
         self._process_id = process_id

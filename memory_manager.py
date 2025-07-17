@@ -471,7 +471,10 @@ class MemoryManager:
                 
             except Exception as e:
                 self.logger.error(f"Memory monitoring error: {e}")
-                time.sleep(10)  # Wait before retry
+                # Use exponential backoff for retry instead of fixed sleep
+                retry_delay = min(10, 2 ** getattr(self, '_retry_count', 0))
+                self._retry_count = getattr(self, '_retry_count', 0) + 1
+                time.sleep(retry_delay)
 
 # Global memory manager instance
 _global_memory_manager: Optional[MemoryManager] = None
