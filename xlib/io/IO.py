@@ -141,7 +141,9 @@ class FormattedIOBase:
         if suppress_error:
             try:
                 obj = pickle.load(self)
-            except:
+            except (pickle.PickleError, EOFError, ValueError, AttributeError) as e:
+                # Handle specific pickle errors that can occur during deserialization
+                print(f"Warning: Failed to unpickle object: {e}")
                 obj = None
         else:
             obj = pickle.load(self)
