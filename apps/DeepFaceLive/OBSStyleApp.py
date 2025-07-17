@@ -447,8 +447,16 @@ class QOBSStreamManager(qtx.QXWidget):
         )
         
         if ok and platform:
+            # Map UI platform names to enum values
+            platform_mapping = {
+                "Twitch": "twitch",
+                "YouTube": "youtube", 
+                "Facebook": "facebook",
+                "Custom RTMP": "rtmp_custom"
+            }
+            
             stream_config = StreamConfig(
-                platform=StreamPlatform(platform.lower().replace(" ", "_")),
+                platform=StreamPlatform(platform_mapping[platform]),
                 stream_key="",
                 server_url="",
                 enabled=True
