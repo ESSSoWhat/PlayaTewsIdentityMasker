@@ -583,7 +583,7 @@ class QOptimizedDFLAppWindow(qtx.QXWindow):
         self.finalize()
 
 
-class OptimizedDeepFaceLiveApp(qtx.QXMainApplication):
+class OptimizedPlayaTewsIdentityMaskerApp(qtx.QXMainApplication):
     """Optimized DeepFaceLive application"""
     
     def __init__(self, userdata_path):

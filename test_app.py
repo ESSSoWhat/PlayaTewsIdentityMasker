@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple test script to verify DeepFaceLive features
+Simple test script to verify PlayaTewsIdentityMasker features
 """
 
 import sys
@@ -13,15 +13,15 @@ def test_basic_imports():
     
     try:
         # Test backend imports
-        from apps.DeepFaceLive.backend import StreamFaceLabs
+        from apps.PlayaTewsIdentityMasker.backend import StreamFaceLabs
         print("✅ Backend components imported successfully")
         
         # Test UI imports
-        from apps.DeepFaceLive.ui import QStreamFaceLabsPanel
+        from apps.PlayaTewsIdentityMasker.ui import QStreamFaceLabsPanel
         print("✅ UI components imported successfully")
         
         # Test main app import
-        from apps.DeepFaceLive.DeepFaceLiveApp import DeepFaceLiveApp
+        from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
         print("✅ Main application imported successfully")
         
         return True
@@ -34,9 +34,9 @@ def test_file_structure():
     print("\n🔍 Testing file structure...")
     
     required_files = [
-        "apps/DeepFaceLive/backend/StreamFaceLabs.py",
-        "apps/DeepFaceLive/ui/QStreamFaceLabs.py",
-        "apps/DeepFaceLive/DeepFaceLiveApp.py",
+        "apps/PlayaTewsIdentityMasker/backend/StreamFaceLabs.py",
+        "apps/PlayaTewsIdentityMasker/ui/QStreamFaceLabs.py",
+        "apps/PlayaTewsIdentityMasker/PlayaTewsIdentityMaskerApp.py",
         "localization/en-US.py"
     ]
     
@@ -73,8 +73,8 @@ def test_stream_face_labs():
     print("\n🔍 Testing StreamFaceLabs component...")
     
     try:
-        from apps.DeepFaceLive.backend import StreamFaceLabs
-        from apps.DeepFaceLive.ui import QStreamFaceLabsPanel
+        from apps.PlayaTewsIdentityMasker.backend import StreamFaceLabs
+        from apps.PlayaTewsIdentityMasker.ui import QStreamFaceLabsPanel
         
         print("✅ StreamFaceLabs component available")
         return True

@@ -36,7 +36,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('deepfacelive_optimized.log'),
+        logging.FileHandler('playatewsidentitymasker_optimized.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )

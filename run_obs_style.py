@@ -61,13 +61,13 @@ Examples:
     # Import and run the appropriate application
     try:
         if args.traditional:
-            print("Launching DeepFaceLive with traditional interface...")
-            from apps.DeepFaceLive.DeepFaceLiveApp import DeepFaceLiveApp
-            app = DeepFaceLiveApp(userdata_path=userdata_path)
+            print("Launching PlayaTewsIdentityMasker with traditional interface...")
+            from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
+            app = PlayaTewsIdentityMaskerApp(userdata_path=userdata_path)
         else:
-            print("Launching DeepFaceLive with OBS-style interface...")
-            from apps.DeepFaceLive.DeepFaceLiveOBSStyleApp import DeepFaceLiveOBSStyleApp
-            app = DeepFaceLiveOBSStyleApp(userdata_path=userdata_path)
+            print("Launching PlayaTewsIdentityMasker with OBS-style interface...")
+            from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerOBSStyleApp import PlayaTewsIdentityMaskerOBSStyleApp
+            app = PlayaTewsIdentityMaskerOBSStyleApp(userdata_path=userdata_path)
         
         app.run()
         

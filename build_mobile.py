@@ -38,7 +38,7 @@ import cv2
 import numpy as np
 from pathlib import Path
 
-class DeepFaceLiveMobile(BoxLayout):
+class PlayaTewsIdentityMaskerMobile(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
@@ -130,12 +130,12 @@ class DeepFaceLiveMobile(BoxLayout):
         
         return frame
 
-class DeepFaceLiveMobileApp(App):
+class PlayaTewsIdentityMaskerMobileApp(App):
     def build(self):
-        return DeepFaceLiveMobile()
+        return PlayaTewsIdentityMaskerMobile()
 
 if __name__ == '__main__':
-    DeepFaceLiveMobileApp().run()
+    PlayaTewsIdentityMaskerMobileApp().run()
 '''
     
     with open('mobile_main.py', 'w') as f:
@@ -643,7 +643,7 @@ def build_apk():
 
 def main():
     """Main mobile build process"""
-    print("DeepFaceLive Mobile Application Builder")
+    print("PlayaTewsIdentityMasker Mobile Application Builder")
     print("=" * 50)
     
     # Install buildozer
@@ -659,7 +659,7 @@ def main():
     build_apk()
     
     print("\nMobile build completed!")
-    print("APK location: bin/deepfacelivemobile-0.1-debug.apk")
+    print("APK location: bin/playatewsidentitymasker-0.1-debug.apk")
 
 if __name__ == "__main__":
     main()
