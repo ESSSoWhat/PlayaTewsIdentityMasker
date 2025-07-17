@@ -91,7 +91,11 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
+ cursor/update-application-and-repository-name-ad7b
+            name='PlayaTewsIdentityMasker',
+=======
     name='PlayaTewsIdentityMasker',
+ main
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -149,10 +153,17 @@ RequestExecutionLevel admin
 Section "Install"
     SetOutPath "$INSTDIR"
     File /r "dist\\PlayaTewsIdentityMasker\\*.*"
+ cursor/update-application-and-repository-name-ad7b
+
+CreateDirectory "$SMPROGRAMS\\PlayaTewsIdentityMasker"
+CreateShortCut "$SMPROGRAMS\\PlayaTewsIdentityMasker\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
+CreateShortCut "$DESKTOP\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
+=======
     
     CreateDirectory "$SMPROGRAMS\\PlayaTewsIdentityMasker"
     CreateShortCut "$SMPROGRAMS\\PlayaTewsIdentityMasker\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
     CreateShortCut "$DESKTOP\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
+ main
     
     WriteUninstaller "$INSTDIR\\Uninstall.exe"
     WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\PlayaTewsIdentityMasker" "DisplayName" "PlayaTewsIdentityMasker"

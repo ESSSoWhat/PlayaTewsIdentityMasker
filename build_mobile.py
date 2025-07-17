@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DeepFaceLive Mobile Application Builder
+PlayaTewsIdentityMasker Mobile Application Builder
 Packages the application into Android APK using Kivy and Buildozer
 """
 
@@ -22,7 +22,7 @@ def create_mobile_main():
     """Create mobile-optimized main file using Kivy"""
     mobile_main = '''#!/usr/bin/env python3
 """
-DeepFaceLive Mobile Application
+PlayaTewsIdentityMasker Mobile Application
 Kivy-based mobile interface for face swapping
 """
 
@@ -54,7 +54,7 @@ class DeepFaceLiveMobile(BoxLayout):
         
     def create_ui(self):
         # Title
-        title = Label(text='DeepFaceLive Mobile', size_hint_y=None, height=50)
+        title = Label(text='PlayaTewsIdentityMasker Mobile', size_hint_y=None, height=50)
         self.add_widget(title)
         
         # Camera preview
@@ -148,13 +148,13 @@ def create_buildozer_spec():
     buildozer_spec = '''[app]
 
 # (str) Title of your application
-title = DeepFaceLive Mobile
+title = PlayaTewsIdentityMasker Mobile
 
 # (str) Package name
-package.name = deepfacelivemobile
+package.name = playatewsidentitymasker
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.deepfacelive
+package.domain = org.playatews
 
 # (str) Source code where the main.py live
 source.dir = .
