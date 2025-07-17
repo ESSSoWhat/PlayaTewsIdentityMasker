@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GPU Setup Test Script
-Tests all GPU frameworks for DeepFaceLive and DeepFaceLab
+Tests all GPU frameworks for PlayaTewsIdentityMasker and DeepFaceLab
 """
 
 import sys
@@ -81,7 +81,7 @@ def main():
     results['nvidia'] = test_nvidia_smi()
     print()
     
-    # Test ONNX Runtime (for DeepFaceLive)
+    # Test ONNX Runtime (for PlayaTewsIdentityMasker)
     results['onnx'] = test_onnx_runtime()
     print()
     
@@ -104,9 +104,9 @@ def main():
         print("❌ NVIDIA GPU not detected")
     
     if results['onnx']:
-        print("✅ ONNX Runtime GPU support - DeepFaceLive ready")
+        print("✅ ONNX Runtime GPU support - PlayaTewsIdentityMasker ready")
     else:
-        print("❌ ONNX Runtime GPU support - DeepFaceLive may be slow")
+        print("❌ ONNX Runtime GPU support - PlayaTewsIdentityMasker may be slow")
     
     if results['pytorch']:
         print("✅ PyTorch GPU support - DeepFaceLab training ready")
@@ -123,7 +123,7 @@ def main():
     if results['pytorch'] and results['onnx']:
         print("✅ Your setup is ready for both training and live streaming!")
         print("   - Use PyTorch for DeepFaceLab training")
-        print("   - Use ONNX Runtime for DeepFaceLive streaming")
+        print("   - Use ONNX Runtime for PlayaTewsIdentityMasker streaming")
     elif results['onnx']:
         print("✅ Ready for live streaming, training will be slower")
     else:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Camera and Model Test Script
-Tests camera functionality and model loading for DeepFaceLive
+Tests camera functionality and model loading for PlayaTewsIdentityMasker
 """
 
 import sys
@@ -177,7 +177,7 @@ def main():
     print("RECOMMENDATIONS:")
     
     if all(results.values()):
-        print("✅ Everything is working! Camera should appear in DeepFaceLive.")
+        print("✅ Everything is working! Camera should appear in PlayaTewsIdentityMasker.")
         print("   - Camera devices are detected and working")
         print("   - Models are loading properly")
         print("   - Face swap functionality should work")
@@ -189,7 +189,7 @@ def main():
         print("❌ Camera issues detected")
         print("   - Check camera permissions")
         print("   - Ensure camera is not being used by another application")
-        print("   - Try different camera settings in DeepFaceLive")
+        print("   - Try different camera settings in PlayaTewsIdentityMasker")
 
 if __name__ == "__main__":
     main() 

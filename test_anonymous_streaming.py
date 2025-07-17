@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for DeepFaceLive StreamFaceLabs Features
+Test script for PlayaTewsIdentityMasker StreamFaceLabs Features
 """
 
 import sys
@@ -67,7 +67,7 @@ def test_backend_components():
 
 def main():
     """Run all tests"""
-    print("🧪 Testing DeepFaceLive StreamFaceLabs Features")
+    print("🧪 Testing PlayaTewsIdentityMasker StreamFaceLabs Features")
     print("=" * 50)
     
     tests = [
@@ -94,7 +94,7 @@ def main():
     if passed == total:
         print("🎉 All tests passed! StreamFaceLabs features are ready.")
         print("\n📖 To use the features:")
-        print("1. Run: python main.py run DeepFaceLive")
+        print("1. Run: python main.py run PlayaTewsIdentityMasker")
         print("2. Look for the StreamFaceLabs panel in the UI")
         print("3. Configure your model training settings and start training!")
     else:
