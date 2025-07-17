@@ -2,11 +2,11 @@
 # Core requirements for basic functionality
 
 # Essential Python packages
-numpy>=1.21.0,<1.27.0
-opencv-python>=4.5.0,<4.9.0
+numpy>=1.21.0,<1.28.0
+opencv-python>=4.5.0,<4.10.0
 
-# GUI Framework
-PyQt5>=5.15.0
+# GUI Framework (Updated to PyQt6)
+PyQt6>=6.4.0,<6.7.0
 
 # System monitoring
 psutil>=5.8.0
