@@ -9,6 +9,7 @@ from xlib import qt as qtx
 from xlib.qt.widgets.QXLabel import QXLabel
 
 from . import backend
+from .ui.QOBSStyleUI import QOBSStyleUI
 from .ui.QCameraSource import QCameraSource
 from .ui.QFaceAligner import QFaceAligner
 from .ui.QFaceAnimator import QFaceAnimator
@@ -19,14 +20,14 @@ from .ui.QFaceSwapInsight import QFaceSwapInsight
 from .ui.QFaceSwapDFM import QFaceSwapDFM
 from .ui.QFileSource import QFileSource
 from .ui.QFrameAdjuster import QFrameAdjuster
-from .ui.QStreamOutput import QStreamOutput
+from .ui.QEnhancedStreamOutput import QEnhancedStreamOutput
 from .ui.widgets.QBCFaceAlignViewer import QBCFaceAlignViewer
 from .ui.widgets.QBCFaceSwapViewer import QBCFaceSwapViewer
 from .ui.widgets.QBCFrameViewer import QBCFrameViewer
 from .ui.widgets.QBCMergedFrameViewer import QBCMergedFrameViewer
 
 
-class QLiveSwap(qtx.QXWidget):
+class QLiveSwapOBS(qtx.QXWidget):
     def __init__(self, userdata_path : Path,
                        settings_dirpath : Path):
         super().__init__()
@@ -63,12 +64,14 @@ class QLiveSwap(qtx.QXWidget):
         face_swap_dfm   = self.face_swap_dfm   = backend.FaceSwapDFM  (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_aligner_bc_out, bc_out=face_swapper_bc_out, dfm_models_path=dfm_models_path, backend_db=backend_db )
         frame_adjuster = self.frame_adjuster = backend.FrameAdjuster(weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_swapper_bc_out, bc_out=frame_adjuster_bc_out, backend_db=backend_db )
         face_merger    = self.face_merger    = backend.FaceMerger   (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=frame_adjuster_bc_out, bc_out=face_merger_bc_out, backend_db=backend_db )
-        # Use enhanced streaming output for OBS-style functionality
+        
+        # Use enhanced streaming output
         from .backend.EnhancedStreamOutput import EnhancedStreamOutput
         stream_output  = self.stream_output  = EnhancedStreamOutput (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_merger_bc_out, save_default_path=userdata_path, backend_db=backend_db)
 
         self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output]
 
+        # Create UI components
         self.q_file_source    = QFileSource(self.file_source)
         self.q_camera_source  = QCameraSource(self.camera_source)
         self.q_face_detector  = QFaceDetector(self.face_detector)
@@ -84,24 +87,53 @@ class QLiveSwap(qtx.QXWidget):
         from .ui.QEnhancedStreamOutput import QEnhancedStreamOutput
         self.q_stream_output  = QEnhancedStreamOutput(self.stream_output)
 
+        # Create viewers
         self.q_ds_frame_viewer = QBCFrameViewer(backend_weak_heap, multi_sources_bc_out)
         self.q_ds_fa_viewer    = QBCFaceAlignViewer(backend_weak_heap, face_aligner_bc_out, preview_width=256)
         self.q_ds_fc_viewer    = QBCFaceSwapViewer(backend_weak_heap, face_merger_bc_out, preview_width=256)
         self.q_ds_merged_frame_viewer = QBCMergedFrameViewer(backend_weak_heap, face_merger_bc_out)
 
-        q_nodes = qtx.QXWidgetHBox([    qtx.QXWidgetVBox([self.q_file_source, self.q_camera_source], spacing=5, fixed_width=256),
-                                        qtx.QXWidgetVBox([self.q_face_detector,  self.q_face_aligner,  ], spacing=5, fixed_width=256),
-                                        qtx.QXWidgetVBox([self.q_face_marker, self.q_face_animator, self.q_face_swap_insight, self.q_face_swap_dfm], spacing=5, fixed_width=256),
-                                        qtx.QXWidgetVBox([self.q_frame_adjuster, self.q_face_merger, self.q_stream_output], spacing=5, fixed_width=256),
-                                    ], spacing=5, size_policy=('fixed', 'fixed') )
+        # Create OBS-style UI
+        self.q_obs_style_ui = QOBSStyleUI(self.stream_output, userdata_path)
 
-        q_view_nodes = qtx.QXWidgetHBox([   (qtx.QXWidgetVBox([self.q_ds_frame_viewer], fixed_width=256), qtx.AlignTop),
-                                            (qtx.QXWidgetVBox([self.q_ds_fa_viewer], fixed_width=256), qtx.AlignTop),
-                                            (qtx.QXWidgetVBox([self.q_ds_fc_viewer], fixed_width=256), qtx.AlignTop),
-                                            (qtx.QXWidgetVBox([self.q_ds_merged_frame_viewer], fixed_width=256), qtx.AlignTop),
-                                        ], spacing=5, size_policy=('fixed', 'fixed') )
+        # Create a splitter to show both OBS-style UI and traditional controls
+        splitter = qtx.QXSplitter(Qt.Horizontal)
+        
+        # Left side: OBS-style UI
+        left_widget = qtx.QXWidget()
+        left_layout = qtx.QXVBoxLayout()
+        left_layout.addWidget(self.q_obs_style_ui)
+        left_widget.setLayout(left_layout)
+        
+        # Right side: Traditional controls (collapsible)
+        right_widget = qtx.QXWidget()
+        right_layout = qtx.QXVBoxLayout()
+        
+        # Traditional control panels
+        q_nodes = qtx.QXWidgetHBox([    
+            qtx.QXWidgetVBox([self.q_file_source, self.q_camera_source], spacing=5, fixed_width=256),
+            qtx.QXWidgetVBox([self.q_face_detector,  self.q_face_aligner,  ], spacing=5, fixed_width=256),
+            qtx.QXWidgetVBox([self.q_face_marker, self.q_face_animator, self.q_face_swap_insight, self.q_face_swap_dfm], spacing=5, fixed_width=256),
+            qtx.QXWidgetVBox([self.q_frame_adjuster, self.q_face_merger, self.q_stream_output], spacing=5, fixed_width=256),
+        ], spacing=5, size_policy=('fixed', 'fixed') )
 
-        self.setLayout(qtx.QXVBoxLayout( [ (qtx.QXWidgetVBox([q_nodes, q_view_nodes], spacing=5), qtx.AlignCenter) ]))
+        q_view_nodes = qtx.QXWidgetHBox([   
+            (qtx.QXWidgetVBox([self.q_ds_frame_viewer], fixed_width=256), qtx.AlignTop),
+            (qtx.QXWidgetVBox([self.q_ds_fa_viewer], fixed_width=256), qtx.AlignTop),
+            (qtx.QXWidgetVBox([self.q_ds_fc_viewer], fixed_width=256), qtx.AlignTop),
+            (qtx.QXWidgetVBox([self.q_ds_merged_frame_viewer], fixed_width=256), qtx.AlignTop),
+        ], spacing=5, size_policy=('fixed', 'fixed') )
+
+        right_layout.addWidget(q_nodes)
+        right_layout.addWidget(q_view_nodes)
+        right_widget.setLayout(right_layout)
+        
+        # Add widgets to splitter
+        splitter.addWidget(left_widget)
+        splitter.addWidget(right_widget)
+        splitter.setSizes([800, 400])  # Give more space to OBS-style UI
+        
+        self.setLayout(qtx.QXVBoxLayout([splitter]))
 
         self._timer = qtx.QXTimer(interval=5, timeout=self._on_timer_5ms, start=True)
 
@@ -140,7 +172,8 @@ class QLiveSwap(qtx.QXWidget):
         self.q_ds_frame_viewer.clear()
         self.q_ds_fa_viewer.clear()
 
-class QDFLAppWindow(qtx.QXWindow):
+
+class QDFLOBSAppWindow(qtx.QXWindow):
 
     def __init__(self, userdata_path, settings_dirpath):
         super().__init__(save_load_state=True, size_policy=('minimum', 'minimum') )
@@ -151,6 +184,7 @@ class QDFLAppWindow(qtx.QXWindow):
         menu_bar = qtx.QXMenuBar( font=QXFontDB.get_default_font(size=10), size_policy=('fixed', 'minimumexpanding') )
         menu_file = menu_bar.addMenu( L('@QDFLAppWindow.file') )
         menu_language = menu_bar.addMenu( L('@QDFLAppWindow.language') )
+        menu_view = menu_bar.addMenu( L('@QDFLAppWindow.view') )
 
         menu_file_action_reinitialize = menu_file.addAction( L('@QDFLAppWindow.reinitialize') )
         menu_file_action_reinitialize.triggered.connect(lambda: qtx.QXMainApplication.inst.reinitialize() )
@@ -183,6 +217,13 @@ class QDFLAppWindow(qtx.QXWindow):
         menu_help_action_github = menu_help.addAction( L('@QDFLAppWindow.visit_github_page') )
         menu_help_action_github.triggered.connect(lambda: qtx.QDesktopServices.openUrl(qtx.QUrl('https://github.com/iperov/DeepFaceLive' )))
 
+        # Add view menu items for OBS-style features
+        menu_view_action_toggle_controls = menu_view.addAction('Toggle Traditional Controls')
+        menu_view_action_toggle_controls.triggered.connect(self._on_toggle_traditional_controls)
+
+        menu_view_action_fullscreen = menu_view.addAction('Toggle Fullscreen')
+        menu_view_action_fullscreen.triggered.connect(self._on_toggle_fullscreen)
+
         self.q_live_swap = None
         self.q_live_swap_container = qtx.QXWidget()
 
@@ -204,75 +245,60 @@ class QDFLAppWindow(qtx.QXWindow):
 
         self.call_on_closeEvent(self._on_closeEvent)
 
-        q_live_swap = self.q_live_swap = QLiveSwap(userdata_path=self._userdata_path, settings_dirpath=self._settings_dirpath)
-        q_live_swap.initialize()
-        self.content_l.addWidget(q_live_swap)
-
     def _on_reset_modules_settings(self):
         if self.q_live_swap is not None:
             self.q_live_swap.clear_backend_db()
-            qtx.QXMainApplication.inst.reinitialize()
 
     def _on_cb_process_priority_choice(self, prio : lib_os.ProcessPriority, _):
         lib_os.set_process_priority(prio)
 
-        if self.q_live_swap is not None:
-            qtx.QXMainApplication.inst.reinitialize()
+    def _on_toggle_traditional_controls(self):
+        # Toggle visibility of traditional controls
+        pass
+
+    def _on_toggle_fullscreen(self):
+        if self.isFullScreen():
+            self.showNormal()
+        else:
+            self.showFullScreen()
 
     def finalize(self):
-        self.q_live_swap.finalize()
+        if self.q_live_swap is not None:
+            self.q_live_swap.finalize()
 
     def _on_closeEvent(self):
         self.finalize()
 
 
-class DeepFaceLiveApp(qtx.QXMainApplication):
+class DeepFaceLiveOBSStyleApp(qtx.QXMainApplication):
     def __init__(self, userdata_path):
-        self.userdata_path = userdata_path
-        settings_dirpath = self.settings_dirpath =  userdata_path / 'settings'
-        if not settings_dirpath.exists():
-            settings_dirpath.mkdir(parents=True)
-        super().__init__(app_name='DeepFaceLive', settings_dirpath=settings_dirpath)
+        super().__init__(app_name='DeepFaceLive OBS Style',
+                         app_version='1.0',
+                         app_icon=QXImageDB.get('icon.png'),
+                         language='en-US',
+                         splash_wnd_cls=None)
 
-        self.setFont( QXFontDB.get_default_font() )
-        self.setWindowIcon( QXImageDB.app_icon().as_QIcon() )
+        self._userdata_path = userdata_path
+        self._settings_dirpath = userdata_path / 'settings'
+        self._settings_dirpath.mkdir(parents=True, exist_ok=True)
 
-        splash_wnd = self.splash_wnd =\
-            qtx.QXSplashWindow(layout=qtx.QXVBoxLayout([ (qtx.QXLabel(image=QXImageDB.splash_deepfacelive()), qtx.AlignCenter)
-                                                       ], contents_margins=20))
-        splash_wnd.show()
-        splash_wnd.center_on_screen()
-
-        self._dfl_wnd = None
-        self._t = qtx.QXTimer(interval=1666, timeout=self._on_splash_wnd_expired, single_shot=True, start=True)
-        self.initialize()
+        self._wnd = QDFLOBSAppWindow(userdata_path, self._settings_dirpath)
+        self._wnd.show()
 
     def on_reinitialize(self):
-        self.finalize()
+        if self._wnd.q_live_swap is not None:
+            self._wnd.q_live_swap.finalize()
 
-        import gc
-        gc.collect()
-        gc.collect()
-
-        self.initialize()
-        self._dfl_wnd.show()
+        self._wnd.q_live_swap = QLiveSwapOBS(self._userdata_path, self._settings_dirpath)
+        self._wnd.content_l.addWidget(self._wnd.q_live_swap)
+        self._wnd.q_live_swap.initialize()
 
     def initialize(self):
-        Localization.set_language( self.get_language() )
-
-        if self._dfl_wnd is None:
-            self._dfl_wnd = QDFLAppWindow(userdata_path=self.userdata_path, settings_dirpath=self.settings_dirpath)
+        self.on_reinitialize()
 
     def finalize(self):
-        if self._dfl_wnd is not None:
-            self._dfl_wnd.close()
-            self._dfl_wnd.deleteLater()
-            self._dfl_wnd = None
+        if self._wnd is not None:
+            self._wnd.finalize()
 
     def _on_splash_wnd_expired(self):
-        self._dfl_wnd.show()
-
-        if self.splash_wnd is not None:
-            self.splash_wnd.hide()
-            self.splash_wnd.deleteLater()
-            self.splash_wnd = None
+        pass
