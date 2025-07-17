@@ -75,7 +75,7 @@ class StreamOutputWorker(BackendWorker):
 
         self.prev_frame_num = -1
 
-        self._wnd_name = 'DeepFaceLive output'
+        self._wnd_name = 'PlayaTewsIdentityMasker output'
         self._wnd_showing = False
 
         self._streamer = FFMPEGStreamer()

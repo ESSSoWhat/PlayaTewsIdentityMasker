@@ -1,4 +1,4 @@
-# DeepFaceLive - Minimal Dependencies
+# PlayaTewsIdentityMasker - Minimal Dependencies
 # Core requirements for basic functionality
 
 # Essential Python packages
