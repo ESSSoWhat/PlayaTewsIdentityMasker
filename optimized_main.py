@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced Optimized DeepFaceLive Application Entry Point
+Enhanced Optimized PlayaTewsIdentityMasker Application Entry Point
 Features: Integrated optimization system, auto-tuning, advanced performance management
 """
 
@@ -42,8 +42,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class OptimizedDeepFaceLiveApp:
-    """Enhanced optimized DeepFaceLive application with integrated optimization system"""
+class OptimizedPlayaTewsIdentityMaskerApp:
+    """Enhanced optimized PlayaTewsIdentityMasker application with integrated optimization system"""
     
     def __init__(self, userdata_path: Path, no_cuda: bool = False, optimization_mode: str = "balanced"):
         self.userdata_path = userdata_path
@@ -62,7 +62,7 @@ class OptimizedDeepFaceLiveApp:
             self.memory_manager = get_memory_manager()
             self.video_processor: Optional[AsyncVideoProcessor] = None
         
-        logger.info(f"Initializing Enhanced OptimizedDeepFaceLive with userdata: {userdata_path}")
+        logger.info(f"Initializing Enhanced OptimizedPlayaTewsIdentityMasker with userdata: {userdata_path}")
         logger.info(f"Optimization mode: {optimization_mode}")
     
     def _setup_optimization_config(self):
@@ -260,7 +260,7 @@ class OptimizedDeepFaceLiveApp:
         """Initialize GUI components (placeholder for actual implementation)"""
         logger.info("Initializing GUI components...")
         
-        # This would initialize the actual DeepFaceLive GUI
+        # This would initialize the actual PlayaTewsIdentityMasker GUI
         # For now, just simulate the loading time
         await asyncio.sleep(0.5)  # Simulate GUI initialization
         
@@ -268,7 +268,7 @@ class OptimizedDeepFaceLiveApp:
     
     def run(self):
         """Run the optimized application"""
-        logger.info("Starting OptimizedDeepFaceLive...")
+        logger.info("Starting OptimizedPlayaTewsIdentityMasker...")
         
         # Use asyncio for the main application loop
         try:
@@ -355,7 +355,7 @@ class OptimizedDeepFaceLiveApp:
 
 def main():
     """Main entry point with optimized argument parsing"""
-    parser = argparse.ArgumentParser(description="Optimized DeepFaceLive Application")
+    parser = argparse.ArgumentParser(description="Optimized PlayaTewsIdentityMasker Application")
     
     # Subcommands
     subparsers = parser.add_subparsers(dest='command')
@@ -364,8 +364,8 @@ def main():
     run_parser = subparsers.add_parser('run', help="Run the optimized application")
     run_subparsers = run_parser.add_subparsers(dest='app_type')
     
-    # DeepFaceLive app
-    dfl_parser = run_subparsers.add_parser('DeepFaceLive', help="Run Enhanced DeepFaceLive")
+    # PlayaTewsIdentityMasker app
+    dfl_parser = run_subparsers.add_parser('PlayaTewsIdentityMasker', help="Run Enhanced PlayaTewsIdentityMasker")
     dfl_parser.add_argument('--userdata-dir', 
                            default='./userdata',
                            type=Path,
@@ -407,9 +407,9 @@ def main():
     
     args = parser.parse_args()
     
-    if args.command == 'run' and args.app_type == 'DeepFaceLive':
-        # Run enhanced optimized DeepFaceLive
-        app = OptimizedDeepFaceLiveApp(
+    if args.command == 'run' and args.app_type == 'PlayaTewsIdentityMasker':
+        # Run enhanced optimized PlayaTewsIdentityMasker
+        app = OptimizedPlayaTewsIdentityMaskerApp(
             userdata_path=args.userdata_dir,
             no_cuda=args.no_cuda,
             optimization_mode=args.optimization_mode
