@@ -19,3 +19,6 @@ asyncio-compat>=0.1.0
 
 # Logging and configuration
 pyyaml>=6.0
+
+# Streaming and recording support
+ffmpeg-python>=0.2.0

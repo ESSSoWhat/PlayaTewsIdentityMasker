@@ -36,13 +36,19 @@ def main():
         userdata_path = Path(args.userdata_dir)
         lib_appargs.set_arg_bool('NO_CUDA', args.no_cuda)
 
-        print('Running DeepFaceLive.')
-        from apps.DeepFaceLive.DeepFaceLiveApp import DeepFaceLiveApp
-        DeepFaceLiveApp(userdata_path=userdata_path).run()
+        if args.obs_style:
+            print('Running OBS-Style DeepFaceLive.')
+            from apps.DeepFaceLive.OBSStyleApp import OBSStyleDeepFaceLiveApp
+            OBSStyleDeepFaceLiveApp(userdata_path=userdata_path).run()
+        else:
+            print('Running DeepFaceLive.')
+            from apps.DeepFaceLive.DeepFaceLiveApp import DeepFaceLiveApp
+            DeepFaceLiveApp(userdata_path=userdata_path).run()
 
     p = run_subparsers.add_parser('DeepFaceLive')
     p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
     p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
+    p.add_argument('--obs-style', action="store_true", default=False, help="Use OBS Studio-style interface with streaming capabilities.")
     p.set_defaults(func=run_DeepFaceLive)
 
     dev_parser = subparsers.add_parser("dev")
