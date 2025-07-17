@@ -76,18 +76,8 @@ def main():
     p.add_argument('--faceset-path', default=None, action=fixPathAction, help="output .dfs path")
     p.set_defaults(func=run_extract_FaceSynthetics)
 
-    train_parser = subparsers.add_parser( "train", help="Train neural network.")
-    train_parsers = train_parser.add_subparsers()
-
-    def train_FaceAligner(args):
-        lib_os.set_process_priority(lib_os.ProcessPriority.IDLE)
-        from apps.trainers.FaceAligner.FaceAlignerTrainerApp import FaceAlignerTrainerApp
-        FaceAlignerTrainerApp(workspace_path=Path(args.workspace_dir), faceset_path=Path(args.faceset_path))
-
-    p = train_parsers.add_parser('FaceAligner')
-    p.add_argument('--workspace-dir', default=None, action=fixPathAction, help="Workspace directory.")
-    p.add_argument('--faceset-path', default=None, action=fixPathAction, help=".dfs path")
-    p.set_defaults(func=train_FaceAligner)
+    # FaceAligner trainer has been moved to separate executable
+    # Use train_facealigner.bat (Windows) or train_facealigner.sh (Linux) instead
 
     def bad_args(arguments):
         parser.print_help()
