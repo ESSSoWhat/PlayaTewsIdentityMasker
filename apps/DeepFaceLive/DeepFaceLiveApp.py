@@ -227,7 +227,7 @@ class DeepFaceLiveApp(qtx.QXMainApplication):
         settings_dirpath = self.settings_dirpath =  userdata_path / 'settings'
         if not settings_dirpath.exists():
             settings_dirpath.mkdir(parents=True)
-        super().__init__(app_name='DeepFaceLive', settings_dirpath=settings_dirpath)
+        super().__init__(app_name='PlayaTewsIdentityMasker', settings_dirpath=settings_dirpath)
 
         self.setFont( QXFontDB.get_default_font() )
         self.setWindowIcon( QXImageDB.app_icon().as_QIcon() )

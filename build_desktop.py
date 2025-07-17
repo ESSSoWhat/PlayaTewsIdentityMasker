@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DeepFaceLive Desktop Application Builder
+PlayaTewsIdentityMasker Desktop Application Builder
 Packages the application into standalone executables for Windows, macOS, and Linux
 """
 
@@ -21,7 +21,7 @@ def install_pyinstaller():
         subprocess.check_call([sys.executable, "-m", "pip", "install", "pyinstaller"])
 
 def create_spec_file():
-    """Create PyInstaller spec file for DeepFaceLive"""
+    """Create PyInstaller spec file for PlayaTewsIdentityMasker"""
     spec_content = '''# -*- mode: python ; coding: utf-8 -*-
 
 import sys
@@ -91,7 +91,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='DeepFaceLive',
+            name='PlayaTewsIdentityMasker',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -108,10 +108,10 @@ exe = EXE(
 )
 '''
     
-    with open('DeepFaceLive.spec', 'w') as f:
+    with open('PlayaTewsIdentityMasker.spec', 'w') as f:
         f.write(spec_content)
     
-    print("Created DeepFaceLive.spec file")
+    print("Created PlayaTewsIdentityMasker.spec file")
 
 def build_executable():
     """Build the executable using PyInstaller"""
@@ -134,9 +134,9 @@ def create_installer_script():
     # Windows NSIS installer script
     nsis_script = '''!include "MUI2.nsh"
 
-Name "DeepFaceLive"
-OutFile "DeepFaceLive-Setup.exe"
-InstallDir "$PROGRAMFILES\\DeepFaceLive"
+Name "PlayaTewsIdentityMasker"
+OutFile "PlayaTewsIdentityMasker-Setup.exe"
+InstallDir "$PROGRAMFILES\\PlayaTewsIdentityMasker"
 RequestExecutionLevel admin
 
 !insertmacro MUI_PAGE_WELCOME
@@ -148,23 +148,23 @@ RequestExecutionLevel admin
 
 Section "Install"
     SetOutPath "$INSTDIR"
-    File /r "dist\\DeepFaceLive\\*.*"
-    
-    CreateDirectory "$SMPROGRAMS\\DeepFaceLive"
-    CreateShortCut "$SMPROGRAMS\\DeepFaceLive\\DeepFaceLive.lnk" "$INSTDIR\\DeepFaceLive.exe"
-    CreateShortCut "$DESKTOP\\DeepFaceLive.lnk" "$INSTDIR\\DeepFaceLive.exe"
+    File /r "dist\\PlayaTewsIdentityMasker\\*.*"
+
+CreateDirectory "$SMPROGRAMS\\PlayaTewsIdentityMasker"
+CreateShortCut "$SMPROGRAMS\\PlayaTewsIdentityMasker\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
+CreateShortCut "$DESKTOP\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
     
     WriteUninstaller "$INSTDIR\\Uninstall.exe"
-    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\DeepFaceLive" "DisplayName" "DeepFaceLive"
-    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\DeepFaceLive" "UninstallString" "$INSTDIR\\Uninstall.exe"
+    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\PlayaTewsIdentityMasker" "DisplayName" "PlayaTewsIdentityMasker"
+    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\PlayaTewsIdentityMasker" "UninstallString" "$INSTDIR\\Uninstall.exe"
 SectionEnd
 
 Section "Uninstall"
-    Delete "$SMPROGRAMS\\DeepFaceLive\\DeepFaceLive.lnk"
-    Delete "$DESKTOP\\DeepFaceLive.lnk"
-    RMDir "$SMPROGRAMS\\DeepFaceLive"
+    Delete "$SMPROGRAMS\\PlayaTewsIdentityMasker\\PlayaTewsIdentityMasker.lnk"
+    Delete "$DESKTOP\\PlayaTewsIdentityMasker.lnk"
+    RMDir "$SMPROGRAMS\\PlayaTewsIdentityMasker"
     RMDir /r "$INSTDIR"
-    DeleteRegKey HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\DeepFaceLive"
+    DeleteRegKey HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\PlayaTewsIdentityMasker"
 SectionEnd
 '''
     
