@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Optimized DeepFaceLive Application Entry Point
-Features: Async initialization, performance monitoring, memory management
+Enhanced Optimized DeepFaceLive Application Entry Point
+Features: Integrated optimization system, auto-tuning, advanced performance management
 """
 
 import sys
@@ -12,10 +12,24 @@ import time
 from pathlib import Path
 from typing import Optional
 
-# Import optimization modules
-from performance_monitor import get_performance_monitor, start_performance_monitoring
-from memory_manager import get_memory_manager, start_memory_monitoring
-from async_processor import AsyncVideoProcessor
+# Import comprehensive optimization system
+try:
+    from integrated_optimizer import (
+        get_integrated_optimizer, 
+        optimize_for_performance, 
+        optimize_for_quality,
+        OptimizationConfig,
+        OptimizationLevel,
+        SystemProfile
+    )
+    from enhanced_memory_manager import MemoryPriority
+    OPTIMIZATION_AVAILABLE = True
+except ImportError:
+    # Fallback to original optimization modules
+    from performance_monitor import get_performance_monitor, start_performance_monitoring
+    from memory_manager import get_memory_manager, start_memory_monitoring
+    from async_processor import AsyncVideoProcessor
+    OPTIMIZATION_AVAILABLE = False
 
 # Setup logging
 logging.basicConfig(
@@ -29,37 +43,98 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class OptimizedDeepFaceLiveApp:
-    """Optimized DeepFaceLive application with performance enhancements"""
+    """Enhanced optimized DeepFaceLive application with integrated optimization system"""
     
-    def __init__(self, userdata_path: Path, no_cuda: bool = False):
+    def __init__(self, userdata_path: Path, no_cuda: bool = False, optimization_mode: str = "balanced"):
         self.userdata_path = userdata_path
         self.no_cuda = no_cuda
+        self.optimization_mode = optimization_mode
         self.app_modules = {}
         self.initialized = False
         
-        # Performance monitoring
-        self.perf_monitor = get_performance_monitor()
-        self.memory_manager = get_memory_manager()
+        # Initialize integrated optimization system
+        if OPTIMIZATION_AVAILABLE:
+            self.optimizer = get_integrated_optimizer()
+            self._setup_optimization_config()
+        else:
+            # Fallback to original optimization modules
+            self.perf_monitor = get_performance_monitor()
+            self.memory_manager = get_memory_manager()
+            self.video_processor: Optional[AsyncVideoProcessor] = None
         
-        # Processing pipeline
-        self.video_processor: Optional[AsyncVideoProcessor] = None
+        logger.info(f"Initializing Enhanced OptimizedDeepFaceLive with userdata: {userdata_path}")
+        logger.info(f"Optimization mode: {optimization_mode}")
+    
+    def _setup_optimization_config(self):
+        """Setup optimization configuration based on mode"""
+        if not OPTIMIZATION_AVAILABLE:
+            return
+            
+        if self.optimization_mode == "performance":
+            # Maximum performance configuration
+            from integrated_optimizer import ProcessingMode, FrameSkipStrategy
+            config = OptimizationConfig(
+                optimization_level=OptimizationLevel.AGGRESSIVE,
+                processing_mode=ProcessingMode.REALTIME,
+                skip_strategy=FrameSkipStrategy.ADAPTIVE,
+                ui_target_fps=60,
+                processing_workers=6,
+                frame_buffer_size=5,
+                memory_compression=True,
+                auto_tuning_enabled=True,
+                system_profile=SystemProfile.AUTO
+            )
+        elif self.optimization_mode == "quality":
+            # Maximum quality configuration
+            from integrated_optimizer import ProcessingMode, FrameSkipStrategy
+            config = OptimizationConfig(
+                optimization_level=OptimizationLevel.CONSERVATIVE,
+                processing_mode=ProcessingMode.QUALITY,
+                skip_strategy=FrameSkipStrategy.NONE,
+                ui_target_fps=45,
+                processing_workers=4,
+                frame_buffer_size=8,
+                memory_compression=False,
+                auto_tuning_enabled=False,
+                system_profile=SystemProfile.AUTO
+            )
+        else:  # balanced (default)
+            # Balanced configuration
+            from integrated_optimizer import ProcessingMode, FrameSkipStrategy
+            config = OptimizationConfig(
+                optimization_level=OptimizationLevel.BALANCED,
+                processing_mode=ProcessingMode.BALANCED,
+                skip_strategy=FrameSkipStrategy.ADAPTIVE,
+                ui_target_fps=60,
+                processing_workers=4,
+                frame_buffer_size=5,
+                memory_compression=True,
+                auto_tuning_enabled=True,
+                system_profile=SystemProfile.AUTO
+            )
         
-        logger.info(f"Initializing OptimizedDeepFaceLive with userdata: {userdata_path}")
+        self.optimizer.update_config(config)
     
     async def initialize_async(self):
-        """Asynchronous initialization with progress tracking"""
+        """Enhanced asynchronous initialization with integrated optimization"""
         if self.initialized:
             return True
         
-        logger.info("Starting optimized initialization...")
+        logger.info("Starting enhanced optimized initialization...")
         init_start_time = time.time()
         
         try:
-            # Start monitoring systems
-            start_performance_monitoring()
-            start_memory_monitoring()
+            if OPTIMIZATION_AVAILABLE:
+                # Initialize integrated optimization system
+                self.optimizer.initialize()
+                self.optimizer.start_optimization()
+                logger.info("Integrated optimization system started")
+            else:
+                # Fallback to original optimization
+                start_performance_monitoring()
+                start_memory_monitoring()
             
-            # Initialize modules in parallel
+            # Initialize modules in parallel with optimization
             init_tasks = [
                 self._init_gpu_detection(),
                 self._init_models_lazy(),
@@ -76,11 +151,25 @@ class OptimizedDeepFaceLiveApp:
                     return False
             
             # Mark startup complete
-            self.perf_monitor.mark_startup_complete()
+            if OPTIMIZATION_AVAILABLE:
+                pass  # Integrated optimizer handles completion automatically
+            else:
+                self.perf_monitor.mark_startup_complete()
+            
             self.initialized = True
             
             init_time = time.time() - init_start_time
-            logger.info(f"Optimized initialization completed in {init_time:.2f} seconds")
+            
+            # Enhanced logging with optimization metrics
+            if OPTIMIZATION_AVAILABLE:
+                metrics = self.optimizer.get_metrics()
+                config = self.optimizer.get_config()
+                logger.info(f"Enhanced initialization completed in {init_time:.2f} seconds")
+                logger.info(f"System profile: {config.system_profile.value}")
+                logger.info(f"Optimization level: {config.optimization_level.value}")
+                logger.info(f"Processing mode: {config.processing_mode.value}")
+            else:
+                logger.info(f"Optimized initialization completed in {init_time:.2f} seconds")
             
             return True
             
@@ -276,7 +365,7 @@ def main():
     run_subparsers = run_parser.add_subparsers(dest='app_type')
     
     # DeepFaceLive app
-    dfl_parser = run_subparsers.add_parser('DeepFaceLive', help="Run DeepFaceLive")
+    dfl_parser = run_subparsers.add_parser('DeepFaceLive', help="Run Enhanced DeepFaceLive")
     dfl_parser.add_argument('--userdata-dir', 
                            default='./userdata',
                            type=Path,
@@ -284,9 +373,23 @@ def main():
     dfl_parser.add_argument('--no-cuda', 
                            action='store_true',
                            help="Disable CUDA acceleration")
+    dfl_parser.add_argument('--optimization-mode',
+                           choices=['performance', 'quality', 'balanced'],
+                           default='balanced',
+                           help="Optimization mode: performance (speed), quality (accuracy), balanced (default)")
+    dfl_parser.add_argument('--system-profile',
+                           choices=['auto', 'low_end', 'medium', 'high_end', 'workstation'],
+                           default='auto',
+                           help="System profile for optimization (auto-detects by default)")
     dfl_parser.add_argument('--profile', 
                            action='store_true',
                            help="Enable detailed performance profiling")
+    dfl_parser.add_argument('--save-config',
+                           type=Path,
+                           help="Save optimization configuration to file")
+    dfl_parser.add_argument('--load-config',
+                           type=Path,
+                           help="Load optimization configuration from file")
     
     # Performance test command
     test_parser = subparsers.add_parser('test', help="Run performance tests")
@@ -305,12 +408,25 @@ def main():
     args = parser.parse_args()
     
     if args.command == 'run' and args.app_type == 'DeepFaceLive':
-        # Run optimized DeepFaceLive
+        # Run enhanced optimized DeepFaceLive
         app = OptimizedDeepFaceLiveApp(
             userdata_path=args.userdata_dir,
-            no_cuda=args.no_cuda
+            no_cuda=args.no_cuda,
+            optimization_mode=args.optimization_mode
         )
+        
+        # Handle configuration loading/saving
+        if hasattr(args, 'load_config') and args.load_config and OPTIMIZATION_AVAILABLE:
+            if app.optimizer.load_config(args.load_config):
+                logger.info(f"Loaded configuration from {args.load_config}")
+        
+        # Run the application
         app.run()
+        
+        # Save configuration if requested
+        if hasattr(args, 'save_config') and args.save_config and OPTIMIZATION_AVAILABLE:
+            app.optimizer.save_config(args.save_config)
+            logger.info(f"Saved configuration to {args.save_config}")
         
     elif args.command == 'test':
         # Run performance tests
