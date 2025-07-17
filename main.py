@@ -40,10 +40,27 @@ def main():
         from apps.DeepFaceLive.DeepFaceLiveApp import DeepFaceLiveApp
         DeepFaceLiveApp(userdata_path=userdata_path).run()
 
+        cursor/create-obs-inspired-streaming-interface-2239
+    def run_DeepFaceLiveOBS(args):
+        userdata_path = Path(args.userdata_dir)
+        lib_appargs.set_arg_bool('NO_CUDA', args.no_cuda)
+
+        print('Running DeepFaceLive with OBS-style UI.')
+        from apps.DeepFaceLive.DeepFaceLiveOBSStyleApp import DeepFaceLiveOBSStyleApp
+        DeepFaceLiveOBSStyleApp(userdata_path=userdata_path).run()
+
+    p = run_subparsers.add_parser('DeepFaceLive')
+
     p = run_subparsers.add_parser('PlayaTewsIdentityMasker')
+ main
     p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
     p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
     p.set_defaults(func=run_PlayaTewsIdentityMasker)
+
+    p = run_subparsers.add_parser('DeepFaceLiveOBS')
+    p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
+    p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
+    p.set_defaults(func=run_DeepFaceLiveOBS)
 
     dev_parser = subparsers.add_parser("dev")
     dev_subparsers = dev_parser.add_subparsers()
