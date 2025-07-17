@@ -1,0 +1,27 @@
+# Test Optimization Dependencies
+# Core testing framework
+pytest>=7.0.0
+pytest-xdist>=3.0.0      # Parallel test execution
+pytest-benchmark>=4.0.0   # Performance benchmarking
+pytest-cov>=4.0.0        # Coverage reporting
+pytest-mock>=3.10.0      # Enhanced mocking
+pytest-timeout>=2.1.0    # Test timeout management
+
+# Advanced testing features
+pytest-html>=3.1.0       # HTML test reports
+pytest-json-report>=1.5.0 # JSON test reports
+pytest-sugar>=0.9.6      # Better test output
+pytest-clarity>=1.0.1    # Better assertion failures
+
+# Performance and monitoring
+memory-profiler>=0.60.0  # Memory usage profiling
+psutil>=5.8.0           # System resource monitoring
+
+# Mocking and test data
+factory-boy>=3.2.0      # Test data factories
+freezegun>=1.2.0        # Time mocking
+responses>=0.21.0       # HTTP mocking
+
+# Optional: For advanced performance analysis
+py-spy>=0.3.14          # CPU profiling (optional)
+pympler>=0.9            # Memory analysis (optional)
