@@ -23,14 +23,14 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('deepfacelive_optimized_ui.log'),
+        logging.FileHandler('playatewsidentitymasker_optimized_ui.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )
 logger = logging.getLogger(__name__)
 
 
-class OptimizedDeepFaceLiveUI:
+class OptimizedPlayaTewsIdentityMaskerUI:
     """Optimized DeepFaceLive UI application with performance enhancements"""
     
     def __init__(self, userdata_path: Path, no_cuda: bool = False, debug: bool = False):
@@ -132,8 +132,8 @@ class OptimizedDeepFaceLiveUI:
         
         # Import the optimized application
         try:
-            from apps.DeepFaceLive.QOptimizedDeepFaceLiveApp import OptimizedDeepFaceLiveApp
-            self.OptimizedDeepFaceLiveApp = OptimizedDeepFaceLiveApp
+            from apps.PlayaTewsIdentityMasker.QOptimizedPlayaTewsIdentityMaskerApp import OptimizedPlayaTewsIdentityMaskerApp
+            self.OptimizedPlayaTewsIdentityMaskerApp = OptimizedPlayaTewsIdentityMaskerApp
             logger.info("Optimized UI components ready")
             return {'ui_components_ready': True}
         except ImportError as e:

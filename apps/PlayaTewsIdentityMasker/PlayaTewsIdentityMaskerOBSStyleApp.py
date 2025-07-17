@@ -270,9 +270,9 @@ class QDFLOBSAppWindow(qtx.QXWindow):
         self.finalize()
 
 
-class DeepFaceLiveOBSStyleApp(qtx.QXMainApplication):
+class PlayaTewsIdentityMaskerOBSStyleApp(qtx.QXMainApplication):
     def __init__(self, userdata_path):
-        super().__init__(app_name='DeepFaceLive OBS Style',
+        super().__init__(app_name='PlayaTewsIdentityMasker OBS Style',
                          app_version='1.0',
                          app_icon=QXImageDB.get('icon.png'),
                          language='en-US',

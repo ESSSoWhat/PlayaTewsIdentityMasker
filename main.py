@@ -7,24 +7,6 @@ from pathlib import Path
 from xlib import appargs as lib_appargs
 from xlib import os as lib_os
 
-# onnxruntime==1.8.0 requires CUDA_PATH_V11_2, but 1.8.1 don't
-# keep the code if they return that behaviour
-# if __name__ == '__main__':
-#     if platform.system() == 'Windows':
-#         if 'CUDA_PATH' not in os.environ:
-#             raise Exception('CUDA_PATH should be set to environ')
-#         # set environ for onnxruntime
-#         # os.environ['CUDA_PATH_V11_2'] = os.environ['CUDA_PATH']
-
-# from modelhub.onnx import InsightFaceSwap
-
-# x = InsightFaceSwap(InsightFaceSwap.get_available_devices()[0])
-
-
-# import code
-# code.interact(local=dict(globals(), **locals()))
-
-
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
@@ -37,37 +19,26 @@ def main():
         lib_appargs.set_arg_bool('NO_CUDA', args.no_cuda)
 
         print('Running PlayaTewsIdentityMasker.')
-        from apps.DeepFaceLive.DeepFaceLiveApp import DeepFaceLiveApp
-        DeepFaceLiveApp(userdata_path=userdata_path).run()
+        from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
+        PlayaTewsIdentityMaskerApp(userdata_path=userdata_path).run()
 
- cursor/update-application-and-repository-name-ad7b
-    p = run_subparsers.add_parser('PlayaTewsIdentityMasker')
-    p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
-    p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
-    p.set_defaults(func=run_PlayaTewsIdentityMasker)
-=======
-        cursor/create-obs-inspired-streaming-interface-2239
-    def run_DeepFaceLiveOBS(args):
+    def run_PlayaTewsIdentityMaskerOBS(args):
         userdata_path = Path(args.userdata_dir)
         lib_appargs.set_arg_bool('NO_CUDA', args.no_cuda)
 
-        print('Running DeepFaceLive with OBS-style UI.')
-        from apps.DeepFaceLive.DeepFaceLiveOBSStyleApp import DeepFaceLiveOBSStyleApp
-        DeepFaceLiveOBSStyleApp(userdata_path=userdata_path).run()
-
-    p = run_subparsers.add_parser('DeepFaceLive')
+        print('Running PlayaTewsIdentityMasker with OBS-style UI.')
+        from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerOBSStyleApp import PlayaTewsIdentityMaskerOBSStyleApp
+        PlayaTewsIdentityMaskerOBSStyleApp(userdata_path=userdata_path).run()
 
     p = run_subparsers.add_parser('PlayaTewsIdentityMasker')
- main
     p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
     p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
     p.set_defaults(func=run_PlayaTewsIdentityMasker)
 
-    p = run_subparsers.add_parser('DeepFaceLiveOBS')
+    p = run_subparsers.add_parser('PlayaTewsIdentityMaskerOBS')
     p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
     p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
-    p.set_defaults(func=run_DeepFaceLiveOBS)
- main
+    p.set_defaults(func=run_PlayaTewsIdentityMaskerOBS)
 
     dev_parser = subparsers.add_parser("dev")
     dev_subparsers = dev_parser.add_subparsers()
@@ -116,7 +87,4 @@ class fixPathAction(argparse.Action):
         setattr(namespace, self.dest, os.path.abspath(os.path.expanduser(values)))
 
 if __name__ == '__main__':
-    main()
-
-# import code
-# code.interact(local=dict(globals(), **locals())) 
+    main() 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test Script for DeepFaceLive Performance Optimizations
+Test Script for PlayaTewsIdentityMasker Performance Optimizations
 Demonstrates key optimization concepts without external dependencies
 """
 
@@ -290,7 +290,7 @@ def test_lazy_loading():
 
 async def run_comprehensive_test():
     """Run all optimization tests"""
-    print("🎯 DeepFaceLive Performance Optimization Tests")
+    print("🎯 PlayaTewsIdentityMasker Performance Optimization Tests")
     print("=" * 60)
     
     # Test 1: Async Processing

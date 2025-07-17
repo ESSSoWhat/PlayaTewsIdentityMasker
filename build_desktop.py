@@ -61,9 +61,9 @@ hiddenimports = [
     'xlib.appargs',
     'xlib.os',
     'xlib.qt',
-    'apps.DeepFaceLive.DeepFaceLiveApp',
-    'apps.DeepFaceLive.backend',
-    'apps.DeepFaceLive.ui',
+                'apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp',
+            'apps.PlayaTewsIdentityMasker.backend',
+            'apps.PlayaTewsIdentityMasker.ui',
 ]
 
 a = Analysis(

@@ -61,7 +61,7 @@ class TestBasicImports:
             # This should work even if the actual file doesn't exist
             # because we're testing the import mechanism
             try:
-                from apps.DeepFaceLive.backend import StreamFaceLabs
+                from apps.PlayaTewsIdentityMasker.backend import StreamFaceLabs
                 # If import succeeds, that's good
                 assert True
             except ImportError:
@@ -81,7 +81,7 @@ class TestBasicImports:
         
         with patch.dict('sys.modules', mock_modules):
             try:
-                from apps.DeepFaceLive.ui import QStreamFaceLabsPanel
+                from apps.PlayaTewsIdentityMasker.ui import QStreamFaceLabsPanel
                 assert True
             except ImportError:
                 pytest.skip("UI file not found - mocking validated")

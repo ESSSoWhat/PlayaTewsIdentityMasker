@@ -226,7 +226,7 @@ class QDFLAppWindow(qtx.QXWindow):
         self.finalize()
 
 
-class DeepFaceLiveApp(qtx.QXMainApplication):
+class PlayaTewsIdentityMaskerApp(qtx.QXMainApplication):
     def __init__(self, userdata_path):
         self.userdata_path = userdata_path
         settings_dirpath = self.settings_dirpath =  userdata_path / 'settings'
@@ -238,7 +238,7 @@ class DeepFaceLiveApp(qtx.QXMainApplication):
         self.setWindowIcon( QXImageDB.app_icon().as_QIcon() )
 
         splash_wnd = self.splash_wnd =\
-            qtx.QXSplashWindow(layout=qtx.QXVBoxLayout([ (qtx.QXLabel(image=QXImageDB.splash_deepfacelive()), qtx.AlignCenter)
+            qtx.QXSplashWindow(layout=qtx.QXVBoxLayout([ (qtx.QXLabel(image=QXImageDB.splash_playatewsidentitymasker()), qtx.AlignCenter)
                                                        ], contents_margins=20))
         splash_wnd.show()
         splash_wnd.center_on_screen()

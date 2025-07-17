@@ -19,11 +19,11 @@ def test_optimized_frame_viewer():
     logger.info("Testing Optimized Frame Viewer...")
     
     try:
-        from apps.DeepFaceLive.ui.widgets.QOptimizedFrameViewer import QOptimizedFrameViewer
+        from apps.PlayaTewsIdentityMasker.ui.widgets.QOptimizedFrameViewer import QOptimizedFrameViewer
         logger.info("✅ Optimized Frame Viewer imported successfully")
         
         # Test basic functionality
-        from apps.DeepFaceLive import backend
+        from apps.PlayaTewsIdentityMasker import backend
         
         # Create mock backend components
         weak_heap = backend.BackendWeakHeap(size_mb=512)
@@ -54,7 +54,7 @@ def test_ui_manager():
     logger.info("Testing UI Manager...")
     
     try:
-        from apps.DeepFaceLive.ui.QOptimizedUIManager import get_ui_manager, cleanup_ui_manager
+        from apps.PlayaTewsIdentityMasker.ui.QOptimizedUIManager import get_ui_manager, cleanup_ui_manager
         
         # Get UI manager
         ui_manager = get_ui_manager()
@@ -104,12 +104,12 @@ def test_optimized_application():
     logger.info("Testing Optimized Application...")
     
     try:
-        from apps.DeepFaceLive.QOptimizedDeepFaceLiveApp import OptimizedDeepFaceLiveApp
+        from apps.PlayaTewsIdentityMasker.QOptimizedPlayaTewsIdentityMaskerApp import OptimizedPlayaTewsIdentityMaskerApp
         logger.info("✅ Optimized Application imported successfully")
         
         # Test application creation (without full initialization)
         userdata_path = Path('.')
-        app = OptimizedDeepFaceLiveApp(userdata_path)
+        app = OptimizedPlayaTewsIdentityMaskerApp(userdata_path)
         logger.info("✅ Optimized Application created successfully")
         
         # Test application methods

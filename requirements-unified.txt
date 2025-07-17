@@ -1,4 +1,4 @@
-# DeepFaceLive - Unified Requirements
+# PlayaTewsIdentityMasker - Unified Requirements
 # Comprehensive dependency list for all functionality
 # Compatible with Python 3.13+
 
