@@ -181,7 +181,7 @@ class QDFLAppWindow(qtx.QXWindow):
 
         menu_help = menu_bar.addMenu( L('@QDFLAppWindow.help') )
         menu_help_action_github = menu_help.addAction( L('@QDFLAppWindow.visit_github_page') )
-        menu_help_action_github.triggered.connect(lambda: qtx.QDesktopServices.openUrl(qtx.QUrl('https://github.com/iperov/DeepFaceLive' )))
+        menu_help_action_github.triggered.connect(lambda: qtx.QDesktopServices.openUrl(qtx.QUrl('https://github.com/yourusername/PlayaTewsIdentityMasker' )))
 
         self.q_live_swap = None
         self.q_live_swap_container = qtx.QXWidget()
@@ -232,7 +232,7 @@ class DeepFaceLiveApp(qtx.QXMainApplication):
         settings_dirpath = self.settings_dirpath =  userdata_path / 'settings'
         if not settings_dirpath.exists():
             settings_dirpath.mkdir(parents=True)
-        super().__init__(app_name='DeepFaceLive', settings_dirpath=settings_dirpath)
+        super().__init__(app_name='PlayaTewsIdentityMasker', settings_dirpath=settings_dirpath)
 
         self.setFont( QXFontDB.get_default_font() )
         self.setWindowIcon( QXImageDB.app_icon().as_QIcon() )

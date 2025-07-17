@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Optimized Test Runner for DeepFaceLive
+Optimized Test Runner for PlayaTewsIdentityMasker
 Demonstrates test optimization techniques and provides performance analysis
 """
 
@@ -305,7 +305,7 @@ class OptimizedTestRunner:
 
 def main():
     """Main test runner entry point"""
-    parser = argparse.ArgumentParser(description="Optimized Test Runner for DeepFaceLive")
+    parser = argparse.ArgumentParser(description="Optimized Test Runner for PlayaTewsIdentityMasker")
     parser.add_argument("--fast", action="store_true", help="Run only fast unit tests")
     parser.add_argument("--benchmarks", action="store_true", help="Run performance benchmarks")
     parser.add_argument("--integration", action="store_true", help="Run integration tests")
@@ -318,7 +318,7 @@ def main():
     
     runner = OptimizedTestRunner()
     
-    print("🧪 DeepFaceLive Optimized Test Runner")
+    print("🧪 PlayaTewsIdentityMasker Optimized Test Runner")
     print("="*50)
     
     success = True
