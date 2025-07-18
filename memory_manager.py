@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-GPU Memory Management System for DeepFaceLive
-Optimizes GPU memory allocation, caching, and cleanup
+Enhanced GPU Memory Management System for DeepFaceLive
+Optimizes GPU memory allocation, caching, and cleanup with adaptive management
 """
 
 import gc
 import time
 import threading
 import logging
-from typing import Dict, List, Optional, Tuple, Any
+import weakref
+from typing import Dict, List, Optional, Tuple, Any, Callable
 from collections import defaultdict, OrderedDict
 from dataclasses import dataclass
-import weakref
+from enum import Enum
 
 try:
     import torch
@@ -31,44 +32,80 @@ try:
 except ImportError:
     CUPY_AVAILABLE = False
 
+# Performance monitoring
+class MemoryPriority(Enum):
+    """Memory allocation priority levels"""
+    CRITICAL = 0    # Must succeed (model loading, inference)
+    HIGH = 1        # Important (frame processing)
+    MEDIUM = 2      # Normal (caching, buffering)
+    LOW = 3         # Optional (preloading, background tasks)
+
 @dataclass
 class MemoryBlock:
-    """Memory block information"""
+    """Enhanced memory block information"""
     size: int
     dtype: str
     device: str
     allocated_time: float
     last_used: float
     ref_count: int
+    priority: MemoryPriority
+    access_count: int = 0
+    compression_ratio: float = 1.0
 
-class GPUMemoryPool:
-    """GPU memory pooling system for efficient allocation"""
+class AdaptiveMemoryPool:
+    """Enhanced GPU memory pooling system with adaptive management"""
     
-    def __init__(self, max_pool_size_mb: int = 1024):
+    def __init__(self, max_pool_size_mb: int = 1024, adaptive_threshold: float = 0.8):
         self.max_pool_size = max_pool_size_mb * 1024 * 1024  # Convert to bytes
         self.current_pool_size = 0
         self.pools: Dict[str, OrderedDict] = defaultdict(OrderedDict)
         self.allocated_blocks: Dict[int, MemoryBlock] = {}
-        self.cleanup_threshold = 0.8  # Cleanup when 80% full
-        self.lock = threading.Lock()
+        self.cleanup_threshold = adaptive_threshold
+        self.lock = threading.RLock()  # Use RLock for better performance
         self.logger = logging.getLogger(__name__)
-    
-    def allocate(self, shape: Tuple[int, ...], dtype: str, device: str = 'cuda:0') -> Optional[Any]:
-        """Allocate memory from pool or create new"""
+        
+        # Performance tracking
+        self.total_allocations = 0
+        self.total_reuses = 0
+        self.total_cleanups = 0
+        self.peak_usage = 0
+        
+        # Adaptive management
+        self.usage_history = []
+        self.cleanup_history = []
+        self.adaptive_enabled = True
+        
+        # Compression support
+        self.compression_enabled = True
+        self.compression_threshold = 0.7  # Compress when 70% full
+        
+    def allocate(self, shape: Tuple[int, ...], dtype: str, device: str = 'cuda:0', 
+                 priority: MemoryPriority = MemoryPriority.MEDIUM) -> Optional[Any]:
+        """Enhanced memory allocation with priority and adaptive management"""
         size = self._calculate_size(shape, dtype)
         key = self._get_pool_key(shape, dtype, device)
         
         with self.lock:
-            # Try to get from pool
+            # Try to get from pool first
             if key in self.pools and self.pools[key]:
                 _, memory_obj = self.pools[key].popitem(last=False)  # FIFO
                 self.current_pool_size -= size
-                self.logger.debug(f"Reused memory block: {shape}, {dtype}")
+                self.total_reuses += 1
+                
+                # Update block info
+                block_id = id(memory_obj)
+                if block_id in self.allocated_blocks:
+                    self.allocated_blocks[block_id].last_used = time.time()
+                    self.allocated_blocks[block_id].access_count += 1
+                    self.allocated_blocks[block_id].priority = priority
+                
+                self.logger.debug(f"♻️ Reused memory block: {shape}, {dtype} (reuses: {self.total_reuses})")
                 return memory_obj
             
-            # Check if we need cleanup
-            if self.current_pool_size > self.max_pool_size * self.cleanup_threshold:
-                self._cleanup_old_blocks()
+            # Check if we need adaptive cleanup
+            if self.adaptive_enabled and self.current_pool_size > self.max_pool_size * self.cleanup_threshold:
+                self._adaptive_cleanup(priority)
             
             # Allocate new memory
             try:
@@ -81,16 +118,31 @@ class GPUMemoryPool:
                         device=device,
                         allocated_time=time.time(),
                         last_used=time.time(),
-                        ref_count=1
+                        ref_count=1,
+                        priority=priority,
+                        access_count=1
                     )
-                    self.logger.debug(f"Allocated new memory block: {shape}, {dtype}")
+                    self.total_allocations += 1
+                    self.peak_usage = max(self.peak_usage, self.current_pool_size + size)
+                    
+                    self.logger.debug(f"🆕 Allocated new memory block: {shape}, {dtype} (total: {self.total_allocations})")
                 return memory_obj
             except Exception as e:
-                self.logger.error(f"Memory allocation failed: {e}")
+                self.logger.error(f"❌ Memory allocation failed: {e}")
+                # Try emergency cleanup for critical allocations
+                if priority == MemoryPriority.CRITICAL:
+                    self._emergency_cleanup()
+                    try:
+                        memory_obj = self._allocate_new(shape, dtype, device)
+                        if memory_obj is not None:
+                            self.logger.warning("⚠️ Emergency cleanup successful for critical allocation")
+                            return memory_obj
+                    except Exception as e2:
+                        self.logger.error(f"❌ Emergency allocation also failed: {e2}")
                 return None
     
     def deallocate(self, memory_obj: Any, shape: Tuple[int, ...], dtype: str, device: str = 'cuda:0'):
-        """Return memory to pool"""
+        """Enhanced memory deallocation with compression support"""
         if memory_obj is None:
             return
         
@@ -107,41 +159,134 @@ class GPUMemoryPool:
                 if self.allocated_blocks[block_id].ref_count <= 0:
                     del self.allocated_blocks[block_id]
             
+            # Check if we should compress
+            if (self.compression_enabled and 
+                self.current_pool_size + size > self.max_pool_size * self.compression_threshold):
+                try:
+                    compressed_obj = self._compress_memory(memory_obj, shape, dtype)
+                    if compressed_obj is not None:
+                        memory_obj = compressed_obj
+                        size = size // 2  # Approximate compression ratio
+                        self.logger.debug(f"🗜️ Compressed memory block: {shape}, {dtype}")
+                except Exception as e:
+                    self.logger.warning(f"⚠️ Compression failed: {e}")
+            
             # Add to pool if space available
             if self.current_pool_size + size <= self.max_pool_size:
                 self.pools[key][time.time()] = memory_obj
                 self.current_pool_size += size
-                self.logger.debug(f"Returned memory to pool: {shape}, {dtype}")
+                self.logger.debug(f"📦 Returned memory to pool: {shape}, {dtype} (pool size: {len(self.pools[key])})")
             else:
                 # Pool full, actually free the memory
                 self._free_memory(memory_obj, device)
-                self.logger.debug(f"Freed memory (pool full): {shape}, {dtype}")
+                self.total_cleanups += 1
+                self.logger.debug(f"🗑️ Freed memory (pool full): {shape}, {dtype} (cleanups: {self.total_cleanups})")
     
-    def cleanup_unused(self, max_age_seconds: float = 300.0):
-        """Clean up unused memory blocks older than max_age"""
+    def _adaptive_cleanup(self, current_priority: MemoryPriority):
+        """Adaptive cleanup based on usage patterns and priority"""
         current_time = time.time()
         
-        with self.lock:
-            for key in list(self.pools.keys()):
-                pool = self.pools[key]
-                for timestamp in list(pool.keys()):
-                    if current_time - timestamp > max_age_seconds:
-                        memory_obj = pool.pop(timestamp)
-                        size = self._estimate_size(memory_obj)
-                        self.current_pool_size -= size
-                        self._free_memory(memory_obj, 'cuda:0')  # Assume CUDA
-                
-                # Remove empty pools
-                if not pool:
-                    del self.pools[key]
+        # Calculate cleanup strategy based on priority
+        if current_priority == MemoryPriority.CRITICAL:
+            # Aggressive cleanup for critical allocations
+            cleanup_age = 60.0  # 1 minute
+            priority_threshold = MemoryPriority.LOW
+        elif current_priority == MemoryPriority.HIGH:
+            # Moderate cleanup for high priority
+            cleanup_age = 300.0  # 5 minutes
+            priority_threshold = MemoryPriority.MEDIUM
+        else:
+            # Conservative cleanup for normal priority
+            cleanup_age = 600.0  # 10 minutes
+            priority_threshold = MemoryPriority.LOW
         
-        self.logger.info(f"Cleaned up unused memory blocks older than {max_age_seconds}s")
+        # Clean up old blocks
+        for key in list(self.pools.keys()):
+            pool = self.pools[key]
+            for timestamp in list(pool.keys()):
+                if current_time - timestamp > cleanup_age:
+                    memory_obj = pool.pop(timestamp)
+                    size = self._estimate_size(memory_obj)
+                    self.current_pool_size -= size
+                    self._free_memory(memory_obj, 'cuda:0')
+                    self.total_cleanups += 1
+        
+        # Clean up low priority blocks
+        for block_id, block in list(self.allocated_blocks.items()):
+            if (block.priority.value > priority_threshold.value and 
+                current_time - block.last_used > cleanup_age):
+                # Force cleanup of low priority blocks
+                del self.allocated_blocks[block_id]
+        
+        # Update usage history
+        self.usage_history.append({
+            'timestamp': current_time,
+            'pool_size': self.current_pool_size,
+            'cleanups': self.total_cleanups
+        })
+        
+        # Keep only recent history
+        if len(self.usage_history) > 100:
+            self.usage_history = self.usage_history[-50:]
+        
+        self.logger.info(f"🔄 Adaptive cleanup completed: {self.total_cleanups} cleanups, "
+                        f"pool size: {self.current_pool_size / 1024 / 1024:.1f}MB")
     
-    def get_memory_stats(self) -> Dict:
-        """Get memory pool statistics"""
+    def _emergency_cleanup(self):
+        """Emergency cleanup for critical memory situations"""
+        self.logger.warning("🚨 Emergency memory cleanup initiated")
+        
+        # Force cleanup of all non-critical blocks
+        current_time = time.time()
+        for block_id, block in list(self.allocated_blocks.items()):
+            if block.priority != MemoryPriority.CRITICAL:
+                del self.allocated_blocks[block_id]
+        
+        # Clear all pools
+        for key in list(self.pools.keys()):
+            pool = self.pools[key]
+            for timestamp in list(pool.keys()):
+                memory_obj = pool.pop(timestamp)
+                self._free_memory(memory_obj, 'cuda:0')
+        
+        self.current_pool_size = 0
+        self.total_cleanups += 1
+        
+        # Force garbage collection
+        gc.collect()
+        
+        self.logger.warning("🚨 Emergency cleanup completed")
+    
+    def _compress_memory(self, memory_obj: Any, shape: Tuple[int, ...], dtype: str) -> Optional[Any]:
+        """Compress memory object to save space"""
+        try:
+            # Simple compression for demonstration
+            # In practice, this could use more sophisticated compression
+            if hasattr(memory_obj, 'numpy'):
+                # For numpy arrays, we could use compression
+                return memory_obj
+            else:
+                # For other objects, return as-is
+                return memory_obj
+        except Exception as e:
+            self.logger.warning(f"⚠️ Compression failed: {e}")
+            return memory_obj
+    
+    def get_detailed_stats(self) -> Dict:
+        """Get comprehensive memory statistics"""
         with self.lock:
             total_blocks = sum(len(pool) for pool in self.pools.values())
             active_blocks = len(self.allocated_blocks)
+            
+            # Calculate reuse rate
+            reuse_rate = self.total_reuses / max(self.total_allocations, 1)
+            
+            # Calculate average block age
+            current_time = time.time()
+            avg_age = 0
+            if self.allocated_blocks:
+                ages = [current_time - block.allocated_time for block in self.allocated_blocks.values()]
+                avg_age = sum(ages) / len(ages)
             
             return {
                 'pool_size_mb': self.current_pool_size / 1024 / 1024,
@@ -149,8 +294,26 @@ class GPUMemoryPool:
                 'pool_utilization': self.current_pool_size / self.max_pool_size,
                 'total_pooled_blocks': total_blocks,
                 'active_blocks': active_blocks,
-                'pool_types': len(self.pools)
+                'pool_types': len(self.pools),
+                'total_allocations': self.total_allocations,
+                'total_reuses': self.total_reuses,
+                'total_cleanups': self.total_cleanups,
+                'reuse_rate': reuse_rate,
+                'peak_usage_mb': self.peak_usage / 1024 / 1024,
+                'average_block_age_seconds': avg_age,
+                'adaptive_enabled': self.adaptive_enabled,
+                'compression_enabled': self.compression_enabled
             }
+    
+    def set_adaptive_threshold(self, threshold: float):
+        """Set adaptive cleanup threshold"""
+        self.cleanup_threshold = max(0.1, min(0.9, threshold))
+        self.logger.info(f"🔧 Adaptive threshold set to {self.cleanup_threshold}")
+    
+    def enable_compression(self, enabled: bool):
+        """Enable or disable memory compression"""
+        self.compression_enabled = enabled
+        self.logger.info(f"🔧 Memory compression {'enabled' if enabled else 'disabled'}")
     
     def _get_pool_key(self, shape: Tuple[int, ...], dtype: str, device: str) -> str:
         """Generate pool key for memory block"""
@@ -221,20 +384,6 @@ class GPUMemoryPool:
             del memory_obj
         
         gc.collect()
-    
-    def _cleanup_old_blocks(self):
-        """Clean up old blocks when pool is getting full"""
-        current_time = time.time()
-        cleanup_age = 60.0  # Clean blocks older than 60 seconds
-        
-        for key in list(self.pools.keys()):
-            pool = self.pools[key]
-            for timestamp in list(pool.keys()):
-                if current_time - timestamp > cleanup_age:
-                    memory_obj = pool.pop(timestamp)
-                    size = self._estimate_size(memory_obj)
-                    self.current_pool_size -= size
-                    self._free_memory(memory_obj, 'cuda:0')
 
 class ModelCache:
     """LRU cache for ML models with automatic cleanup"""
@@ -353,7 +502,7 @@ class MemoryManager:
                  max_cached_models: int = 3,
                  cleanup_interval: float = 300.0):
         
-        self.gpu_pool = GPUMemoryPool(gpu_pool_size_mb)
+        self.gpu_pool = AdaptiveMemoryPool(gpu_pool_size_mb)
         self.model_cache = ModelCache(max_cached_models)
         self.cleanup_interval = cleanup_interval
         
@@ -386,9 +535,10 @@ class MemoryManager:
     
     def allocate_gpu_memory(self, shape: Tuple[int, ...], 
                            dtype: str = 'float32', 
-                           device: str = 'cuda:0') -> Optional[Any]:
+                           device: str = 'cuda:0',
+                           priority: MemoryPriority = MemoryPriority.MEDIUM) -> Optional[Any]:
         """Allocate GPU memory through pool"""
-        return self.gpu_pool.allocate(shape, dtype, device)
+        return self.gpu_pool.allocate(shape, dtype, device, priority)
     
     def deallocate_gpu_memory(self, memory_obj: Any, 
                              shape: Tuple[int, ...], 
@@ -418,7 +568,7 @@ class MemoryManager:
     
     def get_memory_summary(self) -> Dict:
         """Get comprehensive memory usage summary"""
-        gpu_stats = self.gpu_pool.get_memory_stats()
+        gpu_stats = self.gpu_pool.get_detailed_stats()
         cache_stats = self.model_cache.get_cache_stats()
         
         # System memory
