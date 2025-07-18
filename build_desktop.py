@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DeepFaceLive Desktop Application Builder
+PlayaTewsIdentityMasker Desktop Application Builder
 Packages the application into standalone executables for Windows, macOS, and Linux
 """
 
@@ -21,7 +21,7 @@ def install_pyinstaller():
         subprocess.check_call([sys.executable, "-m", "pip", "install", "pyinstaller"])
 
 def create_spec_file():
-    """Create PyInstaller spec file for DeepFaceLive"""
+    """Create PyInstaller spec file for PlayaTewsIdentityMasker"""
     spec_content = '''# -*- mode: python ; coding: utf-8 -*-
 
 import sys
@@ -61,9 +61,9 @@ hiddenimports = [
     'xlib.appargs',
     'xlib.os',
     'xlib.qt',
-    'apps.DeepFaceLive.DeepFaceLiveApp',
-    'apps.DeepFaceLive.backend',
-    'apps.DeepFaceLive.ui',
+                'apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp',
+            'apps.PlayaTewsIdentityMasker.backend',
+            'apps.PlayaTewsIdentityMasker.ui',
 ]
 
 a = Analysis(
@@ -91,7 +91,11 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='DeepFaceLive',
+ cursor/update-application-and-repository-name-ad7b
+            name='PlayaTewsIdentityMasker',
+=======
+    name='PlayaTewsIdentityMasker',
+ main
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -108,21 +112,21 @@ exe = EXE(
 )
 '''
     
-    with open('DeepFaceLive.spec', 'w') as f:
+    with open('PlayaTewsIdentityMasker.spec', 'w') as f:
         f.write(spec_content)
     
-    print("Created DeepFaceLive.spec file")
+    print("Created PlayaTewsIdentityMasker.spec file")
 
 def build_executable():
     """Build the executable using PyInstaller"""
-    print("Building DeepFaceLive executable...")
+    print("Building PlayaTewsIdentityMasker executable...")
     
     # Build command
     cmd = [
         'pyinstaller',
         '--clean',
         '--noconfirm',
-        'DeepFaceLive.spec'
+        'PlayaTewsIdentityMasker.spec'
     ]
     
     subprocess.check_call(cmd)
@@ -134,9 +138,9 @@ def create_installer_script():
     # Windows NSIS installer script
     nsis_script = '''!include "MUI2.nsh"
 
-Name "DeepFaceLive"
-OutFile "DeepFaceLive-Setup.exe"
-InstallDir "$PROGRAMFILES\\DeepFaceLive"
+Name "PlayaTewsIdentityMasker"
+OutFile "PlayaTewsIdentityMasker-Setup.exe"
+InstallDir "$PROGRAMFILES\\PlayaTewsIdentityMasker"
 RequestExecutionLevel admin
 
 !insertmacro MUI_PAGE_WELCOME
@@ -148,23 +152,30 @@ RequestExecutionLevel admin
 
 Section "Install"
     SetOutPath "$INSTDIR"
-    File /r "dist\\DeepFaceLive\\*.*"
+    File /r "dist\\PlayaTewsIdentityMasker\\*.*"
+ cursor/update-application-and-repository-name-ad7b
+
+CreateDirectory "$SMPROGRAMS\\PlayaTewsIdentityMasker"
+CreateShortCut "$SMPROGRAMS\\PlayaTewsIdentityMasker\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
+CreateShortCut "$DESKTOP\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
+=======
     
-    CreateDirectory "$SMPROGRAMS\\DeepFaceLive"
-    CreateShortCut "$SMPROGRAMS\\DeepFaceLive\\DeepFaceLive.lnk" "$INSTDIR\\DeepFaceLive.exe"
-    CreateShortCut "$DESKTOP\\DeepFaceLive.lnk" "$INSTDIR\\DeepFaceLive.exe"
+    CreateDirectory "$SMPROGRAMS\\PlayaTewsIdentityMasker"
+    CreateShortCut "$SMPROGRAMS\\PlayaTewsIdentityMasker\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
+    CreateShortCut "$DESKTOP\\PlayaTewsIdentityMasker.lnk" "$INSTDIR\\PlayaTewsIdentityMasker.exe"
+ main
     
     WriteUninstaller "$INSTDIR\\Uninstall.exe"
-    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\DeepFaceLive" "DisplayName" "DeepFaceLive"
-    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\DeepFaceLive" "UninstallString" "$INSTDIR\\Uninstall.exe"
+    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\PlayaTewsIdentityMasker" "DisplayName" "PlayaTewsIdentityMasker"
+    WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\PlayaTewsIdentityMasker" "UninstallString" "$INSTDIR\\Uninstall.exe"
 SectionEnd
 
 Section "Uninstall"
-    Delete "$SMPROGRAMS\\DeepFaceLive\\DeepFaceLive.lnk"
-    Delete "$DESKTOP\\DeepFaceLive.lnk"
-    RMDir "$SMPROGRAMS\\DeepFaceLive"
+    Delete "$SMPROGRAMS\\PlayaTewsIdentityMasker\\PlayaTewsIdentityMasker.lnk"
+    Delete "$DESKTOP\\PlayaTewsIdentityMasker.lnk"
+    RMDir "$SMPROGRAMS\\PlayaTewsIdentityMasker"
     RMDir /r "$INSTDIR"
-    DeleteRegKey HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\DeepFaceLive"
+    DeleteRegKey HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\PlayaTewsIdentityMasker"
 SectionEnd
 '''
     
@@ -173,7 +184,7 @@ SectionEnd
     
     # Linux AppImage script
     appimage_script = '''#!/bin/bash
-# AppImage build script for DeepFaceLive
+# AppImage build script for PlayaTewsIdentityMasker
 
 # Create AppDir structure
 mkdir -p AppDir/usr/bin
@@ -181,15 +192,15 @@ mkdir -p AppDir/usr/share/applications
 mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps
 
 # Copy executable and dependencies
-cp -r dist/DeepFaceLive/* AppDir/usr/bin/
+cp -r dist/PlayaTewsIdentityMasker/* AppDir/usr/bin/
 
 # Create desktop file
-cat > AppDir/usr/share/applications/deepfacelive.desktop << EOF
+cat > AppDir/usr/share/applications/playatewsidentitymasker.desktop << EOF
 [Desktop Entry]
-Name=DeepFaceLive
+Name=PlayaTewsIdentityMasker
 Comment=Real-time face swapping application
-Exec=deepfacelive
-Icon=deepfacelive
+Exec=playatewsidentitymasker
+Icon=playatewsidentitymasker
 Type=Application
 Categories=Graphics;Video;
 EOF
@@ -198,14 +209,14 @@ EOF
 cat > AppDir/AppRun << EOF
 #!/bin/bash
 cd "\$APPDIR/usr/bin"
-exec "\$APPDIR/usr/bin/DeepFaceLive" "\$@"
+exec "\$APPDIR/usr/bin/PlayaTewsIdentityMasker" "\$@"
 EOF
 
 chmod +x AppDir/AppRun
 
 # Build AppImage (requires appimagetool)
 if command -v appimagetool &> /dev/null; then
-    appimagetool AppDir DeepFaceLive-x86_64.AppImage
+    appimagetool AppDir PlayaTewsIdentityMasker-x86_64.AppImage
 else
     echo "appimagetool not found. Install it to create AppImage."
 fi
@@ -217,7 +228,7 @@ fi
 
 def main():
     """Main build process"""
-    print("DeepFaceLive Desktop Application Builder")
+    print("PlayaTewsIdentityMasker Desktop Application Builder")
     print("=" * 50)
     
     # Install PyInstaller
@@ -233,9 +244,9 @@ def main():
     create_installer_script()
     
     print("\nBuild completed!")
-    print("Executable location: dist/DeepFaceLive/")
+    print("Executable location: dist/PlayaTewsIdentityMasker/")
     print("\nNext steps:")
-    print("1. Test the executable: ./dist/DeepFaceLive/DeepFaceLive")
+    print("1. Test the executable: ./dist/PlayaTewsIdentityMasker/PlayaTewsIdentityMasker")
     print("2. Create installer (Windows): makensis installer.nsi")
     print("3. Create AppImage (Linux): ./build_appimage.sh")
 

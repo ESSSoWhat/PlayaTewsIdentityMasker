@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Demonstration Script for Enhanced DeepFaceLive Optimizations
+Demonstration Script for Enhanced PlayaTewsIdentityMasker Optimizations
 Shows how to use the new integrated optimization system
 """
 
@@ -330,7 +330,7 @@ def demo_performance_monitoring():
 
 def main():
     """Run all optimization demos"""
-    print("🚀 DeepFaceLive Enhanced Optimization System Demo")
+    print("🚀 PlayaTewsIdentityMasker Enhanced Optimization System Demo")
     print("This demo showcases the new optimization features")
     
     # Run demos
@@ -356,9 +356,9 @@ def main():
     print("3. Initialize the integrated optimizer")
     print("4. Let the auto-tuning system optimize performance automatically")
     print("\nExample usage:")
-    print("  python optimized_main.py run DeepFaceLive --optimization-mode performance")
-    print("  python optimized_main.py run DeepFaceLive --optimization-mode quality")
-    print("  python optimized_main.py run DeepFaceLive --optimization-mode balanced")
+    print("  python optimized_main.py run PlayaTewsIdentityMasker --optimization-mode performance")
+    print("  python optimized_main.py run PlayaTewsIdentityMasker --optimization-mode quality")
+    print("  python optimized_main.py run PlayaTewsIdentityMasker --optimization-mode balanced")
 
 if __name__ == '__main__':
     main()

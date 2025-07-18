@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DeepFaceLive Mobile Application Builder
+PlayaTewsIdentityMasker Mobile Application Builder
 Packages the application into Android APK using Kivy and Buildozer
 """
 
@@ -22,7 +22,7 @@ def create_mobile_main():
     """Create mobile-optimized main file using Kivy"""
     mobile_main = '''#!/usr/bin/env python3
 """
-DeepFaceLive Mobile Application
+PlayaTewsIdentityMasker Mobile Application
 Kivy-based mobile interface for face swapping
 """
 
@@ -38,7 +38,7 @@ import cv2
 import numpy as np
 from pathlib import Path
 
-class DeepFaceLiveMobile(BoxLayout):
+class PlayaTewsIdentityMaskerMobile(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
@@ -54,7 +54,7 @@ class DeepFaceLiveMobile(BoxLayout):
         
     def create_ui(self):
         # Title
-        title = Label(text='DeepFaceLive Mobile', size_hint_y=None, height=50)
+        title = Label(text='PlayaTewsIdentityMasker Mobile', size_hint_y=None, height=50)
         self.add_widget(title)
         
         # Camera preview
@@ -130,12 +130,12 @@ class DeepFaceLiveMobile(BoxLayout):
         
         return frame
 
-class DeepFaceLiveMobileApp(App):
+class PlayaTewsIdentityMaskerMobileApp(App):
     def build(self):
-        return DeepFaceLiveMobile()
+        return PlayaTewsIdentityMaskerMobile()
 
 if __name__ == '__main__':
-    DeepFaceLiveMobileApp().run()
+    PlayaTewsIdentityMaskerMobileApp().run()
 '''
     
     with open('mobile_main.py', 'w') as f:
@@ -148,13 +148,13 @@ def create_buildozer_spec():
     buildozer_spec = '''[app]
 
 # (str) Title of your application
-title = DeepFaceLive Mobile
+title = PlayaTewsIdentityMasker Mobile
 
 # (str) Package name
-package.name = deepfacelivemobile
+package.name = playatewsidentitymasker
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.deepfacelive
+package.domain = org.playatews
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -643,7 +643,7 @@ def build_apk():
 
 def main():
     """Main mobile build process"""
-    print("DeepFaceLive Mobile Application Builder")
+    print("PlayaTewsIdentityMasker Mobile Application Builder")
     print("=" * 50)
     
     # Install buildozer
@@ -659,7 +659,7 @@ def main():
     build_apk()
     
     print("\nMobile build completed!")
-    print("APK location: bin/deepfacelivemobile-0.1-debug.apk")
+    print("APK location: bin/playatewsidentitymasker-0.1-debug.apk")
 
 if __name__ == "__main__":
     main()

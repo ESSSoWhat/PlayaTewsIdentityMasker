@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for DeepFaceLive StreamFaceLabs Features
+Test script for PlayaTewsIdentityMasker StreamFaceLabs Features
 """
 
 import sys
@@ -10,8 +10,8 @@ from pathlib import Path
 def test_imports():
     """Test that StreamFaceLabs component can be imported"""
     try:
-        from apps.DeepFaceLive.backend import StreamFaceLabs
-        from apps.DeepFaceLive.ui import QStreamFaceLabsPanel
+        from apps.PlayaTewsIdentityMasker.backend import StreamFaceLabs
+from apps.PlayaTewsIdentityMasker.ui import QStreamFaceLabsPanel
         print("✅ StreamFaceLabs component imported successfully")
         return True
     except ImportError as e:
@@ -35,7 +35,7 @@ def test_directories():
 def test_stream_face_labs():
     """Test StreamFaceLabs component"""
     try:
-        from apps.DeepFaceLive.backend import StreamFaceLabs
+        from apps.PlayaTewsIdentityMasker.backend import StreamFaceLabs
         
         print("✅ StreamFaceLabs component available")
         return True
@@ -46,7 +46,7 @@ def test_stream_face_labs():
 def test_ui_components():
     """Test UI components"""
     try:
-        from apps.DeepFaceLive.ui import QStreamFaceLabsPanel
+        from apps.PlayaTewsIdentityMasker.ui import QStreamFaceLabsPanel
         
         print("✅ StreamFaceLabs UI component available")
         return True
@@ -57,7 +57,7 @@ def test_ui_components():
 def test_backend_components():
     """Test backend components"""
     try:
-        from apps.DeepFaceLive.backend import StreamFaceLabs
+        from apps.PlayaTewsIdentityMasker.backend import StreamFaceLabs
         
         print("✅ StreamFaceLabs backend component available")
         return True
@@ -67,7 +67,7 @@ def test_backend_components():
 
 def main():
     """Run all tests"""
-    print("🧪 Testing DeepFaceLive StreamFaceLabs Features")
+    print("🧪 Testing PlayaTewsIdentityMasker StreamFaceLabs Features")
     print("=" * 50)
     
     tests = [
@@ -94,7 +94,7 @@ def main():
     if passed == total:
         print("🎉 All tests passed! StreamFaceLabs features are ready.")
         print("\n📖 To use the features:")
-        print("1. Run: python main.py run DeepFaceLive")
+        print("1. Run: python main.py run PlayaTewsIdentityMasker")
         print("2. Look for the StreamFaceLabs panel in the UI")
         print("3. Configure your model training settings and start training!")
     else:

@@ -34,7 +34,7 @@ class DFMModelInfo:
 def get_available_models_info(models_path : Path) -> List[DFMModelInfo]:
     # predefined list of celebs with urls
     dfm_models = [
-            DFMModelInfo(name='Albica Johns', model_path=models_path / f'Albica_Johns.dfm', url=rf'https://github.com/iperov/DeepFaceLive/releases/download/ALBICA_JOHNS/Albica_Johns.dfm'),
+            DFMModelInfo(name='Albica Johns', model_path=models_path / f'Albica_Johns.dfm', url=rf'https://github.com/iperov/PlayaTewsIdentityMasker/releases/download/ALBICA_JOHNS/Albica_Johns.dfm'),
             DFMModelInfo(name='Amber Song', model_path=models_path / f'Amber_Song.dfm', url=rf'https://github.com/iperov/DeepFaceLive/releases/download/AMBER_SONG/Amber_Song.dfm'),
             DFMModelInfo(name='Ava de Addario', model_path=models_path / f'Ava_de_Addario.dfm', url=rf'https://github.com/iperov/DeepFaceLive/releases/download/AVA_DE_ADDARIO/Ava_de_Addario.dfm'),
             DFMModelInfo(name='Bryan Greynolds', model_path=models_path / f'Bryan_Greynolds.dfm', url=rf'https://github.com/iperov/DeepFaceLive/releases/download/BRYAN_GREYNOLDS/Bryan_Greynolds.dfm'),
