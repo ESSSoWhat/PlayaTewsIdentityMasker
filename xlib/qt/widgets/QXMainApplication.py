@@ -106,7 +106,15 @@ QRadioButton::disabled {{
                 break
             iter_widget = iter_parent_widget
 
-        if not isinstance(iter_widget, forward_declarations.QXWindow):
+        # Import QXWindow directly if forward_declarations.QXWindow is None
+        if forward_declarations.QXWindow is None:
+            try:
+                from .QXWindow import QXWindow
+                forward_declarations.QXWindow = QXWindow
+            except ImportError:
+                pass
+
+        if forward_declarations.QXWindow is not None and not isinstance(iter_widget, forward_declarations.QXWindow):
             raise Exception('Top widget must be a class of QXWindow')
 
         if len(hierarchy) == 1:

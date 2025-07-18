@@ -42,6 +42,8 @@ from .widgets.QXHBoxLayout import QXHBoxLayout
 from .widgets.QXHorizontalLine import QXHorizontalLine
 from .widgets.QXLabel import QXLabel
 from .widgets.QXLineEdit import QXLineEdit
+# Import QXWindow early to set forward_declarations before QXMainApplication
+from .widgets.QXWindow import QXWindow
 from .widgets.QXMainApplication import QXMainApplication
 from .widgets.QXMenuBar import QXMenuBar
 from .widgets.QXOpenGLWidget import QXOpenGLWidget
@@ -61,4 +63,3 @@ from .widgets.QXVerticalLine import QXVerticalLine
 from .widgets.QXWidget import QXWidget
 from .widgets.QXWidgetHBox import QXWidgetHBox
 from .widgets.QXWidgetVBox import QXWidgetVBox
-from .widgets.QXWindow import QXWindow
