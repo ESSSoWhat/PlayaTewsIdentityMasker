@@ -5,3 +5,6 @@ from .InsightFaceSwap.InsightFaceSwap import InsightFaceSwap
 from .LIA.LIA import LIA
 from .S3FD.S3FD import S3FD
 from .YoloV5Face.YoloV5Face import YoloV5Face
+
+# Backward compatibility alias
+FaceSwap = InsightFaceSwap
