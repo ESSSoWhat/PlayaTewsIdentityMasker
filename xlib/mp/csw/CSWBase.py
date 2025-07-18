@@ -312,9 +312,19 @@ class Host(Base):
                                         args=[self._worker_cls, self._worker_sheet_cls, worker_pipe, self._state, self._worker_start_args, self._worker_start_kwargs],
                                         daemon=True)
 
-                # Start non-blocking in subthread
-                threading.Thread(target=lambda: self._process.start(), daemon=True).start()
-                time.sleep(0.016) # BUG ? remove will raise ImportError: cannot import name 'Popen' tested in Python 3.6
+                # Start non-blocking in subthread with proper synchronization
+                start_event = threading.Event()
+                def start_process():
+                    try:
+                        self._process.start()
+                        start_event.set()
+                    except Exception as e:
+                        print(f"Error starting process: {e}")
+                        start_event.set()
+                
+                threading.Thread(target=start_process, daemon=True).start()
+                # Wait for process to start or timeout after reasonable delay
+                start_event.wait(timeout=0.1)  # 100ms should be sufficient
                 return True
         return False
 
