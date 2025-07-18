@@ -20,6 +20,7 @@ from .ui.QFaceSwapDFM import QFaceSwapDFM
 from .ui.QFileSource import QFileSource
 from .ui.QFrameAdjuster import QFrameAdjuster
 from .ui.QStreamOutput import QStreamOutput
+from .ui.QVoiceChanger import QVoiceChanger
 from .ui.widgets.QBCFaceAlignViewer import QBCFaceAlignViewer
 from .ui.widgets.QBCFaceSwapViewer import QBCFaceSwapViewer
 from .ui.widgets.QBCFrameViewer import QBCFrameViewer
@@ -67,7 +68,11 @@ class QLiveSwap(qtx.QXWidget):
         from .backend.EnhancedStreamOutput import EnhancedStreamOutput
         stream_output  = self.stream_output  = EnhancedStreamOutput (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_merger_bc_out, save_default_path=userdata_path, backend_db=backend_db)
 
-        self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output]
+        # Add voice changer backend
+        from .backend.VoiceChanger import VoiceChanger
+        voice_changer = self.voice_changer = VoiceChanger(weak_heap=backend_weak_heap, backend_db=backend_db)
+
+        self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output, voice_changer]
 
         self.q_file_source    = QFileSource(self.file_source)
         self.q_camera_source  = QCameraSource(self.camera_source)
@@ -83,6 +88,9 @@ class QLiveSwap(qtx.QXWidget):
         # Use enhanced streaming output UI
         from .ui.QEnhancedStreamOutput import QEnhancedStreamOutput
         self.q_stream_output  = QEnhancedStreamOutput(self.stream_output)
+        
+        # Add voice changer UI
+        self.q_voice_changer = QVoiceChanger(self.voice_changer)
 
         self.q_ds_frame_viewer = QBCFrameViewer(backend_weak_heap, multi_sources_bc_out)
         self.q_ds_fa_viewer    = QBCFaceAlignViewer(backend_weak_heap, face_aligner_bc_out, preview_width=256)
@@ -93,6 +101,7 @@ class QLiveSwap(qtx.QXWidget):
                                         qtx.QXWidgetVBox([self.q_face_detector,  self.q_face_aligner,  ], spacing=5, fixed_width=256),
                                         qtx.QXWidgetVBox([self.q_face_marker, self.q_face_animator, self.q_face_swap_insight, self.q_face_swap_dfm], spacing=5, fixed_width=256),
                                         qtx.QXWidgetVBox([self.q_frame_adjuster, self.q_face_merger, self.q_stream_output], spacing=5, fixed_width=256),
+                                        qtx.QXWidgetVBox([self.q_voice_changer], spacing=5, fixed_width=300),
                                     ], spacing=5, size_policy=('fixed', 'fixed') )
 
         q_view_nodes = qtx.QXWidgetHBox([   (qtx.QXWidgetVBox([self.q_ds_frame_viewer], fixed_width=256), qtx.AlignTop),
