@@ -2,6 +2,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+# PyQt5 uses direct enum access - no need for aliases
+main
 AlignLeft = Qt.AlignLeft
 AlignLeading = Qt.AlignLeading
 AlignRight = Qt.AlignRight
