@@ -5,7 +5,7 @@ Replaces wildcard imports with specific imports and lazy loading for better perf
 """
 
 # Import only essential Qt components at module level
-from PyQt6.QtCore import (
+from PyQt5.QtCore import (
     Qt, QTimer, QTimeLine, QObject, QThread, pyqtSignal, pyqtSlot,
     QRect, QRectF, QPoint, QPointF, QSize, QSizeF,
     QMargins, QMarginsF, QUrl, QDateTime, QDate, QTime,
@@ -13,14 +13,14 @@ from PyQt6.QtCore import (
     QAbstractAnimation, QSequentialAnimationGroup, QParallelAnimationGroup
 )
 
-from PyQt6.QtGui import (
+from PyQt5.QtGui import (
     QIcon, QPixmap, QImage, QPainter, QPen, QBrush, QColor, QFont,
     QFontMetrics, QPalette, QLinearGradient, QRadialGradient,
     QKeySequence, QAction, QMouseEvent, QKeyEvent, QPaintEvent,
     QResizeEvent, QCloseEvent, QShowEvent, QHideEvent
 )
 
-from PyQt6.QtWidgets import (
+from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QFrame, QLabel, QPushButton,
     QLineEdit, QTextEdit, QComboBox, QSpinBox, QDoubleSpinBox,
     QCheckBox, QRadioButton, QSlider, QProgressBar, QScrollArea,
@@ -31,20 +31,20 @@ from PyQt6.QtWidgets import (
 )
 
 # Alignment constants (optimized)
-AlignLeft = Qt.AlignmentFlag.AlignLeft
-AlignLeading = Qt.AlignmentFlag.AlignLeading
-AlignRight = Qt.AlignmentFlag.AlignRight
-AlignTrailing = Qt.AlignmentFlag.AlignTrailing
-AlignHCenter = Qt.AlignmentFlag.AlignHCenter
-AlignJustify = Qt.AlignmentFlag.AlignJustify
-AlignAbsolute = Qt.AlignmentFlag.AlignAbsolute
-AlignHorizontal_Mask = Qt.AlignmentFlag.AlignHorizontal_Mask
-AlignTop = Qt.AlignmentFlag.AlignTop
-AlignBottom = Qt.AlignmentFlag.AlignBottom
-AlignVCenter = Qt.AlignmentFlag.AlignVCenter
-AlignVertical_Mask = Qt.AlignmentFlag.AlignVertical_Mask
-AlignCenter = Qt.AlignmentFlag.AlignCenter
-AlignBaseline = Qt.AlignmentFlag.AlignBaseline
+AlignLeft = Qt.AlignLeft
+AlignLeading = Qt.AlignLeading
+AlignRight = Qt.AlignRight
+AlignTrailing = Qt.AlignTrailing
+AlignHCenter = Qt.AlignHCenter
+AlignJustify = Qt.AlignJustify
+AlignAbsolute = Qt.AlignAbsolute
+AlignHorizontal_Mask = Qt.AlignHorizontal_Mask
+AlignTop = Qt.AlignTop
+AlignBottom = Qt.AlignBottom
+AlignVCenter = Qt.AlignVCenter
+AlignVertical_Mask = Qt.AlignVertical_Mask
+AlignCenter = Qt.AlignCenter
+AlignBaseline = Qt.AlignBaseline
 
 # Lazy loading for heavy custom widgets
 _custom_widgets = {}

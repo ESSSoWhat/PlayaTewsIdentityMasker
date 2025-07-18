@@ -11,7 +11,11 @@ numpy>=1.21.0,<1.28.0
 opencv-python>=4.5.0,<4.10.0
 opencv-contrib-python>=4.5.0,<4.10.0
 
+ cursor/plan-voice-changer-integration-strategy-a035
+
+=======
 # GUI Framework (Standardized on PyQt5)
+ main
 PyQt5>=5.15.0,<5.16.0
 
 # System monitoring and utilities

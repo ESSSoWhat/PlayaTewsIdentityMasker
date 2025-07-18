@@ -1,6 +1,6 @@
-# from PyQt6.QtCore import *
-# from PyQt6.QtGui import *
-# from PyQt6.QtWidgets import *
+# from PyQt5.QtCore import *
+# from PyQt5.QtGui import *
+# from PyQt5.QtWidgets import *
 
 # #from localization import StringsDB
 # from .QXMainWindow import *
@@ -204,7 +204,7 @@
 
 #         main_l = QXGridLayout( contents_margins=0 )
 
-#         main_l.addWidget(btn, 0, 0, alignment=Qt.AlignmentFlag.AlignLeft)
+#         main_l.addWidget(btn, 0, 0, alignment=Qt.AlignLeft)
 #         main_l.addWidget(QXHorizontalLine() , 0, 1)
 
 #         main_l.addWidget(frame, 1, 0, 1, 2)

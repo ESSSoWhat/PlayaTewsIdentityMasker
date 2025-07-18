@@ -135,7 +135,7 @@ def demo_technical_specs():
         ("VAD", "WebRTC Voice Activity Detection"),
         ("Audio I/O", "PyAudio"),
         ("Effects Engine", "Custom DSP algorithms"),
-        ("UI Framework", "PyQt6")
+        ("UI Framework", "PyQt5")
     ]
     
     for spec_name, spec_value in specs:

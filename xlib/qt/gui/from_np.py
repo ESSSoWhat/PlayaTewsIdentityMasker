@@ -1,7 +1,7 @@
 from typing import Union
 
 import numpy as np
-from PyQt6.QtGui import *
+from PyQt5.QtGui import *
 
 from ...image import ImageProcessor, get_NHWC_shape
 
