@@ -1,8 +1,8 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
                              QLabel, QSlider, QComboBox, QCheckBox, QSpinBox,
                              QDoubleSpinBox, QPushButton, QTabWidget, QGridLayout)
-from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QFont, QPalette, QColor
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QFont, QPalette, QColor
 
 from .widgets.QComboBoxCSWDynamicSingleSwitch import QComboBoxCSWDynamicSingleSwitch
 from .widgets.QCheckBoxCSWFlag import QCheckBoxCSWFlag
@@ -26,7 +26,7 @@ class QVoiceChanger(QWidget):
         title_font.setPointSize(14)
         title_font.setBold(True)
         title_label.setFont(title_font)
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label.setAlignment(Qt.AlignCenter)
         main_layout.addWidget(title_label)
         
         # Create tab widget for different effect categories

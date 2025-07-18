@@ -1,4 +1,4 @@
-from PyQt6.QtGui import *
+from PyQt5.QtGui import *
 
 from .QXImage import QXImage
 from .QXPixmap import QXPixmap

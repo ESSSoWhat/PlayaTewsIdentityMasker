@@ -1,21 +1,21 @@
-from PyQt6.QtCore import *
-from PyQt6.QtGui import *
-from PyQt6.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
-AlignLeft = Qt.AlignmentFlag.AlignLeft
-AlignLeading = Qt.AlignmentFlag.AlignLeading
-AlignRight = Qt.AlignmentFlag.AlignRight
-AlignTrailing = Qt.AlignmentFlag.AlignTrailing
-AlignHCenter = Qt.AlignmentFlag.AlignHCenter
-AlignJustify = Qt.AlignmentFlag.AlignJustify
-AlignAbsolute = Qt.AlignmentFlag.AlignAbsolute
-AlignHorizontal_Mask = Qt.AlignmentFlag.AlignHorizontal_Mask
-AlignTop = Qt.AlignmentFlag.AlignTop
-AlignBottom = Qt.AlignmentFlag.AlignBottom
-AlignVCenter = Qt.AlignmentFlag.AlignVCenter
-AlignVertical_Mask = Qt.AlignmentFlag.AlignVertical_Mask
-AlignCenter = Qt.AlignmentFlag.AlignCenter
-AlignBaseline = Qt.AlignmentFlag.AlignBaseline
+AlignLeft = Qt.AlignLeft
+AlignLeading = Qt.AlignLeading
+AlignRight = Qt.AlignRight
+AlignTrailing = Qt.AlignTrailing
+AlignHCenter = Qt.AlignHCenter
+AlignJustify = Qt.AlignJustify
+AlignAbsolute = Qt.AlignAbsolute
+AlignHorizontal_Mask = Qt.AlignHorizontal_Mask
+AlignTop = Qt.AlignTop
+AlignBottom = Qt.AlignBottom
+AlignVCenter = Qt.AlignVCenter
+AlignVertical_Mask = Qt.AlignVertical_Mask
+AlignCenter = Qt.AlignCenter
+AlignBaseline = Qt.AlignBaseline
 
 from .core.QXTimeLine import QXTimeLine
 from .core.QXTimer import QXTimer

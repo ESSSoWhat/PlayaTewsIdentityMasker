@@ -1,6 +1,6 @@
-from PyQt6.QtCore import *
-from PyQt6.QtGui import *
-from PyQt6.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from .QXFrame import QXFrame
 from .QXHBoxLayout import QXHBoxLayout
@@ -36,14 +36,14 @@ class QXCollapsibleSection(QXFrame):
         frame = self.frame = QXFrame(layout=content_layout, size_policy=(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding), hided=True)
 
         if vertical:
-            main_l = QXHBoxLayout([ ( QXFrameVBox([ (btn, Qt.AlignmentFlag.AlignTop),
-                                                    (label_title, Qt.AlignmentFlag.AlignCenter)
-                                                  ], size_policy=('fixed', 'fixed') ), Qt.AlignmentFlag.AlignTop),
+            main_l = QXHBoxLayout([ ( QXFrameVBox([ (btn, Qt.AlignTop),
+                                                    (label_title, Qt.AlignCenter)
+                                                  ], size_policy=('fixed', 'fixed') ), Qt.AlignTop),
                                     frame])
         else:
-            main_l = QXVBoxLayout( [ ( QXFrameHBox([ (btn, Qt.AlignmentFlag.AlignTop),
-                                                     (label_title, Qt.AlignmentFlag.AlignCenter)
-                                                   ], size_policy=('fixed', 'fixed')) , Qt.AlignmentFlag.AlignTop),
+            main_l = QXVBoxLayout( [ ( QXFrameHBox([ (btn, Qt.AlignTop),
+                                                     (label_title, Qt.AlignCenter)
+                                                   ], size_policy=('fixed', 'fixed')) , Qt.AlignTop),
                                     frame])
         super().__init__(layout=main_l)
 

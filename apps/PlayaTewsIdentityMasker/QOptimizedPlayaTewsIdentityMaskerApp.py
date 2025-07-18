@@ -561,7 +561,7 @@ class QOptimizedDFLAppWindow(qtx.QXWindow):
             stats_text = "\n".join([f"{k}: {v}" for k, v in stats.items()])
             
             # Show in a simple dialog
-            from PyQt6.QtWidgets import QMessageBox
+            from PyQt5.QtWidgets import QMessageBox
             msg = QMessageBox()
             msg.setWindowTitle("Performance Statistics")
             msg.setText(stats_text)
