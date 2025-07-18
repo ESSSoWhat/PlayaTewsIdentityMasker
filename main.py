@@ -96,6 +96,22 @@ Examples:
                 # Set default CUDA behavior
                 os.environ['NO_CUDA'] = str(args.no_cuda).lower()
 
+ cursor/create-obs-inspired-streaming-interface-da73
+        if args.obs_style:
+            print('Running OBS-Style DeepFaceLive.')
+            from apps.DeepFaceLive.OBSStyleApp import OBSStyleDeepFaceLiveApp
+            OBSStyleDeepFaceLiveApp(userdata_path=userdata_path).run()
+        else:
+            print('Running DeepFaceLive.')
+            from apps.DeepFaceLive.DeepFaceLiveApp import DeepFaceLiveApp
+            DeepFaceLiveApp(userdata_path=userdata_path).run()
+
+    p = run_subparsers.add_parser('DeepFaceLive')
+    p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
+    p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
+    p.add_argument('--obs-style', action="store_true", default=False, help="Use OBS Studio-style interface with streaming capabilities.")
+    p.set_defaults(func=run_DeepFaceLive)
+=======
             logger.info(f"🚀 Starting PlayaTewsIdentityMasker with userdata: {userdata_path}")
             
             try:
@@ -135,6 +151,7 @@ Examples:
                 logger.warning(f"Could not import xlib.appargs: {e}")
                 # Set default CUDA behavior
                 os.environ['NO_CUDA'] = str(args.no_cuda).lower()
+ main
 
             logger.info(f"🚀 Starting PlayaTewsIdentityMasker with OBS-style UI: {userdata_path}")
             
