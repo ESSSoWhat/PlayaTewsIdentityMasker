@@ -1,14 +1,14 @@
- cursor/create-obs-inspired-streaming-interface-da73
-# DeepFaceLive - Professional Streaming Edition
+# PlayaTewsIdentityMasker - Professional Face-Swapping & Streaming
 
-🔥 Real-time face swapping in live video streams  
-🎯 High-quality DeepFake technology  
-🎥 **NEW**: OBS Studio-style interface with multi-platform streaming  
-📹 **NEW**: Professional recording and scene management  
+🔥 Real-time face swapping with professional streaming capabilities  
+🎯 High-quality face processing technology  
+🎥 **OBS Studio-style interface** - Now the primary interface!  
+📹 **Multi-platform streaming** to Twitch, YouTube, Facebook  
+🎬 **Professional recording** and scene management  
 
-## ✨ New OBS-Style Interface
+## 🚀 OBS-Style Interface (Primary)
 
-Transform your DeepFaceLive experience with our professional streaming interface inspired by OBS Studio!
+PlayaTewsIdentityMasker now features a professional streaming interface inspired by OBS Studio as the main interface!
 
 ### 🚀 Key Features
 
@@ -20,21 +20,27 @@ Transform your DeepFaceLive experience with our professional streaming interface
 
 ## 🎮 Quick Start
 
-### Launch OBS-Style Interface
+### Primary Launch Methods (OBS-Style Interface)
 
 ```bash
-# Easy launch with dedicated script
-python launch_obs_style.py
+# Simplest way - Quick launcher
+python launch.py
 
-# Or use the main application
-python main.py run DeepFaceLive --obs-style
+# Primary OBS-style launcher with options
+python run_obs_style.py
+
+# Using main script (OBS is now default)
+python main.py run PlayaTewsIdentityMasker
 ```
 
-### Traditional Interface
+### Legacy Traditional Interface
 
 ```bash
-# Standard DeepFaceLive interface
-python main.py run DeepFaceLive
+# Traditional interface (legacy mode)
+python run_obs_style.py --traditional
+
+# Or using main script
+python main.py run PlayaTewsIdentityMaskerTraditional
 ```
 
 ## 📋 System Requirements
