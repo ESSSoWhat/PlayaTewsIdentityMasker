@@ -1428,4 +1428,265 @@ class Localization:
                 'it-IT' : 'Faccia allineata e scambiata',
                 'ja-JP' : 'アライン済の顔と合成される顔',
                 'de-DE' : 'Ausgerichtete und getauschte Gesichter'},
+
+    'QEnhancedRecorder.module_title':{
+                'en-US' : 'Enhanced Recorder',
+                'ru-RU' : 'Улучшенный рекордер',
+                'zh-CN' : '增强录制器',
+                'es-ES' : 'Grabador mejorado',
+                'it-IT' : 'Registratore avanzato',
+                'ja-JP' : '拡張レコーダー',
+                'de-DE' : 'Erweiterter Recorder'},
+
+    'QEnhancedRecorder.auto_start_recording':{
+                'en-US' : 'Auto start recording',
+                'ru-RU' : 'Автоматический запуск записи',
+                'zh-CN' : '自动开始录制',
+                'es-ES' : 'Inicio automático de grabación',
+                'it-IT' : 'Avvio automatico registrazione',
+                'ja-JP' : '自動録画開始',
+                'de-DE' : 'Automatische Aufnahme starten'},
+
+    'QEnhancedRecorder.recording_format':{
+                'en-US' : 'Recording format',
+                'ru-RU' : 'Формат записи',
+                'zh-CN' : '录制格式',
+                'es-ES' : 'Formato de grabación',
+                'it-IT' : 'Formato registrazione',
+                'ja-JP' : '録画フォーマット',
+                'de-DE' : 'Aufnahmeformat'},
+
+    'QEnhancedRecorder.recording_quality':{
+                'en-US' : 'Recording quality',
+                'ru-RU' : 'Качество записи',
+                'zh-CN' : '录制质量',
+                'es-ES' : 'Calidad de grabación',
+                'it-IT' : 'Qualità registrazione',
+                'ja-JP' : '録画品質',
+                'de-DE' : 'Aufnahmequalität'},
+
+    'QEnhancedRecorder.recording_duration':{
+                'en-US' : 'Recording duration',
+                'ru-RU' : 'Продолжительность записи',
+                'zh-CN' : '录制时长',
+                'es-ES' : 'Duración de grabación',
+                'it-IT' : 'Durata registrazione',
+                'ja-JP' : '録画時間',
+                'de-DE' : 'Aufnahmedauer'},
+
+    'QEnhancedRecorder.recording_fps':{
+                'en-US' : 'Recording FPS',
+                'ru-RU' : 'FPS записи',
+                'zh-CN' : '录制帧率',
+                'es-ES' : 'FPS de grabación',
+                'it-IT' : 'FPS registrazione',
+                'ja-JP' : '録画FPS',
+                'de-DE' : 'Aufnahme-FPS'},
+
+    'QEnhancedRecorder.is_recording':{
+                'en-US' : 'Is recording',
+                'ru-RU' : 'Идет запись',
+                'zh-CN' : '正在录制',
+                'es-ES' : 'Está grabando',
+                'it-IT' : 'Sta registrando',
+                'ja-JP' : '録画中',
+                'de-DE' : 'Wird aufgenommen'},
+
+    'QFileSource.frame_index':{
+                'en-US' : 'Frame index',
+                'ru-RU' : 'Индекс кадра',
+                'zh-CN' : '帧索引',
+                'es-ES' : 'Índice de frame',
+                'it-IT' : 'Indice frame',
+                'ja-JP' : 'フレームインデックス',
+                'de-DE' : 'Frame-Index'},
+
+    'QFileSource.frame_count':{
+                'en-US' : 'Frame count',
+                'ru-RU' : 'Количество кадров',
+                'zh-CN' : '帧数',
+                'es-ES' : 'Conteo de frames',
+                'it-IT' : 'Conteggio frame',
+                'ja-JP' : 'フレーム数',
+                'de-DE' : 'Frame-Anzahl'},
+
+    'QFaceAnimator.anim_mode':{
+                'en-US' : 'Animation mode',
+                'ru-RU' : 'Режим анимации',
+                'zh-CN' : '动画模式',
+                'es-ES' : 'Modo de animación',
+                'it-IT' : 'Modalità animazione',
+                'ja-JP' : 'アニメーションモード',
+                'de-DE' : 'Animationsmodus'},
+
+    'QFaceAnimator.run':{
+                'en-US' : 'Run',
+                'ru-RU' : 'Запустить',
+                'zh-CN' : '运行',
+                'es-ES' : 'Ejecutar',
+                'it-IT' : 'Esegui',
+                'ja-JP' : '実行',
+                'de-DE' : 'Ausführen'},
+
+    'QFaceSwapInsight.swap_mode':{
+                'en-US' : 'Swap mode',
+                'ru-RU' : 'Режим замены',
+                'zh-CN' : '交换模式',
+                'es-ES' : 'Modo de intercambio',
+                'it-IT' : 'Modalità scambio',
+                'ja-JP' : 'スワップモード',
+                'de-DE' : 'Tauschmodus'},
+
+    'QMaskManager.mask_type':{
+                'en-US' : 'Mask type',
+                'ru-RU' : 'Тип маски',
+                'zh-CN' : '遮罩类型',
+                'es-ES' : 'Tipo de máscara',
+                'it-IT' : 'Tipo maschera',
+                'ja-JP' : 'マスクタイプ',
+                'de-DE' : 'Maskentyp'},
+
+    'QMaskManager.mask_intensity':{
+                'en-US' : 'Mask intensity',
+                'ru-RU' : 'Интенсивность маски',
+                'zh-CN' : '遮罩强度',
+                'es-ES' : 'Intensidad de máscara',
+                'it-IT' : 'Intensità maschera',
+                'ja-JP' : 'マスク強度',
+                'de-DE' : 'Maskenintensität'},
+
+    'QMaskManager.custom_mask_path':{
+                'en-US' : 'Custom mask path',
+                'ru-RU' : 'Путь к пользовательской маске',
+                'zh-CN' : '自定义遮罩路径',
+                'es-ES' : 'Ruta de máscara personalizada',
+                'it-IT' : 'Percorso maschera personalizzata',
+                'ja-JP' : 'カスタムマスクパス',
+                'de-DE' : 'Benutzerdefinierter Maskenpfad'},
+
+    'QMaskManager.upload_mask':{
+                'en-US' : 'Upload mask',
+                'ru-RU' : 'Загрузить маску',
+                'zh-CN' : '上传遮罩',
+                'es-ES' : 'Subir máscara',
+                'it-IT' : 'Carica maschera',
+                'ja-JP' : 'マスクアップロード',
+                'de-DE' : 'Maske hochladen'},
+
+    'QMaskManager.module_title':{
+                'en-US' : 'Mask Manager',
+                'ru-RU' : 'Менеджер масок',
+                'zh-CN' : '遮罩管理器',
+                'es-ES' : 'Gestor de máscaras',
+                'it-IT' : 'Gestore maschere',
+                'ja-JP' : 'マスクマネージャー',
+                'de-DE' : 'Masken-Manager'},
+
+    'QMultiPlatformStreamer.avg_fps':{
+                'en-US' : 'Average FPS',
+                'ru-RU' : 'Средний FPS',
+                'zh-CN' : '平均帧率',
+                'es-ES' : 'FPS promedio',
+                'it-IT' : 'FPS medio',
+                'ja-JP' : '平均FPS',
+                'de-DE' : 'Durchschnittliche FPS'},
+
+    'QMultiPlatformStreamer.enable_obs_virtual_camera':{
+                'en-US' : 'Enable OBS Virtual Camera',
+                'ru-RU' : 'Включить OBS Virtual Camera',
+                'zh-CN' : '启用OBS虚拟摄像头',
+                'es-ES' : 'Habilitar cámara virtual OBS',
+                'it-IT' : 'Abilita webcam virtuale OBS',
+                'ja-JP' : 'OBS仮想カメラを有効化',
+                'de-DE' : 'OBS Virtual Camera aktivieren'},
+
+    'QMultiPlatformStreamer.enable_obs_ndi':{
+                'en-US' : 'Enable OBS NDI',
+                'ru-RU' : 'Включить OBS NDI',
+                'zh-CN' : '启用OBS NDI',
+                'es-ES' : 'Habilitar OBS NDI',
+                'it-IT' : 'Abilita OBS NDI',
+                'ja-JP' : 'OBS NDIを有効化',
+                'de-DE' : 'OBS NDI aktivieren'},
+
+    'QMultiPlatformStreamer.enable_discord':{
+                'en-US' : 'Enable Discord',
+                'ru-RU' : 'Включить Discord',
+                'zh-CN' : '启用Discord',
+                'es-ES' : 'Habilitar Discord',
+                'it-IT' : 'Abilita Discord',
+                'ja-JP' : 'Discordを有効化',
+                'de-DE' : 'Discord aktivieren'},
+
+    'QMultiPlatformStreamer.enable_zoom':{
+                'en-US' : 'Enable Zoom',
+                'ru-RU' : 'Включить Zoom',
+                'zh-CN' : '启用Zoom',
+                'es-ES' : 'Habilitar Zoom',
+                'it-IT' : 'Abilita Zoom',
+                'ja-JP' : 'Zoomを有効化',
+                'de-DE' : 'Zoom aktivieren'},
+
+    'QMultiPlatformStreamer.enable_teams':{
+                'en-US' : 'Enable Teams',
+                'ru-RU' : 'Включить Teams',
+                'zh-CN' : '启用Teams',
+                'es-ES' : 'Habilitar Teams',
+                'it-IT' : 'Abilita Teams',
+                'ja-JP' : 'Teamsを有効化',
+                'de-DE' : 'Teams aktivieren'},
+
+    'QMultiPlatformStreamer.enable_skype':{
+                'en-US' : 'Enable Skype',
+                'ru-RU' : 'Включить Skype',
+                'zh-CN' : '启用Skype',
+                'es-ES' : 'Habilitar Skype',
+                'it-IT' : 'Abilita Skype',
+                'ja-JP' : 'Skypeを有効化',
+                'de-DE' : 'Skype aktivieren'},
+
+    'QMultiPlatformStreamer.enable_custom_rtmp':{
+                'en-US' : 'Enable Custom RTMP',
+                'ru-RU' : 'Включить пользовательский RTMP',
+                'zh-CN' : '启用自定义RTMP',
+                'es-ES' : 'Habilitar RTMP personalizado',
+                'it-IT' : 'Abilita RTMP personalizzato',
+                'ja-JP' : 'カスタムRTMPを有効化',
+                'de-DE' : 'Benutzerdefiniertes RTMP aktivieren'},
+
+    'QMultiPlatformStreamer.enable_custom_udp':{
+                'en-US' : 'Enable Custom UDP',
+                'ru-RU' : 'Включить пользовательский UDP',
+                'zh-CN' : '启用自定义UDP',
+                'es-ES' : 'Habilitar UDP personalizado',
+                'it-IT' : 'Abilita UDP personalizzato',
+                'ja-JP' : 'カスタムUDPを有効化',
+                'de-DE' : 'Benutzerdefiniertes UDP aktivieren'},
+
+    'QMultiPlatformStreamer.custom_rtmp_url':{
+                'en-US' : 'Custom RTMP URL',
+                'ru-RU' : 'Пользовательский RTMP URL',
+                'zh-CN' : '自定义RTMP URL',
+                'es-ES' : 'URL RTMP personalizado',
+                'it-IT' : 'URL RTMP personalizzato',
+                'ja-JP' : 'カスタムRTMP URL',
+                'de-DE' : 'Benutzerdefinierte RTMP-URL'},
+
+    'QMultiPlatformStreamer.custom_udp_addr':{
+                'en-US' : 'Custom UDP Address',
+                'ru-RU' : 'Пользовательский UDP адрес',
+                'zh-CN' : '自定义UDP地址',
+                'es-ES' : 'Dirección UDP personalizada',
+                'it-IT' : 'Indirizzo UDP personalizzato',
+                'ja-JP' : 'カスタムUDPアドレス',
+                'de-DE' : 'Benutzerdefinierte UDP-Adresse'},
+
+    'QMultiPlatformStreamer.module_title':{
+                'en-US' : 'Multi-Platform Streamer',
+                'ru-RU' : 'Мультиплатформенный стример',
+                'zh-CN' : '多平台流媒体',
+                'es-ES' : 'Transmisor multiplataforma',
+                'it-IT' : 'Streamer multi-piattaforma',
+                'ja-JP' : 'マルチプラットフォームストリーマー',
+                'de-DE' : 'Multi-Plattform-Streamer'},
     }
