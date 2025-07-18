@@ -680,7 +680,7 @@ class Sheet:
 
 
 class WorkerState(BackendWorkerState):
-    source_type : SourceType = None
+    source_type : SourceType = SourceType.SOURCE_FRAME
     is_showing_window : bool = None
     aligned_face_id : int = None
     target_delay : int = None
