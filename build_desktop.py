@@ -45,11 +45,11 @@ datas = [
 # Collect all necessary binaries
 binaries = []
 
-# Hidden imports for PyQt5 and ML libraries
+# Hidden imports for PyQt6 and ML libraries
 hiddenimports = [
-    'PyQt5.QtCore',
-    'PyQt5.QtGui', 
-    'PyQt5.QtWidgets',
+    'PyQt6.QtCore',
+    'PyQt6.QtGui', 
+    'PyQt6.QtWidgets',
     'onnxruntime',
     'torch',
     'torchvision',

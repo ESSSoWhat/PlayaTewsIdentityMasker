@@ -2,9 +2,9 @@ from pathlib import Path
 from typing import List, Dict, Optional
 import cv2
 import numpy as np
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QPalette, QColor, QFont, QIcon
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, 
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QPalette, QColor, QFont, QIcon
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, 
                             QPushButton, QLabel, QComboBox, QSpinBox, QLineEdit,
                             QCheckBox, QGroupBox, QTabWidget, QSplitter, 
                             QListWidget, QListWidgetItem, QSlider, QFrame,
