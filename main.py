@@ -95,23 +95,6 @@ Examples:
                 logger.warning(f"Could not import xlib.appargs: {e}")
                 # Set default CUDA behavior
                 os.environ['NO_CUDA'] = str(args.no_cuda).lower()
-
- cursor/create-obs-inspired-streaming-interface-da73
-        if args.obs_style:
-            print('Running OBS-Style DeepFaceLive.')
-            from apps.DeepFaceLive.OBSStyleApp import OBSStyleDeepFaceLiveApp
-            OBSStyleDeepFaceLiveApp(userdata_path=userdata_path).run()
-        else:
-            print('Running DeepFaceLive.')
-            from apps.DeepFaceLive.DeepFaceLiveApp import DeepFaceLiveApp
-            DeepFaceLiveApp(userdata_path=userdata_path).run()
-
-    p = run_subparsers.add_parser('DeepFaceLive')
-    p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
-    p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
-    p.add_argument('--obs-style', action="store_true", default=False, help="Use OBS Studio-style interface with streaming capabilities.")
-    p.set_defaults(func=run_DeepFaceLive)
-=======
             logger.info(f"🚀 Starting PlayaTewsIdentityMasker with userdata: {userdata_path}")
             
             try:
@@ -138,7 +121,7 @@ Examples:
                 sys.exit(1)
 
         def run_PlayaTewsIdentityMaskerOBS(args):
-            """Run OBS-style PlayaTewsIdentityMasker with enhanced error handling"""
+            """Run PlayaTewsIdentityMasker with interface choice (OBS by default, traditional if flagged)"""
             startup_timer.mark_stage("args_parsed")
             
             userdata_path = Path(args.userdata_dir) if args.userdata_dir else Path.cwd()
@@ -151,42 +134,67 @@ Examples:
                 logger.warning(f"Could not import xlib.appargs: {e}")
                 # Set default CUDA behavior
                 os.environ['NO_CUDA'] = str(args.no_cuda).lower()
- main
 
-            logger.info(f"🚀 Starting PlayaTewsIdentityMasker with OBS-style UI: {userdata_path}")
+            # Check if traditional interface is requested
+            use_traditional = getattr(args, 'traditional', False)
+            
+            if use_traditional:
+                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with traditional UI: {userdata_path}")
+                try:
+                    from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
+                    startup_timer.mark_stage("app_imported")
+                    
+                    app = PlayaTewsIdentityMaskerApp(userdata_path=userdata_path)
+                    startup_timer.mark_stage("app_created")
+                    
+                    app.run()
+                    startup_timer.mark_stage("app_completed")
+                except ImportError as e:
+                    logger.error(f"❌ Failed to import PlayaTewsIdentityMaskerApp: {e}")
+                    logger.error("Please ensure all dependencies are installed: pip install -r requirements-unified.txt")
+                    sys.exit(1)
+            else:
+                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with OBS-style streaming interface: {userdata_path}")
+                try:
+                    from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerOBSStyleApp import PlayaTewsIdentityMaskerOBSStyleApp
+                    startup_timer.mark_stage("app_imported")
+                    
+                    app = PlayaTewsIdentityMaskerOBSStyleApp(userdata_path=userdata_path)
+                    startup_timer.mark_stage("app_created")
+                    
+                    app.run()
+                    startup_timer.mark_stage("app_completed")
+                except ImportError as e:
+                    logger.error(f"❌ Failed to import PlayaTewsIdentityMaskerOBSStyleApp: {e}")
+                    logger.error("Please ensure all dependencies are installed: pip install -r requirements-unified.txt")
+                    sys.exit(1)
             
             try:
-                # Lazy import the app
-                from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerOBSStyleApp import PlayaTewsIdentityMaskerOBSStyleApp
-                startup_timer.mark_stage("app_imported")
-                
-                app = PlayaTewsIdentityMaskerOBSStyleApp(userdata_path=userdata_path)
-                startup_timer.mark_stage("app_created")
-                
-                app.run()
-                startup_timer.mark_stage("app_completed")
-                
                 # Log startup performance
                 summary = startup_timer.get_summary()
                 logger.info(f"📊 Startup performance: {summary}")
                 
-            except ImportError as e:
-                logger.error(f"❌ Failed to import PlayaTewsIdentityMaskerOBSStyleApp: {e}")
-                logger.error("Please ensure all dependencies are installed: pip install -r requirements-unified.txt")
-                sys.exit(1)
             except Exception as e:
                 logger.error(f"❌ Application failed to start: {e}")
                 sys.exit(1)
 
-        # Standard app parser
-        p = run_subparsers.add_parser('PlayaTewsIdentityMasker', help="Run standard PlayaTewsIdentityMasker")
+        # Primary OBS-style app parser (now the main interface)
+        p = run_subparsers.add_parser('PlayaTewsIdentityMasker', help="Run PlayaTewsIdentityMasker with OBS-style streaming interface")
+        p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
+        p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
+        p.add_argument('--verbose', '-v', action="store_true", default=False, help="Enable verbose logging.")
+        p.add_argument('--traditional', action="store_true", default=False, help="Use traditional interface instead of OBS-style.")
+        p.set_defaults(func=run_PlayaTewsIdentityMaskerOBS)
+
+        # Legacy traditional app parser (for backward compatibility)
+        p = run_subparsers.add_parser('PlayaTewsIdentityMaskerTraditional', help="Run PlayaTewsIdentityMasker with traditional UI (legacy)")
         p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
         p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
         p.add_argument('--verbose', '-v', action="store_true", default=False, help="Enable verbose logging.")
         p.set_defaults(func=run_PlayaTewsIdentityMasker)
 
-        # OBS-style app parser
-        p = run_subparsers.add_parser('PlayaTewsIdentityMaskerOBS', help="Run PlayaTewsIdentityMasker with OBS-style UI")
+        # Alias for OBS-style (backward compatibility)
+        p = run_subparsers.add_parser('PlayaTewsIdentityMaskerOBS', help="Run PlayaTewsIdentityMasker with OBS-style UI (alias)")
         p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
         p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
         p.add_argument('--verbose', '-v', action="store_true", default=False, help="Enable verbose logging.")
