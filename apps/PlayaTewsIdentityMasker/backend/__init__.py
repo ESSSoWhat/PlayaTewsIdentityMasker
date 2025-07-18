@@ -12,3 +12,4 @@ from .FaceSwapDFM import FaceSwapDFM
 from .FileSource import FileSource
 from .FrameAdjuster import FrameAdjuster
 from .StreamOutput import StreamOutput
+from .VoiceChanger import VoiceChanger
