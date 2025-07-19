@@ -26,6 +26,7 @@ class WebTranslator:
     
     def __init__(self):
         self.translation_history = []
+        self.temporary_files = []  # Track temporary files for cleanup
         self.supported_languages = {
             'auto': 'Auto-detect',
             'en': 'English',
@@ -154,21 +155,75 @@ class WebTranslator:
 
     def generate_tts(self, text: str, lang: str) -> str:
         """Generate TTS audio file and return path."""
+        temp_path = None
         try:
-            # Create temporary file
-            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp3')
-            temp_path = temp_file.name
-            temp_file.close()
+            # Validate input parameters
+            if not text or not text.strip():
+                raise ValueError("Text cannot be empty")
+            
+            if not lang or not lang.strip():
+                raise ValueError("Language code cannot be empty")
+            
+            # Validate language code format (basic check)
+            if not lang.isalpha() or len(lang) > 10:
+                raise ValueError("Invalid language code format")
+            
+            # Create temporary file in a secure location with proper permissions
+            import tempfile
+            import os
+            
+            # Use mkstemp for secure temporary file creation
+            temp_fd, temp_path = tempfile.mkstemp(suffix='.mp3', prefix='tts_', dir=None)
+            os.close(temp_fd)  # Close the file descriptor
+            
+            # Validate the created path is within expected bounds
+            temp_dir = os.path.dirname(temp_path)
+            if not temp_dir.startswith(tempfile.gettempdir()):
+                raise ValueError("Temporary file created outside expected directory")
             
             # Generate TTS
             tts = gTTS(text=text, lang=lang, slow=False)
             tts.save(temp_path)
             
+            # Verify file was created and has content
+            if not os.path.exists(temp_path) or os.path.getsize(temp_path) == 0:
+                raise RuntimeError("TTS file was not created or is empty")
+            
+            # Track the temporary file for cleanup
+            self.temporary_files.append(temp_path)
+            
             return temp_path
             
         except Exception as e:
+            # Clean up temporary file if it was created
+            if temp_path and os.path.exists(temp_path):
+                try:
+                    os.unlink(temp_path)
+                except OSError:
+                    pass  # Ignore cleanup errors
+            
             logger.error(f"TTS generation failed: {e}")
             return None
+
+    def cleanup_temporary_files(self):
+        """Clean up all temporary files created by this instance."""
+        cleaned_count = 0
+        for temp_file in self.temporary_files[:]:  # Copy list to avoid modification during iteration
+            try:
+                if os.path.exists(temp_file):
+                    os.unlink(temp_file)
+                    cleaned_count += 1
+            except OSError as e:
+                logger.warning(f"Failed to clean up temporary file {temp_file}: {e}")
+            finally:
+                self.temporary_files.remove(temp_file)
+        
+        logger.info(f"Cleaned up {cleaned_count} temporary files")
+        return cleaned_count
+
+    def __del__(self):
+        """Destructor to ensure temporary files are cleaned up."""
+        self.cleanup_temporary_files()
 
     def get_history_display(self) -> str:
         """Get formatted translation history."""
