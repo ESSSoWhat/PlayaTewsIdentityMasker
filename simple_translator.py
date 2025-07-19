@@ -139,17 +139,44 @@ class SimpleTranslator:
         logger.info("Press Ctrl+C to stop")
         
         try:
-            while True:
-                result = self.listen_and_translate(source_lang, target_lang)
-                if result:
-                    print(f"\n{'='*50}")
-                    print(f"Original ({result['source_lang']}): {result['original']}")
-                    print(f"Translation ({result['target_lang']}): {result['translation']}")
-                    print(f"{'='*50}\n")
-                
-                # Small delay before next iteration
-                time.sleep(1)
-                
+            # Add a flag to control the loop
+            running = True
+            consecutive_failures = 0
+            max_failures = 5
+            
+            while running:
+                try:
+                    result = self.listen_and_translate(source_lang, target_lang)
+                    if result:
+                        print(f"\n{'='*50}")
+                        print(f"Original ({result['source_lang']}): {result['original']}")
+                        print(f"Translation ({result['target_lang']}): {result['translation']}")
+                        print(f"{'='*50}\n")
+                        consecutive_failures = 0  # Reset failure counter on success
+                    else:
+                        consecutive_failures += 1
+                        if consecutive_failures >= max_failures:
+                            logger.warning(f"Too many consecutive failures ({consecutive_failures}), stopping translation")
+                            break
+                    
+                    # Use asyncio.sleep for better performance if available
+                    try:
+                        import asyncio
+                        asyncio.sleep(1)
+                    except ImportError:
+                        time.sleep(1)
+                        
+                except KeyboardInterrupt:
+                    logger.info("Translation stopped by user")
+                    break
+                except Exception as e:
+                    logger.error(f"Error in translation loop: {e}")
+                    consecutive_failures += 1
+                    if consecutive_failures >= max_failures:
+                        logger.error(f"Too many consecutive errors ({consecutive_failures}), stopping translation")
+                        break
+                    time.sleep(2)  # Wait longer on errors
+                    
         except KeyboardInterrupt:
             logger.info("Translation stopped by user")
         except Exception as e:
