@@ -39,6 +39,7 @@ class QOBSStyleUI(QWidget):
         self.userdata_path = userdata_path
         self.scenes = []
         self.current_scene = None
+        self.sources_by_scene = {}  # Track sources per scene
         self.streaming_platforms = {
             'twitch': {'name': 'Twitch', 'rtmp': 'rtmp://live.twitch.tv/app/'},
             'youtube': {'name': 'YouTube', 'rtmp': 'rtmp://a.rtmp.youtube.com/live2/'},
@@ -267,6 +268,7 @@ class QOBSStyleUI(QWidget):
         self.stream_key_edit = QLineEdit()
         self.stream_key_edit.setPlaceholderText("Enter your stream key")
         self.stream_key_edit.setEchoMode(QLineEdit.Password)
+        self.stream_key_edit.setMaxLength(100)  # Limit stream key length
         
         platform_layout.addWidget(QLabel("Stream Key:"))
         platform_layout.addWidget(self.stream_key_edit)
@@ -274,6 +276,7 @@ class QOBSStyleUI(QWidget):
         # Custom RTMP URL
         self.custom_rtmp_edit = QLineEdit()
         self.custom_rtmp_edit.setPlaceholderText("rtmp://your-server.com/live/stream-key")
+        self.custom_rtmp_edit.setEnabled(False)  # Initially disabled
         
         platform_layout.addWidget(QLabel("Custom RTMP URL:"))
         platform_layout.addWidget(self.custom_rtmp_edit)
@@ -296,6 +299,7 @@ class QOBSStyleUI(QWidget):
         self.stream_bitrate_spin.setRange(1000, 8000)
         self.stream_bitrate_spin.setValue(2500)
         self.stream_bitrate_spin.setSuffix(" kbps")
+        self.stream_bitrate_spin.setSingleStep(100)  # Step by 100 kbps
         
         stream_settings_layout.addWidget(QLabel("Quality:"), 0, 0)
         stream_settings_layout.addWidget(self.stream_quality_combo, 0, 1)
@@ -347,6 +351,7 @@ class QOBSStyleUI(QWidget):
         self.recording_bitrate_spin.setRange(1000, 50000)
         self.recording_bitrate_spin.setValue(8000)
         self.recording_bitrate_spin.setSuffix(" kbps")
+        self.recording_bitrate_spin.setSingleStep(500)  # Step by 500 kbps
         
         quality_layout.addWidget(QLabel("Quality:"), 0, 0)
         quality_layout.addWidget(self.recording_quality_combo, 0, 1)
@@ -362,7 +367,10 @@ class QOBSStyleUI(QWidget):
         path_layout = QVBoxLayout()
         
         self.recording_path_edit = QLineEdit()
-        self.recording_path_edit.setText(str(self.userdata_path / "recordings"))
+        recording_path = self.userdata_path / "recordings"
+        self.recording_path_edit.setText(str(recording_path))
+        # Ensure the directory exists
+        recording_path.mkdir(parents=True, exist_ok=True)
         
         path_layout.addWidget(QLabel("Save recordings to:"))
         path_layout.addWidget(self.recording_path_edit)
@@ -389,9 +397,12 @@ class QOBSStyleUI(QWidget):
         self.mic_volume_slider = QSlider(Qt.Horizontal)
         self.mic_volume_slider.setRange(0, 100)
         self.mic_volume_slider.setValue(50)
+        self.mic_volume_slider.setTickPosition(QSlider.TicksBelow)
+        self.mic_volume_slider.setTickInterval(10)
         
         self.desktop_audio_checkbox = QCheckBox("Include Desktop Audio")
         self.desktop_audio_checkbox.setChecked(True)
+        self.desktop_audio_checkbox.toggled.connect(self.on_desktop_audio_toggled)
         
         audio_sources_layout.addWidget(QLabel("Microphone Volume:"))
         audio_sources_layout.addWidget(self.mic_volume_slider)
@@ -404,9 +415,12 @@ class QOBSStyleUI(QWidget):
         monitoring_layout = QVBoxLayout()
         
         self.monitor_audio_checkbox = QCheckBox("Monitor Audio Output")
+        self.monitor_audio_checkbox.toggled.connect(self.on_monitor_audio_toggled)
         self.monitor_volume_slider = QSlider(Qt.Horizontal)
         self.monitor_volume_slider.setRange(0, 100)
         self.monitor_volume_slider.setValue(30)
+        self.monitor_volume_slider.setTickPosition(QSlider.TicksBelow)
+        self.monitor_volume_slider.setTickInterval(10)
         
         monitoring_layout.addWidget(self.monitor_audio_checkbox)
         monitoring_layout.addWidget(QLabel("Monitor Volume:"))
@@ -438,6 +452,10 @@ class QOBSStyleUI(QWidget):
         self.output_resolution_combo.addItems(['1920x1080', '1280x720', '854x480'])
         self.output_resolution_combo.setCurrentText('1280x720')
         
+        # Connect resolution changes to validate compatibility
+        self.base_resolution_combo.currentTextChanged.connect(self.on_resolution_changed)
+        self.output_resolution_combo.currentTextChanged.connect(self.on_resolution_changed)
+        
         self.downscale_filter_combo = QComboBox()
         self.downscale_filter_combo.addItems(['Bicubic', 'Bilinear', 'Lanczos'])
         self.downscale_filter_combo.setCurrentText('Bicubic')
@@ -457,10 +475,12 @@ class QOBSStyleUI(QWidget):
         
         self.face_swap_enabled_checkbox = QCheckBox("Enable Face Swap")
         self.face_swap_enabled_checkbox.setChecked(True)
+        self.face_swap_enabled_checkbox.toggled.connect(self.on_face_swap_toggled)
         
         self.face_swap_quality_combo = QComboBox()
         self.face_swap_quality_combo.addItems(['High', 'Medium', 'Low'])
         self.face_swap_quality_combo.setCurrentText('High')
+        self.face_swap_quality_combo.setEnabled(True)  # Enable by default
         
         face_swap_layout.addWidget(self.face_swap_enabled_checkbox)
         face_swap_layout.addWidget(QLabel("Face Swap Quality:"))
@@ -633,21 +653,31 @@ class QOBSStyleUI(QWidget):
         
         self.platform_combo.currentIndexChanged.connect(self.on_platform_changed)
         
+        # Connect scene selection changes
+        self.scenes_list.currentItemChanged.connect(self.on_scene_changed)
+        
         # Initialize default scene
         self.add_default_scene()
         
     def add_default_scene(self):
         """Add a default scene"""
-        scene_item = QListWidgetItem("Default Scene")
-        self.scenes_list.addItem(scene_item)
-        self.scenes_list.setCurrentItem(scene_item)
-        self.current_scene = "Default Scene"
-        
-        # Add default sources
-        sources = ["Camera Source", "Face Swap", "Audio Input"]
-        for source in sources:
-            source_item = QListWidgetItem(source)
-            self.sources_list.addItem(source_item)
+        try:
+            scene_item = QListWidgetItem("Default Scene")
+            self.scenes_list.addItem(scene_item)
+            self.scenes_list.setCurrentItem(scene_item)
+            self.current_scene = "Default Scene"
+            self.scenes.append("Default Scene")
+            self.sources_by_scene["Default Scene"] = []
+            
+            # Add default sources
+            sources = ["Camera Source", "Face Swap", "Audio Input"]
+            for source in sources:
+                source_item = QListWidgetItem(source)
+                self.sources_list.addItem(source_item)
+                self.sources_by_scene["Default Scene"].append(source)
+        except Exception as e:
+            # Handle any errors in scene creation
+            pass
             
     def toggle_streaming(self):
         """Toggle streaming on/off"""
@@ -661,8 +691,8 @@ class QOBSStyleUI(QWidget):
         platform_key = self.platform_combo.currentData()
         stream_key = self.stream_key_edit.text()
         
-        if not stream_key:
-            # Show error message
+        if not stream_key and platform_key != 'custom':
+            # Show error message for missing stream key
             return
             
         # Configure streaming backend
@@ -672,21 +702,37 @@ class QOBSStyleUI(QWidget):
         # Set stream address based on platform
         if platform_key == 'custom':
             rtmp_url = self.custom_rtmp_edit.text()
+            if not rtmp_url:
+                # Show error message for missing custom RTMP URL
+                return
         else:
             platform = self.streaming_platforms[platform_key]
             rtmp_url = platform['rtmp'] + stream_key
             
         # Parse RTMP URL to get address and port
-        if rtmp_url.startswith('rtmp://'):
-            parts = rtmp_url[7:].split('/')
-            if len(parts) > 0:
-                addr_port = parts[0].split(':')
-                if len(addr_port) == 2:
-                    cs.stream_addr.set_text(addr_port[0])
-                    cs.stream_port.set_number(int(addr_port[1]))
+        try:
+            if rtmp_url.startswith('rtmp://'):
+                parts = rtmp_url[7:].split('/')
+                if len(parts) > 0:
+                    addr_port = parts[0].split(':')
+                    if len(addr_port) == 2:
+                        cs.stream_addr.set_text(addr_port[0])
+                        cs.stream_port.set_number(int(addr_port[1]))
+                    else:
+                        cs.stream_addr.set_text(addr_port[0])
+                        cs.stream_port.set_number(1935)  # Default RTMP port
                 else:
-                    cs.stream_addr.set_text(addr_port[0])
-                    cs.stream_port.set_number(1935)  # Default RTMP port
+                    # Invalid RTMP URL format
+                    cs.is_streaming.set_flag(False)
+                    return
+            else:
+                # Invalid RTMP URL format
+                cs.is_streaming.set_flag(False)
+                return
+        except (ValueError, IndexError) as e:
+            # Handle parsing errors
+            cs.is_streaming.set_flag(False)
+            return
         
         self.stream_btn.setText("Stop Streaming")
         self.stream_btn.setStyleSheet("""
@@ -741,12 +787,19 @@ class QOBSStyleUI(QWidget):
         # Configure recording settings
         format_type = self.recording_format_combo.currentText()
         quality = self.recording_quality_combo.currentText()
-        fps = int(self.recording_fps_combo.currentText())
+        try:
+            fps = int(self.recording_fps_combo.currentText())
+        except ValueError:
+            fps = 30  # Default FPS if conversion fails
         bitrate = self.recording_bitrate_spin.value()
         
         # Set recording path
-        recording_path = Path(self.recording_path_edit.text())
-        recording_path.mkdir(parents=True, exist_ok=True)
+        try:
+            recording_path = Path(self.recording_path_edit.text())
+            recording_path.mkdir(parents=True, exist_ok=True)
+        except (OSError, PermissionError) as e:
+            # Handle directory creation errors
+            return
         
         # Configure backend for recording
         cs = self.stream_output_backend.get_control_sheet()
@@ -796,6 +849,7 @@ class QOBSStyleUI(QWidget):
     def open_settings(self):
         """Open settings dialog"""
         # This could open a more detailed settings dialog
+        # For now, just show a message that settings are accessible via tabs
         pass
         
     def add_scene(self):
@@ -804,6 +858,8 @@ class QOBSStyleUI(QWidget):
         scene_item = QListWidgetItem(scene_name)
         self.scenes_list.addItem(scene_item)
         self.scenes_list.setCurrentItem(scene_item)
+        self.current_scene = scene_name
+        self.scenes.append(scene_name)
         
     def remove_scene(self):
         """Remove the selected scene"""
@@ -850,6 +906,37 @@ class QOBSStyleUI(QWidget):
             self.custom_rtmp_edit.setEnabled(False)
             self.stream_key_edit.setEnabled(True)
             
+    def on_scene_changed(self, current, previous):
+        """Handle scene selection change"""
+        if current:
+            self.current_scene = current.text()
+            
+    def on_resolution_changed(self):
+        """Handle resolution changes and validate compatibility"""
+        base_res = self.base_resolution_combo.currentText()
+        output_res = self.output_resolution_combo.currentText()
+        
+        # Basic validation - output resolution should not be higher than base
+        base_width, base_height = map(int, base_res.split('x'))
+        output_width, output_height = map(int, output_res.split('x'))
+        
+        if output_width > base_width or output_height > base_height:
+            # Reset to base resolution if output is higher
+            self.output_resolution_combo.setCurrentText(base_res)
+            
+    def on_face_swap_toggled(self, enabled):
+        """Handle face swap enable/disable"""
+        self.face_swap_quality_combo.setEnabled(enabled)
+        
+    def on_desktop_audio_toggled(self, enabled):
+        """Handle desktop audio enable/disable"""
+        # This could trigger backend audio configuration changes
+        pass
+        
+    def on_monitor_audio_toggled(self, enabled):
+        """Handle monitor audio enable/disable"""
+        self.monitor_volume_slider.setEnabled(enabled)
+        
     def update_preview(self, frame):
         """Update the preview with a new frame"""
         if frame is not None:
