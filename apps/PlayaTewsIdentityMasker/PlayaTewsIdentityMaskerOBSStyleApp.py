@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import List
+from PyQt5.QtCore import Qt
 
 from localization import L, Localization
 from resources.fonts import QXFontDB
@@ -94,7 +95,15 @@ class QLiveSwapOBS(qtx.QXWidget):
         self.q_ds_merged_frame_viewer = QBCMergedFrameViewer(backend_weak_heap, face_merger_bc_out)
 
         # Create OBS-style UI
-        self.q_obs_style_ui = QOBSStyleUI(self.stream_output, userdata_path)
+        try:
+            from .ui.QOBSStyleUI import QOBSStyleUI
+            self.q_obs_style_ui = QOBSStyleUI(self.stream_output, userdata_path)
+        except ImportError as e:
+            print(f"Warning: Could not import QOBSStyleUI: {e}")
+            # Create a simple placeholder widget
+            self.q_obs_style_ui = qtx.QXLabel(text="OBS-Style UI not available\nUsing Traditional Interface")
+            self.q_obs_style_ui.setStyleSheet("QLabel { background-color: #2d2d2d; color: #ffffff; padding: 20px; font-size: 14px; }")
+            self.q_obs_style_ui.setAlignment(Qt.AlignCenter)
 
         # Create a splitter to show both OBS-style UI and traditional controls
         splitter = qtx.QXSplitter(Qt.Horizontal)
@@ -273,10 +282,7 @@ class QDFLOBSAppWindow(qtx.QXWindow):
 class PlayaTewsIdentityMaskerOBSStyleApp(qtx.QXMainApplication):
     def __init__(self, userdata_path):
         super().__init__(app_name='PlayaTewsIdentityMasker OBS Style',
-                         app_version='1.0',
-                         app_icon=QXImageDB.get('icon.png'),
-                         language='en-US',
-                         splash_wnd_cls=None)
+                         settings_dirpath=userdata_path / 'settings')
 
         self._userdata_path = userdata_path
         self._settings_dirpath = userdata_path / 'settings'

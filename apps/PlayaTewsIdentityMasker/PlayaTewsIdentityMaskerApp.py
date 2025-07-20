@@ -21,6 +21,7 @@ from .ui.QFileSource import QFileSource
 from .ui.QFrameAdjuster import QFrameAdjuster
 from .ui.QStreamOutput import QStreamOutput
 from .ui.QVoiceChanger import QVoiceChanger
+from .ui.QUnifiedLiveSwap import QUnifiedLiveSwap, UIMode
 from .ui.widgets.QBCFaceAlignViewer import QBCFaceAlignViewer
 from .ui.widgets.QBCFaceSwapViewer import QBCFaceSwapViewer
 from .ui.widgets.QBCFrameViewer import QBCFrameViewer
@@ -90,7 +91,7 @@ class QLiveSwap(qtx.QXWidget):
         self.q_stream_output  = QEnhancedStreamOutput(self.stream_output)
         
         # Add voice changer UI
-        self.q_voice_changer = QVoiceChanger(self.voice_changer)
+        self.q_voice_changer = QVoiceChanger(self.voice_changer.get_control_sheet())
 
         self.q_ds_frame_viewer = QBCFrameViewer(backend_weak_heap, multi_sources_bc_out)
         self.q_ds_fa_viewer    = QBCFaceAlignViewer(backend_weak_heap, face_aligner_bc_out, preview_width=256)

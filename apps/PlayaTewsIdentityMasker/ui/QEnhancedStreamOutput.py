@@ -93,12 +93,9 @@ class QEnhancedStreamOutput(QBackendPanel):
     """Enhanced streaming output panel with multi-platform support and scene management"""
     
     def __init__(self, backend: EnhancedStreamOutput):
-        super().__init__(backend, L('@QEnhancedStreamOutput.module_title'))
         self.backend = backend
-        self.setup_ui()
         
-    def setup_ui(self):
-        """Setup the enhanced UI layout"""
+        # Create the main layout first
         main_layout = QVBoxLayout()
         
         # Create tab widget for different sections
@@ -121,7 +118,9 @@ class QEnhancedStreamOutput(QBackendPanel):
         self.tabs.addTab(settings_tab, "Settings")
         
         main_layout.addWidget(self.tabs)
-        self.setLayout(main_layout)
+        
+        # Pass the layout to the parent
+        super().__init__(backend, L('@QEnhancedStreamOutput.module_title'), main_layout)
         
     def create_streaming_tab(self):
         """Create the streaming configuration tab"""

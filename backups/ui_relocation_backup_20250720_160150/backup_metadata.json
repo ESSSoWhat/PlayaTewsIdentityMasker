@@ -1,0 +1,14 @@
+{
+  "timestamp": "20250720_160150",
+  "backup_name": "ui_relocation_backup_20250720_160150",
+  "files_backed_up": [
+    "apps/PlayaTewsIdentityMasker/PlayaTewsIdentityMaskerApp.py",
+    "apps/PlayaTewsIdentityMasker/PlayaTewsIdentityMaskerOBSStyleApp.py",
+    "apps/PlayaTewsIdentityMasker/QOptimizedPlayaTewsIdentityMaskerApp.py",
+    "apps/PlayaTewsIdentityMasker/ui/QOBSStyleUI.py",
+    "apps/PlayaTewsIdentityMasker/ui/QOptimizedUIManager.py",
+    "main.py",
+    "optimized_main_ui.py"
+  ],
+  "migration_log": []
+}
