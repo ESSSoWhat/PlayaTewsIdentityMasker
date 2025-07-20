@@ -205,6 +205,32 @@ class QOBSStyleUI(QWidget):
             }
         """)
         
+        # Global Face Swap Control Button
+        self.global_face_swap_btn = QPushButton("Face Swap: ON")
+        self.global_face_swap_btn.setMinimumHeight(40)
+        self.global_face_swap_btn.setCheckable(True)
+        self.global_face_swap_btn.setChecked(True)  # Default to ON
+        self.global_face_swap_btn.setToolTip("Click to toggle all face swap components on/off\nGreen = ON, Red = OFF")
+        self.global_face_swap_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #27ae60;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #229954;
+            }
+            QPushButton:checked {
+                background-color: #27ae60;
+            }
+            QPushButton:!checked {
+                background-color: #e74c3c;
+            }
+        """)
+        
         # Settings button
         self.settings_btn = QPushButton("Settings")
         self.settings_btn.setMinimumHeight(30)
@@ -231,6 +257,7 @@ class QOBSStyleUI(QWidget):
         
         controls_layout.addWidget(self.stream_btn)
         controls_layout.addWidget(self.record_btn)
+        controls_layout.addWidget(self.global_face_swap_btn)
         controls_layout.addWidget(self.settings_btn)
         controls_layout.addWidget(self.processing_btn)
         controls_layout.addStretch()
@@ -522,8 +549,14 @@ class QOBSStyleUI(QWidget):
         # Connect processing window button
         self.processing_btn.clicked.connect(self.open_processing_window)
         
+        # Connect global face swap control
+        self.global_face_swap_btn.toggled.connect(self.on_global_face_swap_toggled)
+        
         # Initialize processing window
         self.processing_window = None
+        
+        # Initialize global face swap state
+        self.initialize_global_face_swap_state()
         
     def open_processing_window(self):
         """Open the processing controls window"""
@@ -548,3 +581,136 @@ class QOBSStyleUI(QWidget):
         if self.processing_window and self.processing_window.isVisible():
             self.processing_window.close()
         event.accept()
+    
+    # Global face swap control methods
+    def on_global_face_swap_toggled(self, enabled):
+        """Handle global face swap enable/disable"""
+        try:
+            if enabled:
+                self.global_face_swap_btn.setText("Face Swap: ON")
+                self.global_face_swap_btn.setToolTip("Face swap is ENABLED\nAll components are running\nClick to disable")
+                self.enable_all_face_swap_components()
+                print("Global face swap enabled")
+            else:
+                self.global_face_swap_btn.setText("Face Swap: OFF")
+                self.global_face_swap_btn.setToolTip("Face swap is DISABLED\nAll components are stopped\nClick to enable")
+                self.disable_all_face_swap_components()
+                print("Global face swap disabled")
+            
+            # Save the state
+            self.save_global_face_swap_state(enabled)
+            
+        except Exception as e:
+            print(f"Error toggling global face swap: {e}")
+    
+    def enable_all_face_swap_components(self):
+        """Enable all face swap components"""
+        if not self.face_swap_components:
+            return
+        
+        # List of components to enable
+        components_to_enable = [
+            'face_detector', 'face_marker', 'face_aligner', 
+            'face_animator', 'face_swap_insight', 'face_swap_dfm',
+            'frame_adjuster', 'face_merger'
+        ]
+        
+        for component_name in components_to_enable:
+            if component_name in self.face_swap_components:
+                component = self.face_swap_components[component_name]
+                try:
+                    # Try to enable the component through its backend
+                    if hasattr(component, '_backend') and hasattr(component._backend, 'start'):
+                        component._backend.start()
+                    # Also try to enable any checkboxes in the component
+                    self._enable_component_checkboxes(component, True)
+                except Exception as e:
+                    print(f"Error enabling {component_name}: {e}")
+    
+    def disable_all_face_swap_components(self):
+        """Disable all face swap components"""
+        if not self.face_swap_components:
+            return
+        
+        # List of components to disable
+        components_to_disable = [
+            'face_detector', 'face_marker', 'face_aligner', 
+            'face_animator', 'face_swap_insight', 'face_swap_dfm',
+            'frame_adjuster', 'face_merger'
+        ]
+        
+        for component_name in components_to_disable:
+            if component_name in self.face_swap_components:
+                component = self.face_swap_components[component_name]
+                try:
+                    # Try to disable the component through its backend
+                    if hasattr(component, '_backend') and hasattr(component._backend, 'stop'):
+                        component._backend.stop()
+                    # Also try to disable any checkboxes in the component
+                    self._enable_component_checkboxes(component, False)
+                except Exception as e:
+                    print(f"Error disabling {component_name}: {e}")
+    
+    def _enable_component_checkboxes(self, component, enabled):
+        """Enable or disable checkboxes in a component"""
+        try:
+            from PyQt5.QtWidgets import QCheckBox
+            checkboxes = component.findChildren(QCheckBox)
+            for checkbox in checkboxes:
+                if checkbox.isCheckable():
+                    checkbox.setChecked(enabled)
+        except Exception as e:
+            print(f"Error setting checkboxes in component: {e}")
+    
+    def save_global_face_swap_state(self, enabled):
+        """Save the global face swap state to persistent storage"""
+        try:
+            import json
+            from pathlib import Path
+            
+            # Create settings directory if it doesn't exist
+            settings_dir = Path(self.userdata_path) / 'settings'
+            settings_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Save to a JSON file
+            state_file = settings_dir / 'global_face_swap_state.json'
+            state_data = {
+                'enabled': enabled,
+                'timestamp': str(Path().stat().st_mtime) if Path().exists() else '0'
+            }
+            
+            with open(state_file, 'w') as f:
+                json.dump(state_data, f, indent=2)
+                
+        except Exception as e:
+            print(f"Error saving global face swap state: {e}")
+    
+    def load_global_face_swap_state(self):
+        """Load the global face swap state from persistent storage"""
+        try:
+            import json
+            from pathlib import Path
+            
+            state_file = Path(self.userdata_path) / 'settings' / 'global_face_swap_state.json'
+            
+            if state_file.exists():
+                with open(state_file, 'r') as f:
+                    state_data = json.load(f)
+                
+                enabled = state_data.get('enabled', True)  # Default to True
+                return enabled
+            else:
+                return True  # Default to enabled if no saved state
+                
+        except Exception as e:
+            print(f"Error loading global face swap state: {e}")
+            return True  # Default to enabled on error
+    
+    def initialize_global_face_swap_state(self):
+        """Initialize the global face swap state on startup"""
+        try:
+            enabled = self.load_global_face_swap_state()
+            self.global_face_swap_btn.setChecked(enabled)
+            self.on_global_face_swap_toggled(enabled)
+        except Exception as e:
+            print(f"Error initializing global face swap state: {e}")
