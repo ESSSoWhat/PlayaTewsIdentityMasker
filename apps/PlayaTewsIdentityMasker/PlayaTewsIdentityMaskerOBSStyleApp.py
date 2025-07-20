@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QSplitter
 
 from localization import L, Localization
 from resources.fonts import QXFontDB
@@ -94,10 +95,33 @@ class QLiveSwapOBS(qtx.QXWidget):
         self.q_ds_fc_viewer    = QBCFaceSwapViewer(backend_weak_heap, face_merger_bc_out, preview_width=256)
         self.q_ds_merged_frame_viewer = QBCMergedFrameViewer(backend_weak_heap, face_merger_bc_out)
 
-        # Create OBS-style UI
+        # Create face-swapping components dictionary
+        face_swap_components = {
+            'file_source': self.q_file_source,
+            'camera_source': self.q_camera_source,
+            'face_detector': self.q_face_detector,
+            'face_marker': self.q_face_marker,
+            'face_aligner': self.q_face_aligner,
+            'face_animator': self.q_face_animator,
+            'face_swap_insight': self.q_face_swap_insight,
+            'face_swap_dfm': self.q_face_swap_dfm,
+            'frame_adjuster': self.q_frame_adjuster,
+            'face_merger': self.q_face_merger,
+            'stream_output': self.q_stream_output
+        }
+
+        # Create viewers dictionary
+        viewers_components = {
+            'frame_viewer': self.q_ds_frame_viewer,
+            'face_align_viewer': self.q_ds_fa_viewer,
+            'face_swap_viewer': self.q_ds_fc_viewer,
+            'merged_frame_viewer': self.q_ds_merged_frame_viewer
+        }
+
+        # Create OBS-style UI with integrated face-swapping components and viewers
         try:
             from .ui.QOBSStyleUI import QOBSStyleUI
-            self.q_obs_style_ui = QOBSStyleUI(self.stream_output, userdata_path)
+            self.q_obs_style_ui = QOBSStyleUI(self.stream_output, userdata_path, face_swap_components, viewers_components)
         except ImportError as e:
             print(f"Warning: Could not import QOBSStyleUI: {e}")
             # Create a simple placeholder widget
@@ -105,44 +129,10 @@ class QLiveSwapOBS(qtx.QXWidget):
             self.q_obs_style_ui.setStyleSheet("QLabel { background-color: #2d2d2d; color: #ffffff; padding: 20px; font-size: 14px; }")
             self.q_obs_style_ui.setAlignment(Qt.AlignCenter)
 
-        # Create a splitter to show both OBS-style UI and traditional controls
-        splitter = qtx.QXSplitter(Qt.Horizontal)
-        
-        # Left side: OBS-style UI
-        left_widget = qtx.QXWidget()
-        left_layout = qtx.QXVBoxLayout()
-        left_layout.addWidget(self.q_obs_style_ui)
-        left_widget.setLayout(left_layout)
-        
-        # Right side: Traditional controls (collapsible)
-        right_widget = qtx.QXWidget()
-        right_layout = qtx.QXVBoxLayout()
-        
-        # Traditional control panels
-        q_nodes = qtx.QXWidgetHBox([    
-            qtx.QXWidgetVBox([self.q_file_source, self.q_camera_source], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([self.q_face_detector,  self.q_face_aligner,  ], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([self.q_face_marker, self.q_face_animator, self.q_face_swap_insight, self.q_face_swap_dfm], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([self.q_frame_adjuster, self.q_face_merger, self.q_stream_output], spacing=5, fixed_width=256),
-        ], spacing=5, size_policy=('fixed', 'fixed') )
-
-        q_view_nodes = qtx.QXWidgetHBox([   
-            (qtx.QXWidgetVBox([self.q_ds_frame_viewer], fixed_width=256), qtx.AlignTop),
-            (qtx.QXWidgetVBox([self.q_ds_fa_viewer], fixed_width=256), qtx.AlignTop),
-            (qtx.QXWidgetVBox([self.q_ds_fc_viewer], fixed_width=256), qtx.AlignTop),
-            (qtx.QXWidgetVBox([self.q_ds_merged_frame_viewer], fixed_width=256), qtx.AlignTop),
-        ], spacing=5, size_policy=('fixed', 'fixed') )
-
-        right_layout.addWidget(q_nodes)
-        right_layout.addWidget(q_view_nodes)
-        right_widget.setLayout(right_layout)
-        
-        # Add widgets to splitter
-        splitter.addWidget(left_widget)
-        splitter.addWidget(right_widget)
-        splitter.setSizes([800, 400])  # Give more space to OBS-style UI
-        
-        self.setLayout(qtx.QXVBoxLayout([splitter]))
+        # Create main layout with OBS-style UI (viewers are now integrated)
+        main_layout = qtx.QXVBoxLayout()
+        main_layout.addWidget(self.q_obs_style_ui)
+        self.setLayout(main_layout)
 
         self._timer = qtx.QXTimer(interval=5, timeout=self._on_timer_5ms, start=True)
 
@@ -290,6 +280,9 @@ class PlayaTewsIdentityMaskerOBSStyleApp(qtx.QXMainApplication):
 
         self._wnd = QDFLOBSAppWindow(userdata_path, self._settings_dirpath)
         self._wnd.show()
+        
+        # Initialize the main content
+        self.initialize()
 
     def on_reinitialize(self):
         if self._wnd.q_live_swap is not None:

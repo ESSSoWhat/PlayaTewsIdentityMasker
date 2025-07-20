@@ -33,10 +33,12 @@ from ..backend.StreamOutput import SourceType
 class QOBSStyleUI(QWidget):
     """OBS Studio-style UI for DeepFaceLive with enhanced streaming and recording capabilities"""
     
-    def __init__(self, stream_output_backend: StreamOutput, userdata_path: Path):
+    def __init__(self, stream_output_backend: StreamOutput, userdata_path: Path, face_swap_components=None, viewers_components=None):
         super().__init__()
         self.stream_output_backend = stream_output_backend
         self.userdata_path = userdata_path
+        self.face_swap_components = face_swap_components or {}
+        self.viewers_components = viewers_components or {}
         self.scenes = []
         self.current_scene = None
         self.sources_by_scene = {}  # Track sources per scene
@@ -134,16 +136,21 @@ class QOBSStyleUI(QWidget):
         return panel
         
     def create_center_panel(self):
-        """Create the center panel with preview and main controls"""
+        """Create the center panel with preview, controls, and viewers"""
         panel = QWidget()
         layout = QVBoxLayout()
         
-        # Preview area
+        # Top section: Preview and Controls
+        top_section = QWidget()
+        top_layout = QHBoxLayout()
+        
+        # Preview area (left side of top section)
         preview_group = QGroupBox("Preview")
         preview_layout = QVBoxLayout()
         
         self.preview_label = QLabel("Preview Area")
-        self.preview_label.setMinimumSize(640, 360)
+        self.preview_label.setMinimumSize(800, 450)  # Larger preview
+        self.preview_label.setMaximumSize(800, 450)  # Fixed size
         self.preview_label.setStyleSheet("""
             QLabel {
                 background-color: #1e1e1e;
@@ -158,9 +165,9 @@ class QOBSStyleUI(QWidget):
         
         preview_group.setLayout(preview_layout)
         
-        # Main controls
+        # Controls area (right side of top section)
         controls_group = QGroupBox("Controls")
-        controls_layout = QGridLayout()
+        controls_layout = QVBoxLayout()
         
         # Streaming controls
         self.stream_btn = QPushButton("Start Streaming")
@@ -206,14 +213,129 @@ class QOBSStyleUI(QWidget):
         self.settings_btn = QPushButton("Settings")
         self.settings_btn.setMinimumHeight(30)
         
-        controls_layout.addWidget(self.stream_btn, 0, 0, 1, 2)
-        controls_layout.addWidget(self.record_btn, 1, 0, 1, 2)
-        controls_layout.addWidget(self.settings_btn, 2, 0, 1, 2)
+        # Processing window button
+        self.processing_btn = QPushButton("Processing Controls")
+        self.processing_btn.setMinimumHeight(30)
+        self.processing_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2196F3;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+            QPushButton:hover {
+                background-color: #1976D2;
+            }
+            QPushButton:pressed {
+                background-color: #0D47A1;
+            }
+        """)
+        
+        controls_layout.addWidget(self.stream_btn)
+        controls_layout.addWidget(self.record_btn)
+        controls_layout.addWidget(self.settings_btn)
+        controls_layout.addWidget(self.processing_btn)
+        controls_layout.addStretch()
         
         controls_group.setLayout(controls_layout)
         
-        layout.addWidget(preview_group)
-        layout.addWidget(controls_group)
+        # Add preview and controls to top section
+        top_layout.addWidget(preview_group)
+        top_layout.addWidget(controls_group)
+        top_section.setLayout(top_layout)
+        
+        # Bottom section: Viewers
+        bottom_section = QWidget()
+        bottom_layout = QVBoxLayout()
+        
+        # Viewers group
+        viewers_group = QGroupBox("Processing Views")
+        viewers_layout = QHBoxLayout()
+        
+        # Use actual viewers if available, otherwise create placeholders
+        if 'frame_viewer' in self.viewers_components:
+            frame_viewer = self.viewers_components['frame_viewer']
+            frame_viewer.setMinimumSize(150, 120)  # Smaller size
+        else:
+            frame_viewer = QLabel("Frame Viewer")
+            frame_viewer.setMinimumSize(150, 120)  # Smaller size
+            frame_viewer.setStyleSheet("""
+                QLabel {
+                    background-color: #2d2d2d;
+                    border: 1px solid #404040;
+                    border-radius: 3px;
+                    color: #cccccc;
+                    font-size: 12px;
+                }
+            """)
+            frame_viewer.setAlignment(Qt.AlignCenter)
+        
+        if 'face_align_viewer' in self.viewers_components:
+            face_align_viewer = self.viewers_components['face_align_viewer']
+            face_align_viewer.setMinimumSize(150, 120)  # Smaller size
+        else:
+            face_align_viewer = QLabel("Face Align Viewer")
+            face_align_viewer.setMinimumSize(150, 120)  # Smaller size
+            face_align_viewer.setStyleSheet("""
+                QLabel {
+                    background-color: #2d2d2d;
+                    border: 1px solid #404040;
+                    border-radius: 3px;
+                    color: #cccccc;
+                    font-size: 12px;
+                }
+            """)
+            face_align_viewer.setAlignment(Qt.AlignCenter)
+        
+        if 'face_swap_viewer' in self.viewers_components:
+            face_swap_viewer = self.viewers_components['face_swap_viewer']
+            face_swap_viewer.setMinimumSize(150, 120)  # Smaller size
+        else:
+            face_swap_viewer = QLabel("Face Swap Viewer")
+            face_swap_viewer.setMinimumSize(150, 120)  # Smaller size
+            face_swap_viewer.setStyleSheet("""
+                QLabel {
+                    background-color: #2d2d2d;
+                    border: 1px solid #404040;
+                    border-radius: 3px;
+                    color: #cccccc;
+                    font-size: 12px;
+                }
+            """)
+            face_swap_viewer.setAlignment(Qt.AlignCenter)
+        
+        # Merged frame viewer (stretches to fit - much larger)
+        if 'merged_frame_viewer' in self.viewers_components:
+            merged_frame_viewer = self.viewers_components['merged_frame_viewer']
+            merged_frame_viewer.setMinimumSize(600, 200)  # Much larger
+        else:
+            merged_frame_viewer = QLabel("Merged Frame Viewer")
+            merged_frame_viewer.setMinimumSize(600, 200)  # Much larger
+            merged_frame_viewer.setStyleSheet("""
+                QLabel {
+                    background-color: #2d2d2d;
+                    border: 1px solid #404040;
+                    border-radius: 3px;
+                    color: #cccccc;
+                    font-size: 12px;
+                }
+            """)
+            merged_frame_viewer.setAlignment(Qt.AlignCenter)
+        
+        viewers_layout.addWidget(frame_viewer)
+        viewers_layout.addWidget(face_align_viewer)
+        viewers_layout.addWidget(face_swap_viewer)
+        viewers_layout.addWidget(merged_frame_viewer, 3)  # Much more stretch weight
+        
+        viewers_group.setLayout(viewers_layout)
+        bottom_layout.addWidget(viewers_group)
+        bottom_section.setLayout(bottom_layout)
+        
+        # Add sections to main layout
+        layout.addWidget(top_section)
+        layout.addWidget(bottom_section)
         
         panel.setLayout(layout)
         return panel
@@ -225,6 +347,11 @@ class QOBSStyleUI(QWidget):
         
         # Create tab widget for different settings
         self.settings_tabs = QTabWidget()
+        
+        # Face Swap settings tab (if components are available)
+        if self.face_swap_components:
+            face_swap_tab = self.create_face_swap_tab()
+            self.settings_tabs.addTab(face_swap_tab, "Face Swap")
         
         # Streaming settings tab
         streaming_tab = self.create_streaming_tab()
@@ -435,6 +562,57 @@ class QOBSStyleUI(QWidget):
         tab.setLayout(layout)
         return tab
         
+    def create_face_swap_tab(self):
+        """Create face swap settings tab with traditional controls"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # Create scroll area for face swap controls
+        scroll_area = QScrollArea()
+        scroll_widget = QWidget()
+        scroll_layout = QVBoxLayout()
+        
+        # Add face swap components if available
+        if self.face_swap_components:
+            # File and Camera sources
+            if 'file_source' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['file_source'])
+            if 'camera_source' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['camera_source'])
+            
+            # Face detection and alignment
+            if 'face_detector' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['face_detector'])
+            if 'face_aligner' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['face_aligner'])
+            
+            # Face processing
+            if 'face_marker' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['face_marker'])
+            if 'face_animator' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['face_animator'])
+            if 'face_swap_insight' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['face_swap_insight'])
+            if 'face_swap_dfm' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['face_swap_dfm'])
+            
+            # Frame processing
+            if 'frame_adjuster' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['frame_adjuster'])
+            if 'face_merger' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['face_merger'])
+            if 'stream_output' in self.face_swap_components:
+                scroll_layout.addWidget(self.face_swap_components['stream_output'])
+        
+        scroll_layout.addStretch()
+        scroll_widget.setLayout(scroll_layout)
+        scroll_area.setWidget(scroll_widget)
+        scroll_area.setWidgetResizable(True)
+        
+        layout.addWidget(scroll_area)
+        tab.setLayout(layout)
+        return tab
+        
     def create_video_tab(self):
         """Create video settings tab"""
         tab = QWidget()
@@ -642,6 +820,7 @@ class QOBSStyleUI(QWidget):
         self.stream_btn.clicked.connect(self.toggle_streaming)
         self.record_btn.clicked.connect(self.toggle_recording)
         self.settings_btn.clicked.connect(self.open_settings)
+        self.processing_btn.clicked.connect(self.open_processing_window)
         
         self.add_scene_btn.clicked.connect(self.add_scene)
         self.remove_scene_btn.clicked.connect(self.remove_scene)
@@ -658,6 +837,9 @@ class QOBSStyleUI(QWidget):
         
         # Initialize default scene
         self.add_default_scene()
+        
+        # Initialize processing window
+        self.processing_window = None
         
     def add_default_scene(self):
         """Add a default scene"""
@@ -852,6 +1034,18 @@ class QOBSStyleUI(QWidget):
         # For now, just show a message that settings are accessible via tabs
         pass
         
+    def open_processing_window(self):
+        """Open the processing controls window"""
+        # For now, show a message that processing controls are available in the main interface
+        from PyQt5.QtWidgets import QMessageBox
+        QMessageBox.information(self, "Processing Controls", 
+                              "Processing controls are integrated in the main interface.\n"
+                              "Use the Face Swap tab in the right panel for advanced controls.")
+        
+        # TODO: Implement separate processing window when xlib compatibility issues are resolved
+        # The separate window approach has compatibility issues with the xlib framework
+        # For now, we'll keep the controls integrated in the main interface
+        
     def add_scene(self):
         """Add a new scene"""
         scene_name = f"Scene {self.scenes_list.count() + 1}"
@@ -943,3 +1137,9 @@ class QOBSStyleUI(QWidget):
             # Convert frame to QPixmap and display in preview_label
             # This would need to be implemented based on the frame format
             pass
+            
+    def closeEvent(self, event):
+        """Handle close event - ensure processing window is closed"""
+        if self.processing_window and self.processing_window.isVisible():
+            self.processing_window.close()
+        event.accept()

@@ -136,7 +136,12 @@ class QEnhancedStreamOutput(QBackendPanel):
         # FPS display
         q_average_fps_label = QLabelPopupInfo(label=L('@QEnhancedStreamOutput.avg_fps'), 
                                              popup_info_text=L('@QEnhancedStreamOutput.help.avg_fps'))
-        q_average_fps = QLabelCSWNumber(cs.avg_fps, reflect_state_widgets=[q_average_fps_label])
+        try:
+            q_average_fps = QLabelCSWNumber(cs.avg_fps, reflect_state_widgets=[q_average_fps_label])
+        except Exception as e:
+            print(f"Warning: Could not create FPS display: {e}")
+            q_average_fps = QLabel("0.0")
+            q_average_fps.setStyleSheet("QLabel { color: #888888; }")
         
         # Streaming toggle
         q_is_streaming_label = QLabelPopupInfo(label='Multi-Platform Streaming')
