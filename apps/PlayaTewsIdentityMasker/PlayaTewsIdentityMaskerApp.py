@@ -158,6 +158,10 @@ class QDFLAppWindow(qtx.QXWindow):
         self._userdata_path = userdata_path
         self._settings_dirpath = settings_dirpath
 
+        # Initialize backup manager
+        from .ui.UILayoutBackupManager import UILayoutBackupManager
+        self.backup_manager = UILayoutBackupManager(settings_dirpath, userdata_path)
+
         menu_bar = qtx.QXMenuBar( font=QXFontDB.get_default_font(size=10), size_policy=('fixed', 'minimumexpanding') )
         menu_file = menu_bar.addMenu( L('@QDFLAppWindow.file') )
         menu_language = menu_bar.addMenu( L('@QDFLAppWindow.language') )
@@ -167,6 +171,17 @@ class QDFLAppWindow(qtx.QXWindow):
 
         menu_file_action_reset_settings = menu_file.addAction( L('@QDFLAppWindow.reset_modules_settings') )
         menu_file_action_reset_settings.triggered.connect(self._on_reset_modules_settings)
+
+        # Add backup manager menu items
+        menu_file.addSeparator()
+        menu_file_action_backup_layout = menu_file.addAction( "Backup UI Layout" )
+        menu_file_action_backup_layout.triggered.connect(self._on_backup_layout)
+        
+        menu_file_action_restore_layout = menu_file.addAction( "Restore UI Layout" )
+        menu_file_action_restore_layout.triggered.connect(self._on_restore_layout)
+        
+        menu_file_action_manage_backups = menu_file.addAction( "Manage Layout Backups" )
+        menu_file_action_manage_backups.triggered.connect(self._on_manage_backups)
 
         menu_file_action_quit = menu_file.addAction( L('@QDFLAppWindow.quit') )
         menu_file_action_quit.triggered.connect(lambda: qtx.QXMainApplication.quit() )
@@ -234,6 +249,75 @@ class QDFLAppWindow(qtx.QXWindow):
 
     def _on_closeEvent(self):
         self.finalize()
+
+    def _on_backup_layout(self):
+        """Handle backup layout menu action"""
+        try:
+            # Create a quick backup with timestamp
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_name = f"auto_backup_{timestamp}"
+            
+            success = self.backup_manager.create_backup(backup_name, "Auto backup from menu")
+            
+            if success:
+                qtx.QXMessageBox.information(
+                    self,
+                    "Backup Created",
+                    f"UI layout backup created successfully:\n{backup_name}"
+                )
+            else:
+                qtx.QXMessageBox.warning(
+                    self,
+                    "Backup Failed",
+                    "Failed to create UI layout backup"
+                )
+        except Exception as e:
+            qtx.QXMessageBox.critical(
+                self,
+                "Backup Error",
+                f"Error creating backup: {e}"
+            )
+
+    def _on_restore_layout(self):
+        """Handle restore layout menu action"""
+        try:
+            # Get list of available backups
+            backups = self.backup_manager.list_backups()
+            
+            if not backups:
+                qtx.QXMessageBox.information(
+                    self,
+                    "No Backups",
+                    "No UI layout backups found"
+                )
+                return
+            
+            # Show backup selection dialog
+            from .ui.QBackupManagerUI import QBackupManagerDialog
+            dialog = QBackupManagerDialog(self.backup_manager, self)
+            dialog.exec_()
+            
+        except Exception as e:
+            qtx.QXMessageBox.critical(
+                self,
+                "Restore Error",
+                f"Error restoring layout: {e}"
+            )
+
+    def _on_manage_backups(self):
+        """Handle manage backups menu action"""
+        try:
+            from .ui.QBackupManagerUI import QBackupManagerDialog
+            dialog = QBackupManagerDialog(self.backup_manager, self)
+            dialog.exec_()
+            
+        except Exception as e:
+            qtx.QXMessageBox.critical(
+                self,
+                "Backup Manager Error",
+                f"Error opening backup manager: {e}"
+            )
 
 
 class PlayaTewsIdentityMaskerApp(qtx.QXMainApplication):

@@ -291,6 +291,19 @@ class PlayaTewsIdentityMaskerOBSStyleApp(qtx.QXMainApplication):
         self._wnd.q_live_swap = QLiveSwapOBS(self._userdata_path, self._settings_dirpath)
         self._wnd.content_l.addWidget(self._wnd.q_live_swap)
         self._wnd.q_live_swap.initialize()
+        
+        # Ensure all backend components are properly initialized
+        print("Initializing backend components...")
+        from . import backend as backend_module
+        for backend in self._wnd.q_live_swap.all_backends:
+            print(f"Initializing {backend.__class__.__name__}")
+            # Use restore_on_off_state instead of direct start
+            default_state = True
+            if isinstance(backend, (backend_module.CameraSource, 
+                                   backend_module.FaceAnimator, 
+                                   backend_module.FaceSwapInsight)):
+                default_state = False
+            backend.restore_on_off_state(default_state=default_state)
 
     def initialize(self):
         self.on_reinitialize()

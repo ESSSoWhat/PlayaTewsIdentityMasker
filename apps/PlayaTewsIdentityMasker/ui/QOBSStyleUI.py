@@ -1038,9 +1038,24 @@ class QOBSStyleUI(QWidget):
         """Open the processing controls window"""
         # For now, show a message that processing controls are available in the main interface
         from PyQt5.QtWidgets import QMessageBox
+        
+        # Check component states for debugging
+        component_status = []
+        if self.face_swap_components:
+            for name, component in self.face_swap_components.items():
+                if hasattr(component, '_backend'):
+                    backend = component._backend
+                    status = "Running" if backend.is_started() else "Stopped"
+                    component_status.append(f"{name}: {status}")
+                else:
+                    component_status.append(f"{name}: No backend")
+        
+        status_text = "\n".join(component_status) if component_status else "No components available"
+        
         QMessageBox.information(self, "Processing Controls", 
-                              "Processing controls are integrated in the main interface.\n"
-                              "Use the Face Swap tab in the right panel for advanced controls.")
+                              f"Processing controls are integrated in the main interface.\n"
+                              f"Use the Face Swap tab in the right panel for advanced controls.\n\n"
+                              f"Component Status:\n{status_text}")
         
         # TODO: Implement separate processing window when xlib compatibility issues are resolved
         # The separate window approach has compatibility issues with the xlib framework
