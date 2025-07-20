@@ -587,13 +587,14 @@ class OptimizedPlayaTewsIdentityMaskerApp(qtx.QXMainApplication):
     """Optimized DeepFaceLive application"""
     
     def __init__(self, userdata_path):
-        super().__init__(userdata_path=userdata_path)
+        super().__init__(app_name="PlayaTewsIdentityMasker", settings_dirpath=userdata_path / 'settings')
         
+        self.userdata_path = userdata_path
         self.logger = logging.getLogger(__name__)
         self.logger.info("Starting Optimized DeepFaceLive Application...")
         
         # Set up localization
-        Localization.initialize()
+        Localization.set_language(self.get_language())
         
         # Create main window
         self.main_window = QOptimizedDFLAppWindow(

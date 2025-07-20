@@ -179,7 +179,7 @@ Examples:
                 sys.exit(1)
 
         def run_PlayaTewsIdentityMaskerOptimized(args):
-            """Run PlayaTewsIdentityMasker with optimized UI (space-efficient, collapsible sections)"""
+            """Run optimized PlayaTewsIdentityMasker with voice changer integration"""
             startup_timer.mark_stage("args_parsed")
             
             userdata_path = Path(args.userdata_dir) if args.userdata_dir else Path.cwd()
@@ -195,10 +195,10 @@ Examples:
 
             logger.info(f"[START] Starting PlayaTewsIdentityMasker with optimized UI: {userdata_path}")
             try:
-                from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerOptimizedApp import PlayaTewsIdentityMaskerOptimizedApp
+                from apps.PlayaTewsIdentityMasker.QOptimizedPlayaTewsIdentityMaskerApp import OptimizedPlayaTewsIdentityMaskerApp
                 startup_timer.mark_stage("app_imported")
                 
-                app = PlayaTewsIdentityMaskerOptimizedApp(userdata_path=userdata_path)
+                app = OptimizedPlayaTewsIdentityMaskerApp(userdata_path)
                 startup_timer.mark_stage("app_created")
                 
                 app.run()
@@ -206,10 +206,10 @@ Examples:
                 
                 # Log startup performance
                 summary = startup_timer.get_summary()
-                logger.info(f"[PERF] Startup performance: {summary}")
+                logger.info(f"📊 Startup performance: {summary}")
                 
             except ImportError as e:
-                logger.error(f"[ERROR] Failed to import PlayaTewsIdentityMaskerOptimizedApp: {e}")
+                logger.error(f"[ERROR] Failed to import OptimizedPlayaTewsIdentityMaskerApp: {e}")
                 logger.error("Please ensure all dependencies are installed: pip install -r requirements-unified.txt")
                 sys.exit(1)
             except Exception as e:
@@ -239,7 +239,7 @@ Examples:
         p.set_defaults(func=run_PlayaTewsIdentityMaskerOBS)
 
         # Optimized app parser
-        p = run_subparsers.add_parser('PlayaTewsIdentityMaskerOptimized', help="Run PlayaTewsIdentityMasker with optimized UI (space-efficient, collapsible sections)")
+        p = run_subparsers.add_parser('PlayaTewsIdentityMaskerOptimized', help="Run PlayaTewsIdentityMasker with optimized UI and voice changer")
         p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
         p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
         p.add_argument('--verbose', '-v', action="store_true", default=False, help="Enable verbose logging.")
