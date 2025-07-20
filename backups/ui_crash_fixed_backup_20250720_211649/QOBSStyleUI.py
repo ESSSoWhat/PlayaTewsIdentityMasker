@@ -75,78 +75,32 @@ class QOBSStyleUI(QWidget):
         self.setLayout(main_layout)
         
     def create_left_panel(self):
-        """Create the left panel with DFM quick access and sources"""
+        """Create the left panel with scenes and sources"""
         panel = QWidget()
         layout = QVBoxLayout()
         
-        # DFM Quick Access section
-        dfm_group = QGroupBox("Quick DFM Models")
-        dfm_layout = QVBoxLayout()
+        # Scenes section
+        scenes_group = QGroupBox("Scenes")
+        scenes_layout = QVBoxLayout()
         
-        # Create 4 quick access buttons for DFM models
-        self.dfm_buttons = []
-        self.dfm_button_layout = QGridLayout()
+        self.scenes_list = QListWidget()
+        self.scenes_list.setMaximumHeight(150)
+        scenes_layout.addWidget(self.scenes_list)
         
-        for i in range(4):
-            btn = QPushButton(f"DFM {i+1}")
-            btn.setMinimumHeight(50)
-            btn.setMaximumHeight(50)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #2c3e50;
-                    color: white;
-                    border: 2px solid #34495e;
-                    border-radius: 8px;
-                    font-weight: bold;
-                    font-size: 12px;
-                    padding: 5px;
-                }
-                QPushButton:hover {
-                    background-color: #3498db;
-                    border-color: #2980b9;
-                }
-                QPushButton:pressed {
-                    background-color: #2980b9;
-                }
-                QPushButton:checked {
-                    background-color: #e74c3c;
-                    border-color: #c0392b;
-                }
-            """)
-            btn.setCheckable(True)
-            btn.clicked.connect(lambda checked, index=i: self.on_dfm_button_clicked(index))
-            self.dfm_buttons.append(btn)
-            
-            # Arrange in 2x2 grid
-            row = i // 2
-            col = i % 2
-            self.dfm_button_layout.addWidget(btn, row, col)
+        scenes_buttons_layout = QHBoxLayout()
+        self.add_scene_btn = QPushButton("+")
+        self.add_scene_btn.setMaximumWidth(30)
+        self.remove_scene_btn = QPushButton("-")
+        self.remove_scene_btn.setMaximumWidth(30)
+        self.duplicate_scene_btn = QPushButton("Copy")
         
-        dfm_layout.addLayout(self.dfm_button_layout)
+        scenes_buttons_layout.addWidget(self.add_scene_btn)
+        scenes_buttons_layout.addWidget(self.remove_scene_btn)
+        scenes_buttons_layout.addWidget(self.duplicate_scene_btn)
+        scenes_buttons_layout.addStretch()
         
-        # Add refresh button
-        refresh_layout = QHBoxLayout()
-        self.refresh_dfm_btn = QPushButton("🔄 Refresh")
-        self.refresh_dfm_btn.setMaximumHeight(30)
-        self.refresh_dfm_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #27ae60;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 11px;
-            }
-            QPushButton:hover {
-                background-color: #229954;
-            }
-        """)
-        self.refresh_dfm_btn.clicked.connect(self.refresh_dfm_models)
-        refresh_layout.addWidget(self.refresh_dfm_btn)
-        refresh_layout.addStretch()
-        
-        dfm_layout.addLayout(refresh_layout)
-        dfm_group.setLayout(dfm_layout)
+        scenes_layout.addLayout(scenes_buttons_layout)
+        scenes_group.setLayout(scenes_layout)
         
         # Sources section
         sources_group = QGroupBox("Sources")
@@ -170,7 +124,7 @@ class QOBSStyleUI(QWidget):
         sources_layout.addLayout(sources_buttons_layout)
         sources_group.setLayout(sources_layout)
         
-        layout.addWidget(dfm_group)
+        layout.addWidget(scenes_group)
         layout.addWidget(sources_group)
         layout.addStretch()
         
@@ -571,218 +525,15 @@ class QOBSStyleUI(QWidget):
         # Initialize processing window
         self.processing_window = None
         
-        # Initialize DFM quick access buttons
-        self.initialize_dfm_buttons()
-        
     def open_processing_window(self):
-        """Open the processing controls window with consolidated tabs"""
+        """Open the processing controls window"""
         if self.processing_window is None or not self.processing_window.isVisible():
             try:
-                # Create a consolidated processing window with organized tabs
-                from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QWidget, QMessageBox, QHBoxLayout, QLabel
-                from PyQt5.QtCore import Qt
-                
-                self.processing_window = QDialog(self)
-                self.processing_window.setWindowTitle("All Settings - PlayaTewsIdentityMasker")
-                self.processing_window.setMinimumSize(1000, 700)
-                self.processing_window.setStyleSheet("""
-                    QDialog {
-                        background-color: #2b2b2b;
-                        color: #ffffff;
-                    }
-                    QTabWidget::pane {
-                        border: 1px solid #606060;
-                        background-color: #2b2b2b;
-                    }
-                    QTabBar::tab {
-                        background-color: #404040;
-                        border: 1px solid #606060;
-                        padding: 8px 16px;
-                        margin-right: 2px;
-                        color: #ffffff;
-                    }
-                    QTabBar::tab:selected {
-                        background-color: #0078d4;
-                    }
-                    QTabBar::tab:hover {
-                        background-color: #505050;
-                    }
-                """)
-                
-                layout = QVBoxLayout()
-                
-                # Add title
-                title_label = QLabel("PlayaTewsIdentityMasker - All Settings")
-                title_label.setStyleSheet("""
-                    QLabel {
-                        font-size: 18px;
-                        font-weight: bold;
-                        color: #ffffff;
-                        padding: 10px;
-                        background-color: #404040;
-                        border-radius: 5px;
-                        margin-bottom: 10px;
-                    }
-                """)
-                title_label.setAlignment(Qt.AlignCenter)
-                layout.addWidget(title_label)
-                
-                tab_widget = QTabWidget()
-                
-                # Group 1: Input Sources
-                input_tab = QWidget()
-                input_layout = QVBoxLayout()
-                input_title = QLabel("Input Sources")
-                input_title.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 10px;")
-                input_layout.addWidget(input_title)
-                
-                if self.face_swap_components:
-                    # File Source
-                    if 'file_source' in self.face_swap_components and self.face_swap_components['file_source']:
-                        file_source = self.face_swap_components['file_source']
-                        if hasattr(file_source, 'widget'):
-                            input_layout.addWidget(file_source.widget())
-                        else:
-                            input_layout.addWidget(file_source)
-                    
-                    # Camera Source
-                    if 'camera_source' in self.face_swap_components and self.face_swap_components['camera_source']:
-                        camera_source = self.face_swap_components['camera_source']
-                        if hasattr(camera_source, 'widget'):
-                            input_layout.addWidget(camera_source.widget())
-                        else:
-                            input_layout.addWidget(camera_source)
-                
-                input_layout.addStretch()
-                input_tab.setLayout(input_layout)
-                tab_widget.addTab(input_tab, "📹 Input Sources")
-                
-                # Group 2: Face Detection & Processing
-                detection_tab = QWidget()
-                detection_layout = QVBoxLayout()
-                detection_title = QLabel("Face Detection & Processing")
-                detection_title.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 10px;")
-                detection_layout.addWidget(detection_title)
-                
-                if self.face_swap_components:
-                    # Face Detector
-                    if 'face_detector' in self.face_swap_components and self.face_swap_components['face_detector']:
-                        face_detector = self.face_swap_components['face_detector']
-                        if hasattr(face_detector, 'widget'):
-                            detection_layout.addWidget(face_detector.widget())
-                        else:
-                            detection_layout.addWidget(face_detector)
-                    
-                    # Face Marker
-                    if 'face_marker' in self.face_swap_components and self.face_swap_components['face_marker']:
-                        face_marker = self.face_swap_components['face_marker']
-                        if hasattr(face_marker, 'widget'):
-                            detection_layout.addWidget(face_marker.widget())
-                        else:
-                            detection_layout.addWidget(face_marker)
-                    
-                    # Face Aligner
-                    if 'face_aligner' in self.face_swap_components and self.face_swap_components['face_aligner']:
-                        face_aligner = self.face_swap_components['face_aligner']
-                        if hasattr(face_aligner, 'widget'):
-                            detection_layout.addWidget(face_aligner.widget())
-                        else:
-                            detection_layout.addWidget(face_aligner)
-                
-                detection_layout.addStretch()
-                detection_tab.setLayout(detection_layout)
-                tab_widget.addTab(detection_tab, "👁️ Face Detection")
-                
-                # Group 3: Face Swapping
-                swapping_tab = QWidget()
-                swapping_layout = QVBoxLayout()
-                swapping_title = QLabel("Face Swapping")
-                swapping_title.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 10px;")
-                swapping_layout.addWidget(swapping_title)
-                
-                if self.face_swap_components:
-                    # Face Swap Insight
-                    if 'face_swap_insight' in self.face_swap_components and self.face_swap_components['face_swap_insight']:
-                        face_swap_insight = self.face_swap_components['face_swap_insight']
-                        if hasattr(face_swap_insight, 'widget'):
-                            swapping_layout.addWidget(face_swap_insight.widget())
-                        else:
-                            swapping_layout.addWidget(face_swap_insight)
-                    
-                    # Face Swap DFM
-                    if 'face_swap_dfm' in self.face_swap_components and self.face_swap_components['face_swap_dfm']:
-                        face_swap_dfm = self.face_swap_components['face_swap_dfm']
-                        if hasattr(face_swap_dfm, 'widget'):
-                            swapping_layout.addWidget(face_swap_dfm.widget())
-                        else:
-                            swapping_layout.addWidget(face_swap_dfm)
-                
-                swapping_layout.addStretch()
-                swapping_tab.setLayout(swapping_layout)
-                tab_widget.addTab(swapping_tab, "🔄 Face Swapping")
-                
-                # Group 4: Animation & Effects
-                animation_tab = QWidget()
-                animation_layout = QVBoxLayout()
-                animation_title = QLabel("Animation & Effects")
-                animation_title.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 10px;")
-                animation_layout.addWidget(animation_title)
-                
-                if self.face_swap_components:
-                    # Face Animator
-                    if 'face_animator' in self.face_swap_components and self.face_swap_components['face_animator']:
-                        face_animator = self.face_swap_components['face_animator']
-                        if hasattr(face_animator, 'widget'):
-                            animation_layout.addWidget(face_animator.widget())
-                        else:
-                            animation_layout.addWidget(face_animator)
-                    
-                    # Frame Adjuster
-                    if 'frame_adjuster' in self.face_swap_components and self.face_swap_components['frame_adjuster']:
-                        frame_adjuster = self.face_swap_components['frame_adjuster']
-                        if hasattr(frame_adjuster, 'widget'):
-                            animation_layout.addWidget(frame_adjuster.widget())
-                        else:
-                            animation_layout.addWidget(frame_adjuster)
-                
-                animation_layout.addStretch()
-                animation_tab.setLayout(animation_layout)
-                tab_widget.addTab(animation_tab, "🎭 Animation & Effects")
-                
-                # Group 5: Output & Streaming
-                output_tab = QWidget()
-                output_layout = QVBoxLayout()
-                output_title = QLabel("Output & Streaming")
-                output_title.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 10px;")
-                output_layout.addWidget(output_title)
-                
-                if self.face_swap_components:
-                    # Face Merger
-                    if 'face_merger' in self.face_swap_components and self.face_swap_components['face_merger']:
-                        face_merger = self.face_swap_components['face_merger']
-                        if hasattr(face_merger, 'widget'):
-                            output_layout.addWidget(face_merger.widget())
-                        else:
-                            output_layout.addWidget(face_merger)
-                    
-                    # Stream Output
-                    if 'stream_output' in self.face_swap_components and self.face_swap_components['stream_output']:
-                        stream_output = self.face_swap_components['stream_output']
-                        if hasattr(stream_output, 'widget'):
-                            output_layout.addWidget(stream_output.widget())
-                        else:
-                            output_layout.addWidget(stream_output)
-                
-                output_layout.addStretch()
-                output_tab.setLayout(output_layout)
-                tab_widget.addTab(output_tab, "📺 Output & Streaming")
-                
-                layout.addWidget(tab_widget)
-                self.processing_window.setLayout(layout)
+                from .QProcessingWindow import QProcessingWindow
+                self.processing_window = QProcessingWindow(self.face_swap_components)
                 self.processing_window.show()
-                
-            except Exception as e:
-                print(f"Error creating processing window: {e}")
+            except ImportError as e:
+                print(f"Could not import QProcessingWindow: {e}")
                 # Fallback: show a simple message
                 from PyQt5.QtWidgets import QMessageBox
                 QMessageBox.information(self, "All Controls", 
@@ -797,98 +548,3 @@ class QOBSStyleUI(QWidget):
         if self.processing_window and self.processing_window.isVisible():
             self.processing_window.close()
         event.accept()
-
-    def on_dfm_button_clicked(self, index):
-        """Handle DFM button click to switch to a specific DFM model"""
-        try:
-            # Uncheck all other buttons
-            for i, btn in enumerate(self.dfm_buttons):
-                if i != index:
-                    btn.setChecked(False)
-            
-            # Get the selected DFM model
-            if hasattr(self, 'dfm_models') and index < len(self.dfm_models):
-                selected_model = self.dfm_models[index]
-                self.load_dfm_model(selected_model)
-                print(f"Switched to DFM model: {selected_model}")
-            else:
-                print(f"DFM model {index + 1} not available")
-                
-        except Exception as e:
-            print(f"Error switching DFM model: {e}")
-    
-    def refresh_dfm_models(self):
-        """Refresh the list of available DFM models"""
-        try:
-            self.load_recent_dfm_models()
-            print("DFM models refreshed")
-        except Exception as e:
-            print(f"Error refreshing DFM models: {e}")
-    
-    def load_recent_dfm_models(self):
-        """Load the 4 most recent DFM models"""
-        try:
-            # Get DFM models directory
-            dfm_dir = self.userdata_path / 'dfm_models'
-            if not dfm_dir.exists():
-                dfm_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Find all DFM files
-            dfm_files = list(dfm_dir.glob('*.dfm'))
-            
-            # Sort by modification time (most recent first)
-            dfm_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
-            
-            # Take the first 4
-            self.dfm_models = dfm_files[:4]
-            
-            # Update button labels and states
-            for i, btn in enumerate(self.dfm_buttons):
-                if i < len(self.dfm_models):
-                    # Get just the filename without extension
-                    model_name = self.dfm_models[i].stem
-                    btn.setText(f"DFM {i+1}\n{model_name[:15]}")
-                    btn.setToolTip(str(self.dfm_models[i]))
-                    btn.setEnabled(True)
-                else:
-                    btn.setText(f"DFM {i+1}\nEmpty")
-                    btn.setToolTip("No model loaded")
-                    btn.setEnabled(False)
-                    btn.setChecked(False)
-                    
-        except Exception as e:
-            print(f"Error loading DFM models: {e}")
-    
-    def load_dfm_model(self, model_path):
-        """Load a specific DFM model into the face swap component"""
-        try:
-            if 'face_swap_dfm' in self.face_swap_components and self.face_swap_components['face_swap_dfm']:
-                face_swap_dfm = self.face_swap_components['face_swap_dfm']
-                
-                # Try to set the model path through the backend
-                if hasattr(face_swap_dfm, 'backend') and hasattr(face_swap_dfm.backend, 'set_model_path'):
-                    face_swap_dfm.backend.set_model_path(str(model_path))
-                elif hasattr(face_swap_dfm, 'set_model_path'):
-                    face_swap_dfm.set_model_path(str(model_path))
-                else:
-                    # Try to find a control that can set the model path
-                    if hasattr(face_swap_dfm, 'get_control_sheet'):
-                        cs = face_swap_dfm.get_control_sheet()
-                        if hasattr(cs, 'model_path'):
-                            cs.model_path.set_text(str(model_path))
-                        elif hasattr(cs, 'model_file'):
-                            cs.model_file.set_text(str(model_path))
-                
-                print(f"DFM model loaded: {model_path}")
-                
-        except Exception as e:
-            print(f"Error loading DFM model {model_path}: {e}")
-    
-    def initialize_dfm_buttons(self):
-        """Initialize the DFM buttons on startup"""
-        self.load_recent_dfm_models()
-        
-        # Set the first available model as active
-        if self.dfm_models and len(self.dfm_models) > 0:
-            self.dfm_buttons[0].setChecked(True)
-            self.load_dfm_model(self.dfm_models[0])

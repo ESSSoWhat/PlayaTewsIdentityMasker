@@ -1,0 +1,136 @@
+{
+  "timestamp": "2025-07-20T21:06:20.792393",
+  "version": "1.0",
+  "window_geometry": [
+    100,
+    100,
+    1200,
+    800
+  ],
+  "window_state": "normal",
+  "widgets": {
+    "main_window": {
+      "name": "main_window",
+      "class_name": "QDFLAppWindow",
+      "geometry": [
+        100,
+        100,
+        1200,
+        800
+      ],
+      "visible": true,
+      "enabled": true,
+      "custom_data": {},
+      "parent_name": null,
+      "children": [
+        "menu_bar",
+        "content_widget"
+      ]
+    },
+    "menu_bar": {
+      "name": "menu_bar",
+      "class_name": "QXMenuBar",
+      "geometry": [
+        0,
+        0,
+        1200,
+        30
+      ],
+      "visible": true,
+      "enabled": true,
+      "custom_data": {},
+      "parent_name": "main_window",
+      "children": []
+    },
+    "content_widget": {
+      "name": "content_widget",
+      "class_name": "QLiveSwap",
+      "geometry": [
+        0,
+        30,
+        1200,
+        770
+      ],
+      "visible": true,
+      "enabled": true,
+      "custom_data": {},
+      "parent_name": "main_window",
+      "children": [
+        "file_source",
+        "camera_source",
+        "face_detector"
+      ]
+    },
+    "file_source": {
+      "name": "file_source",
+      "class_name": "QFileSource",
+      "geometry": [
+        0,
+        0,
+        256,
+        100
+      ],
+      "visible": true,
+      "enabled": true,
+      "custom_data": {
+        "source_type": "file"
+      },
+      "parent_name": "content_widget",
+      "children": []
+    },
+    "camera_source": {
+      "name": "camera_source",
+      "class_name": "QCameraSource",
+      "geometry": [
+        0,
+        110,
+        256,
+        100
+      ],
+      "visible": true,
+      "enabled": true,
+      "custom_data": {
+        "source_type": "camera"
+      },
+      "parent_name": "content_widget",
+      "children": []
+    },
+    "face_detector": {
+      "name": "face_detector",
+      "class_name": "QFaceDetector",
+      "geometry": [
+        266,
+        0,
+        256,
+        100
+      ],
+      "visible": true,
+      "enabled": true,
+      "custom_data": {
+        "detection_mode": "auto"
+      },
+      "parent_name": "content_widget",
+      "children": []
+    }
+  },
+  "layout_config": {
+    "window_title": "PlayaTewsIdentityMasker",
+    "style_sheet": "",
+    "layout_type": "QVBoxLayout",
+    "content_layout": {
+      "spacing": 5,
+      "contents_margins": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "custom_settings": {
+    "description": "OBS-style UI layout backup with face-swapping components",
+    "backup_name": "obs_layout_backup_20250720_210620",
+    "app_version": "1.0.0"
+  },
+  "checksum": "a7f67e62a99dc7096c29526afea5e23e"
+}

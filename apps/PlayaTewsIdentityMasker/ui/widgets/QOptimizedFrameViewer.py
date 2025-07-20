@@ -73,9 +73,13 @@ class QOptimizedFrameViewer(qtx.QXCollapsibleSection):
             return
         
         # Get window state
-        top_qx = self.get_top_QXWindow()
-        if top_qx is not None:
-            self._is_minimized = top_qx.is_minimized()
+        try:
+            top_qx = self.get_top_QXWindow()
+            if top_qx is not None:
+                self._is_minimized = top_qx.is_minimized()
+        except Exception:
+            # Handle case where top window is not found
+            self._is_minimized = False
         
         if not self.is_opened() or not self._is_visible or self._is_minimized:
             return

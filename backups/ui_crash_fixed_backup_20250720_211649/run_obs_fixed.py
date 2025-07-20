@@ -20,11 +20,6 @@ def setup_local_python_environment():
     os.environ['PYTHONPATH'] = str(local_site_packages) + os.pathsep + os.environ.get('PYTHONPATH', '')
     os.environ['PATH'] = str(local_scripts) + os.pathsep + os.environ.get('PATH', '')
     
-    # Fix GPU warnings
-    os.environ['CUDA_VISIBLE_DEVICES'] = ''
-    os.environ['ONNXRUNTIME_PROVIDER_INFO'] = 'CPUExecutionProvider'
-    os.environ['ONNXRUNTIME_LOGGING_LEVEL'] = '3'
-    
     return True
 
 def main():
