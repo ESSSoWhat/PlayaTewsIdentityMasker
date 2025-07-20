@@ -139,7 +139,8 @@ Examples:
             use_traditional = getattr(args, 'traditional', False)
             
             if use_traditional:
-                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with traditional UI: {userdata_path}")
+                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with TRADITIONAL UI: {userdata_path}")
+                logger.info("📋 Using traditional interface (requested via --traditional flag)")
                 try:
                     from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
                     startup_timer.mark_stage("app_imported")
@@ -154,7 +155,8 @@ Examples:
                     logger.error("Please ensure all dependencies are installed: pip install -r requirements-unified.txt")
                     sys.exit(1)
             else:
-                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with OBS-style streaming interface: {userdata_path}")
+                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with OBS-STYLE STREAMING INTERFACE: {userdata_path}")
+                logger.info("📋 Using OBS-style interface (DEFAULT - modern streaming-focused UI)")
                 try:
                     from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerOBSStyleApp import PlayaTewsIdentityMaskerOBSStyleApp
                     startup_timer.mark_stage("app_imported")
