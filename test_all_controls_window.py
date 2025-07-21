@@ -54,7 +54,7 @@ def test_all_controls_window():
         """Open the all controls window"""
         try:
             # Create and show the all controls window
-            all_controls_window = QProcessingWindow()
+            all_controls_window = QProcessingWindow(face_swap_components={})
             all_controls_window.show()
             
             # Print tab information

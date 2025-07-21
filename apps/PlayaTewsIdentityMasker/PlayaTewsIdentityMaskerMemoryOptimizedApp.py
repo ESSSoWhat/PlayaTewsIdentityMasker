@@ -271,8 +271,7 @@ class QDFLMemoryOptimizedAppWindow(qtx.QXWindow):
             pass
 
         # Create timer for processing messages
-        self.timer_5ms = qtx.QXTimer(interval_ms=5, timeout=self.q_live_swap._on_timer_5ms)
-        self.timer_5ms.start()
+        self.timer_5ms = qtx.QXTimer(interval=5, timeout=self.q_live_swap._on_timer_5ms, start=True)
 
         # Initialize the application
         self.q_live_swap.initialize()

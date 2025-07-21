@@ -14,9 +14,9 @@ from PyQt5.QtGui import QFont, QIcon
 from xlib import qt as qtx
 from xlib.qt.widgets.QXLabel import QXLabel
 from xlib.qt.widgets.QXWidget import QXWidget
-from xlib.qt.widgets.QXTabWidget import QXTabWidget
-from xlib.qt.widgets.QXGroupBox import QXGroupBox
-from xlib.qt.widgets.QXScrollArea import QXScrollArea
+from PyQt5.QtWidgets import QTabWidget as QXTabWidget
+from PyQt5.QtWidgets import QGroupBox as QXGroupBox
+from PyQt5.QtWidgets import QScrollArea as QXScrollArea
 
 class UIMode(Enum):
     TRADITIONAL = "traditional"
