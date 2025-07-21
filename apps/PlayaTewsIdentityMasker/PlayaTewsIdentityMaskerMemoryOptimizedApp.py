@@ -234,28 +234,20 @@ class QLiveSwapMemoryOptimized(qtx.QXWidget):
             backend_host.stop()
 
 
-class QDFLMemoryOptimizedAppWindow(qtx.QXWindow):
+class QDFLMemoryOptimizedAppWindow(QMainWindow):
     def __init__(self, userdata_path, settings_dirpath):
-        super().__init__(save_load_state=True, size_policy=('minimum', 'minimum'))
+        super().__init__()
         self.userdata_path = userdata_path
         self.settings_dirpath = settings_dirpath
 
-        # Initialize menu_bar attribute
+        # Menu bar temporarily disabled to avoid framework issues
         self.menu_bar = None
-
-        # Create menu bar
-        self.create_menu_bar()
 
         # Create main widget
         self.q_live_swap = QLiveSwapMemoryOptimized(userdata_path, settings_dirpath)
 
-        # Create main layout with menu bar included
-        main_layout = qtx.QXVBoxLayout()
-        if self.menu_bar:
-            main_layout.addWidget(self.menu_bar)
-            main_layout.addSpacing(5)
-        main_layout.addWidget(self.q_live_swap)
-        self.setLayout(main_layout)
+        # Set the main widget for QMainWindow
+        self.setCentralWidget(self.q_live_swap)
 
         # Set window properties
         self.setWindowTitle("PlayaTewsIdentityMasker - Memory Optimized")
