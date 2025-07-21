@@ -37,10 +37,10 @@ from .ui.widgets.QBCFrameViewer import QBCFrameViewer
 from .ui.widgets.QBCMergedFrameViewer import QBCMergedFrameViewer
 
 
-class QLiveSwapOptimized(qtx.QXWindow):
+class QLiveSwapOptimized(qtx.QXWidget):
     def __init__(self, userdata_path : Path,
                        settings_dirpath : Path):
-        super().__init__(save_load_state=True, size_policy=('minimum', 'minimum'))
+        super().__init__()
 
         dfm_models_path = userdata_path / 'dfm_models'
         dfm_models_path.mkdir(parents=True, exist_ok=True)
@@ -310,7 +310,7 @@ class QDFLOptimizedAppWindow(qtx.QXWindow):
 
         # Create optimized live swap widget
         self.q_live_swap = QLiveSwapOptimized(userdata_path, settings_dirpath)
-        self.setCentralWidget(self.q_live_swap)
+        self.add_widget(self.q_live_swap)
 
         # Set window properties
         self.setWindowTitle("PlayaTewsIdentityMasker - Optimized OBS-Style Interface")
@@ -446,8 +446,8 @@ class PlayaTewsIdentityMaskerOptimizedApp(qtx.QXMainApplication):
         self.setFont(QXFontDB.get_default_font())
         self.setWindowIcon(QXImageDB.app_icon().as_QIcon())
 
-        # Create main window directly using QLiveSwapOptimized
-        self.q_main_window = QLiveSwapOptimized(userdata_path, self.settings_dirpath)
+        # Create main window using QDFLOptimizedAppWindow
+        self.q_main_window = QDFLOptimizedAppWindow(userdata_path, self.settings_dirpath)
 
     def on_reinitialize(self):
         """Handle application reinitialization"""
@@ -457,10 +457,7 @@ class PlayaTewsIdentityMaskerOptimizedApp(qtx.QXMainApplication):
                 self.q_main_window.finalize()
             
             # Recreate main window
-            self.q_main_window = QLiveSwapOptimized(self.userdata_path, self.settings_dirpath)
-            
-            # Initialize components
-            self.q_main_window.initialize()
+            self.q_main_window = QDFLOptimizedAppWindow(self.userdata_path, self.settings_dirpath)
             
             # Show main window
             self.q_main_window.show()
@@ -470,7 +467,6 @@ class PlayaTewsIdentityMaskerOptimizedApp(qtx.QXMainApplication):
 
     def initialize(self):
         """Initialize the application"""
-        self.q_main_window.initialize()
         self.q_main_window.show()
 
     def finalize(self):

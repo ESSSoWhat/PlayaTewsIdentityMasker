@@ -804,7 +804,7 @@ class QProcessingWindow(qtx.QXWindow):
     def setup_styles(self):
         """Setup application styles"""
         self.setStyleSheet("""
-            QMainWindow {
+            QXWindow {
                 background-color: #2d2d2d;
                 color: #ffffff;
             }

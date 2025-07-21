@@ -7,6 +7,7 @@ from resources.gfx import QXImageDB
 from xlib import os as lib_os
 from xlib import qt as qtx
 from xlib.qt.widgets.QXLabel import QXLabel
+from xlib.qt.widgets.QXWindow import QXWindow
 
 from . import backend
 from .ui.QCameraSource import QCameraSource
@@ -234,7 +235,7 @@ class QLiveSwapMemoryOptimized(qtx.QXWidget):
             backend_host.stop()
 
 
-class QDFLMemoryOptimizedAppWindow(QMainWindow):
+class QDFLMemoryOptimizedAppWindow(QXWindow):
     def __init__(self, userdata_path, settings_dirpath):
         super().__init__()
         self.userdata_path = userdata_path
@@ -246,8 +247,11 @@ class QDFLMemoryOptimizedAppWindow(QMainWindow):
         # Create main widget
         self.q_live_swap = QLiveSwapMemoryOptimized(userdata_path, settings_dirpath)
 
-        # Set the main widget for QMainWindow
-        self.setCentralWidget(self.q_live_swap)
+        # Set the main widget as the central widget using layout
+        from PyQt5.QtWidgets import QVBoxLayout
+        layout = QVBoxLayout()
+        layout.addWidget(self.q_live_swap)
+        self.setLayout(layout)
 
         # Set window properties
         self.setWindowTitle("PlayaTewsIdentityMasker - Memory Optimized")
@@ -458,7 +462,7 @@ class PlayaTewsIdentityMaskerMemoryOptimizedApp(qtx.QXMainApplication):
     def show_splash_screen(self):
         """Show memory optimization splash screen"""
         try:
-            splash = qtx.QXWidget()
+            splash = qtx.QXWindow()
             splash.setFixedSize(400, 300)
             splash.setStyleSheet("""
                 QWidget {
