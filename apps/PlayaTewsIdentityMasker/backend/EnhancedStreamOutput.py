@@ -19,6 +19,7 @@ from xlib.streamer import FFMPEGStreamer
 from .BackendBase import (BackendConnection, BackendDB, BackendHost,
                           BackendSignal, BackendWeakHeap, BackendWorker,
                           BackendWorkerState)
+from .StreamOutput import SourceType, ViewModeNames
 
 
 class StreamingPlatform(IntEnum):
@@ -562,8 +563,10 @@ class EnhancedStreamOutputWorker(BackendWorker):
     def on_tick(self):
         state, cs = self.get_state(), self.get_control_sheet()
 
-        if self.bc_in.has_data():
-            frame = self.bc_in.get()
+        bcd = self.bc_in.read(timeout=0.005)
+        if bcd is not None:
+            bcd.assign_weak_heap(self.weak_heap)
+            frame = self.extract_frame_from_bcd(bcd, state.source_type, state.aligned_face_id)
             if frame is not None:
                 # Update FPS counter
                 self.fps_counter.update()
@@ -599,6 +602,34 @@ class EnhancedStreamOutputWorker(BackendWorker):
                         if state.sequence_path is not None:
                             self.save_frame_to_sequence(delayed_frame, state.sequence_path, state.save_fill_frame_gap)
 
+    def extract_frame_from_bcd(self, bcd, source_type, aligned_face_id):
+        """Extract frame from BackendConnectionData based on source type"""
+        try:
+            if source_type == SourceType.SOURCE_FRAME:
+                return bcd.get_image(bcd.get_frame_image_name())
+            elif source_type == SourceType.ALIGNED_FACE:
+                # Extract aligned face
+                for i, fsi in enumerate(bcd.get_face_swap_info_list()):
+                    if aligned_face_id == i:
+                        return bcd.get_image(fsi.face_align_image_name)
+                return None
+            elif source_type == SourceType.SWAPPED_FACE:
+                # Return swapped face
+                for fsi in bcd.get_face_swap_info_list():
+                    swapped_face = bcd.get_image(fsi.face_swap_image_name)
+                    if swapped_face is not None:
+                        return swapped_face
+                return None
+            elif source_type == SourceType.MERGED_FRAME:
+                # Return merged frame
+                return bcd.get_image(bcd.get_merged_image_name())
+            else:
+                # Default to source frame
+                return bcd.get_image(bcd.get_frame_image_name())
+        except Exception as e:
+            print(f"❌ Error extracting frame from BCD: {e}")
+            return None
+
     def process_frame(self, frame, source_type, aligned_face_id):
         """Process frame based on source type"""
         if source_type == SourceType.SOURCE_FRAME:
@@ -630,53 +661,56 @@ class EnhancedStreamOutputWorker(BackendWorker):
 
 
 # Reuse existing SourceType and ViewModeNames from StreamOutput
-from .StreamOutput import SourceType, ViewModeNames
 
 
 class Sheet:
     class Host(lib_csw.Sheet.Host):
         def __init__(self):
             super().__init__()
-            self.source_type = lib_csw.ControlViewer()
-            self.is_showing_window = lib_csw.ControlViewer()
-            self.aligned_face_id = lib_csw.ControlViewer()
-            self.target_delay = lib_csw.ControlViewer()
-            self.sequence_path = lib_csw.ControlViewer()
-            self.save_fill_frame_gap = lib_csw.ControlViewer()
-            self.is_streaming = lib_csw.ControlViewer()
-            self.stream_addr = lib_csw.ControlViewer()
-            self.stream_port = lib_csw.ControlViewer()
-            self.avg_fps = lib_csw.ControlViewer()
-            self.show_hide_window = lib_csw.ControlSignal()
+            self.source_type = lib_csw.DynamicSingleSwitch.Client()
+            self.is_showing_window = lib_csw.Flag.Client()
+            self.aligned_face_id = lib_csw.Number.Client()
+            self.target_delay = lib_csw.Number.Client()
+            self.sequence_path = lib_csw.Paths.Client()
+            self.save_sequence_path = lib_csw.Paths.Client()
+            self.save_sequence_path_error = lib_csw.Error.Client()
+            self.save_fill_frame_gap = lib_csw.Flag.Client()
+            self.is_streaming = lib_csw.Flag.Client()
+            self.stream_addr = lib_csw.Text.Client()
+            self.stream_port = lib_csw.Number.Client()
+            self.avg_fps = lib_csw.Number.Client()
+            self.show_hide_window = lib_csw.Signal.Client()
             
             # Enhanced controls
-            self.multi_platform_streaming = lib_csw.ControlViewer()
-            self.recording_enabled = lib_csw.ControlViewer()
-            self.scene_name = lib_csw.ControlViewer()
-            self.add_scene = lib_csw.ControlSignal()
-            self.remove_scene = lib_csw.ControlSignal()
+            self.multi_platform_streaming = lib_csw.Flag.Client()
+            self.recording_enabled = lib_csw.Flag.Client()
+            self.scene_name = lib_csw.Text.Client()
+            self.add_scene = lib_csw.Signal.Client()
+            self.remove_scene = lib_csw.Signal.Client()
 
     class Worker(lib_csw.Sheet.Worker):
         def __init__(self):
             super().__init__()
-            self.source_type = lib_csw.ControlSwitcher()
-            self.is_showing_window = lib_csw.ControlSwitcher()
-            self.aligned_face_id = lib_csw.ControlSwitcher()
-            self.target_delay = lib_csw.ControlSwitcher()
-            self.sequence_path = lib_csw.ControlSwitcher()
-            self.save_fill_frame_gap = lib_csw.ControlSwitcher()
-            self.is_streaming = lib_csw.ControlSwitcher()
-            self.stream_addr = lib_csw.ControlSwitcher()
-            self.stream_port = lib_csw.ControlSwitcher()
-            self.avg_fps = lib_csw.ControlSwitcher()
-            self.show_hide_window = lib_csw.ControlSwitcher()
+            self.source_type = lib_csw.DynamicSingleSwitch.Host()
+            self.is_showing_window = lib_csw.Flag.Host()
+            self.aligned_face_id = lib_csw.Number.Host()
+            self.target_delay = lib_csw.Number.Host()
+            self.sequence_path = lib_csw.Paths.Host()
+            self.save_sequence_path = lib_csw.Paths.Host()
+            self.save_sequence_path_error = lib_csw.Error.Host()
+            self.save_fill_frame_gap = lib_csw.Flag.Host()
+            self.is_streaming = lib_csw.Flag.Host()
+            self.stream_addr = lib_csw.Text.Host()
+            self.stream_port = lib_csw.Number.Host()
+            self.avg_fps = lib_csw.Number.Host()
+            self.show_hide_window = lib_csw.Signal.Host()
             
             # Enhanced controls
-            self.multi_platform_streaming = lib_csw.ControlSwitcher()
-            self.recording_enabled = lib_csw.ControlSwitcher()
-            self.scene_name = lib_csw.ControlSwitcher()
-            self.add_scene = lib_csw.ControlSwitcher()
-            self.remove_scene = lib_csw.ControlSwitcher()
+            self.multi_platform_streaming = lib_csw.Flag.Host()
+            self.recording_enabled = lib_csw.Flag.Host()
+            self.scene_name = lib_csw.Text.Host()
+            self.add_scene = lib_csw.Signal.Host()
+            self.remove_scene = lib_csw.Signal.Host()
 
 
 class WorkerState(BackendWorkerState):

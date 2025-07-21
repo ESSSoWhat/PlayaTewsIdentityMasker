@@ -27,8 +27,12 @@ class QBCMergedFrameViewer(qtx.QXCollapsibleSection):
         super().__init__(title=L('@QBCMergedFrameViewer.title'), content_layout=main_l)
 
     def _on_timer_16ms(self):
-        top_qx = self.get_top_QXWindow()
-        if not self.is_opened() or (top_qx is not None and top_qx.is_minimized() ):
+        try:
+            top_qx = self.get_top_QXWindow()
+            if not self.is_opened() or (top_qx is not None and top_qx.is_minimized() ):
+                return
+        except Exception:
+            # Handle case where top window is not found
             return
 
         bcd_id = self._bc.get_write_id()

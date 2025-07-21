@@ -296,7 +296,7 @@ def pytest_configure(config):
     if config.getoption("--real-hardware", default=False):
         TEST_CONFIG['use_real_hardware'] = True
     
-    print(f"\n🚀 Test Configuration:")
+    print(f"\n[TEST] Test Configuration:")
     print(f"   Mock by default: {TEST_CONFIG['mock_by_default']}")
     print(f"   Real hardware: {TEST_CONFIG['use_real_hardware']}")
     print(f"   Benchmarks: {TEST_CONFIG['benchmark_enabled']}")
@@ -340,7 +340,7 @@ def session_performance_report(performance_monitor):
     yield
     
     summary = performance_monitor.get_summary()
-    print(f"\n📊 Performance Summary:")
+    print(f"\n[PERF] Performance Summary:")
     print(f"   Total tests: {summary['total_tests']}")
     print(f"   Total time: {summary['total_time']:.2f}s")
     

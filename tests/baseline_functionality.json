@@ -1,0 +1,80 @@
+{
+  "timestamp": 1752991849.4881368,
+  "components": {
+    "file_source": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "camera_source": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "voice_changer": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "face_detector": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "face_marker": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "face_aligner": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "face_animator": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "face_swap_insight": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "face_swap_dfm": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "frame_adjuster": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "face_merger": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    },
+    "stream_output": {
+      "exists": false,
+      "methods": [],
+      "type": "Error",
+      "error": "App instance creation failed"
+    }
+  },
+  "signals": {},
+  "settings": {},
+  "performance": {}
+}

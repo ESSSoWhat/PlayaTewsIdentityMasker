@@ -19,7 +19,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('playatewsidentitymasker.log'),
+        logging.FileHandler('playatewsidentitymasker.log', encoding='utf-8'),
         logging.StreamHandler(sys.stdout)
     ]
 )
@@ -51,7 +51,7 @@ class StartupTimer:
     def mark_stage(self, stage_name: str):
         """Mark a startup stage completion"""
         self.stages[stage_name] = time.time() - self.start_time
-        logger.info(f"✅ {stage_name} completed in {self.stages[stage_name]:.2f}s")
+        logger.info(f"[OK] {stage_name} completed in {self.stages[stage_name]:.2f}s")
     
     def get_summary(self) -> Dict[str, float]:
         """Get startup performance summary"""
@@ -95,7 +95,7 @@ Examples:
                 logger.warning(f"Could not import xlib.appargs: {e}")
                 # Set default CUDA behavior
                 os.environ['NO_CUDA'] = str(args.no_cuda).lower()
-            logger.info(f"🚀 Starting PlayaTewsIdentityMasker with userdata: {userdata_path}")
+            logger.info(f"[START] Starting PlayaTewsIdentityMasker with userdata: {userdata_path}")
             
             try:
                 # Lazy import the app
@@ -113,11 +113,11 @@ Examples:
                 logger.info(f"📊 Startup performance: {summary}")
                 
             except ImportError as e:
-                logger.error(f"❌ Failed to import PlayaTewsIdentityMaskerApp: {e}")
+                logger.error(f"[ERROR] Failed to import PlayaTewsIdentityMaskerApp: {e}")
                 logger.error("Please ensure all dependencies are installed: pip install -r requirements-unified.txt")
                 sys.exit(1)
             except Exception as e:
-                logger.error(f"❌ Application failed to start: {e}")
+                logger.error(f"[ERROR] Application failed to start: {e}")
                 sys.exit(1)
 
         def run_PlayaTewsIdentityMaskerOBS(args):
@@ -139,8 +139,7 @@ Examples:
             use_traditional = getattr(args, 'traditional', False)
             
             if use_traditional:
-                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with TRADITIONAL UI: {userdata_path}")
-                logger.info("📋 Using traditional interface (requested via --traditional flag)")
+                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with traditional UI: {userdata_path}")
                 try:
                     from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
                     startup_timer.mark_stage("app_imported")
@@ -151,12 +150,11 @@ Examples:
                     app.run()
                     startup_timer.mark_stage("app_completed")
                 except ImportError as e:
-                    logger.error(f"❌ Failed to import PlayaTewsIdentityMaskerApp: {e}")
+                    logger.error(f"[ERROR] Failed to import PlayaTewsIdentityMaskerApp: {e}")
                     logger.error("Please ensure all dependencies are installed: pip install -r requirements-unified.txt")
                     sys.exit(1)
             else:
-                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with OBS-STYLE STREAMING INTERFACE: {userdata_path}")
-                logger.info("📋 Using OBS-style interface (DEFAULT - modern streaming-focused UI)")
+                logger.info(f"🚀 Starting PlayaTewsIdentityMasker with OBS-style streaming interface: {userdata_path}")
                 try:
                     from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerOBSStyleApp import PlayaTewsIdentityMaskerOBSStyleApp
                     startup_timer.mark_stage("app_imported")
@@ -167,17 +165,55 @@ Examples:
                     app.run()
                     startup_timer.mark_stage("app_completed")
                 except ImportError as e:
-                    logger.error(f"❌ Failed to import PlayaTewsIdentityMaskerOBSStyleApp: {e}")
+                    logger.error(f"[ERROR] Failed to import PlayaTewsIdentityMaskerOBSStyleApp: {e}")
                     logger.error("Please ensure all dependencies are installed: pip install -r requirements-unified.txt")
                     sys.exit(1)
             
             try:
                 # Log startup performance
                 summary = startup_timer.get_summary()
-                logger.info(f"📊 Startup performance: {summary}")
+                logger.info(f"[PERF] Startup performance: {summary}")
                 
             except Exception as e:
-                logger.error(f"❌ Application failed to start: {e}")
+                logger.error(f"[ERROR] Application failed to start: {e}")
+                sys.exit(1)
+
+        def run_PlayaTewsIdentityMaskerOptimized(args):
+            """Run optimized PlayaTewsIdentityMasker with voice changer integration"""
+            startup_timer.mark_stage("args_parsed")
+            
+            userdata_path = Path(args.userdata_dir) if args.userdata_dir else Path.cwd()
+            
+            # Lazy import xlib modules
+            try:
+                from xlib import appargs as lib_appargs
+                lib_appargs.set_arg_bool('NO_CUDA', args.no_cuda)
+            except ImportError as e:
+                logger.warning(f"Could not import xlib.appargs: {e}")
+                # Set default CUDA behavior
+                os.environ['NO_CUDA'] = str(args.no_cuda).lower()
+
+            logger.info(f"[START] Starting PlayaTewsIdentityMasker with optimized UI: {userdata_path}")
+            try:
+                from apps.PlayaTewsIdentityMasker.QOptimizedPlayaTewsIdentityMaskerApp import OptimizedPlayaTewsIdentityMaskerApp
+                startup_timer.mark_stage("app_imported")
+                
+                app = OptimizedPlayaTewsIdentityMaskerApp(userdata_path)
+                startup_timer.mark_stage("app_created")
+                
+                app.run()
+                startup_timer.mark_stage("app_completed")
+                
+                # Log startup performance
+                summary = startup_timer.get_summary()
+                logger.info(f"📊 Startup performance: {summary}")
+                
+            except ImportError as e:
+                logger.error(f"[ERROR] Failed to import OptimizedPlayaTewsIdentityMaskerApp: {e}")
+                logger.error("Please ensure all dependencies are installed: pip install -r requirements-unified.txt")
+                sys.exit(1)
+            except Exception as e:
+                logger.error(f"[ERROR] Application failed to start: {e}")
                 sys.exit(1)
 
         # Primary OBS-style app parser (now the main interface)
@@ -201,6 +237,13 @@ Examples:
         p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
         p.add_argument('--verbose', '-v', action="store_true", default=False, help="Enable verbose logging.")
         p.set_defaults(func=run_PlayaTewsIdentityMaskerOBS)
+
+        # Optimized app parser
+        p = run_subparsers.add_parser('PlayaTewsIdentityMaskerOptimized', help="Run PlayaTewsIdentityMasker with optimized UI and voice changer")
+        p.add_argument('--userdata-dir', default=None, action=fixPathAction, help="Workspace directory.")
+        p.add_argument('--no-cuda', action="store_true", default=False, help="Disable CUDA.")
+        p.add_argument('--verbose', '-v', action="store_true", default=False, help="Enable verbose logging.")
+        p.set_defaults(func=run_PlayaTewsIdentityMaskerOptimized)
 
         # Development commands
         dev_parser = subparsers.add_parser("dev", help="Development utilities")

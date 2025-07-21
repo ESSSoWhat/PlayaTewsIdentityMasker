@@ -196,7 +196,7 @@ DFLive = FaceSwapCompatibility
 '''
             
             # Insert the fix after the imports
-            lines = original_content.split('\\n')
+            lines = original_content.split('\n')
             import_end_index = 0
             
             for i, line in enumerate(lines):
@@ -210,7 +210,7 @@ DFLive = FaceSwapCompatibility
             
             # Write the fixed file
             with open(faceswap_module_path, 'w') as f:
-                f.write('\\n'.join(lines))
+                f.write('\n'.join(lines))
             
             logger.info("✅ FaceSwapDFM compatibility fix applied")
             
