@@ -1,6 +1,8 @@
 from enum import IntEnum
 from pathlib import Path
 from typing import List
+import os
+import sys
 
 import cv2
 import numpy as np
@@ -35,6 +37,7 @@ class StreamOutput(BackendHost):
 
     def get_control_sheet(self) -> 'Sheet.Host': return super().get_control_sheet()
 
+
 class SourceType(IntEnum):
     SOURCE_FRAME = 0
     ALIGNED_FACE = 1
@@ -45,6 +48,7 @@ class SourceType(IntEnum):
     SOURCE_N_MERGED_FRAME_OR_SOURCE_FRAME = 6
     ALIGNED_N_SWAPPED_FACE = 7
 
+
 ViewModeNames = ['@StreamOutput.SourceType.SOURCE_FRAME',
                  '@StreamOutput.SourceType.ALIGNED_FACE',
                  '@StreamOutput.SourceType.SWAPPED_FACE',
@@ -54,7 +58,6 @@ ViewModeNames = ['@StreamOutput.SourceType.SOURCE_FRAME',
                  '@StreamOutput.SourceType.SOURCE_N_MERGED_FRAME_OR_SOURCE_FRAME',
                  '@StreamOutput.SourceType.ALIGNED_N_SWAPPED_FACE',
                  ]
-
 
 
 class StreamOutputWorker(BackendWorker):
@@ -69,16 +72,25 @@ class StreamOutputWorker(BackendWorker):
         self.bc_in = bc_in
 
         self.fps_counter = lib_time.FPSCounter()
-
         self.buffered_frames = lib_logic.DelayedBuffers()
         self.is_show_window = False
-
         self.prev_frame_num = -1
 
         self._wnd_name = 'PlayaTewsIdentityMasker output'
         self._wnd_showing = False
 
-        self._streamer = FFMPEGStreamer()
+        # Initialize FFmpeg path
+        self._setup_ffmpeg_path()
+        
+        # Initialize streamer with proper error handling
+        self._streamer = None
+        self._streamer_initialized = False
+        self._streaming_error = None
+        
+        # Performance tracking
+        self._frame_count = 0
+        self._last_error_time = 0
+        self._error_count = 0
 
         lib_os.set_timer_resolution(1)
 
@@ -133,49 +145,86 @@ class StreamOutputWorker(BackendWorker):
         cs.stream_port.set_config(lib_csw.Number.Config(min=1, max=9999, decimals=0, allow_instant_update=True))
         cs.stream_port.set_number(state.stream_port if state.stream_port is not None else 1234)
 
+    def _setup_ffmpeg_path(self):
+        """Setup FFmpeg path for the system"""
+        try:
+            # Check if FFmpeg is already in PATH
+            import subprocess
+            result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True)
+            if result.returncode == 0:
+                print("✅ FFmpeg found in system PATH")
+                return
+        except:
+            pass
+        
+        # Try to find FFmpeg in the project directory
+        project_root = Path(__file__).parent.parent.parent.parent
+        ffmpeg_paths = [
+            project_root / "ffmpeg_enhanced" / "ffmpeg-master-latest-win64-gpl" / "bin",
+            project_root / "ffmpeg" / "bin",
+            project_root / "tools" / "ffmpeg" / "bin"
+        ]
+        
+        for ffmpeg_path in ffmpeg_paths:
+            if ffmpeg_path.exists() and (ffmpeg_path / "ffmpeg.exe").exists():
+                # Add to PATH for this process
+                current_path = os.environ.get('PATH', '')
+                os.environ['PATH'] = str(ffmpeg_path) + os.pathsep + current_path
+                print(f"✅ FFmpeg found and added to PATH: {ffmpeg_path}")
+                return
+        
+        print("⚠️ FFmpeg not found. Streaming functionality may not work properly.")
+        print("   Please install FFmpeg or ensure it's in the system PATH.")
+
+    def _initialize_streamer(self):
+        """Initialize the FFMPEG streamer with error handling"""
+        try:
+            if self._streamer is None:
+                self._streamer = FFMPEGStreamer()
+                self._streamer_initialized = True
+                self._streaming_error = None
+                print("✅ FFMPEG streamer initialized successfully")
+            return True
+        except Exception as e:
+            self._streaming_error = str(e)
+            print(f"❌ Failed to initialize FFMPEG streamer: {e}")
+            return False
+
     def on_stop(self):
-        self._streamer.stop()
+        """Stop streaming and cleanup"""
+        if self._streamer is not None:
+            self._streamer.stop()
+            self._streamer = None
+        self._streamer_initialized = False
 
     def on_cs_source_type(self, idx, source_type):
         state, cs = self.get_state(), self.get_control_sheet()
-        if source_type in [SourceType.ALIGNED_FACE, SourceType.ALIGNED_N_SWAPPED_FACE]:
-            cs.aligned_face_id.enable()
-            cs.aligned_face_id.set_config(lib_csw.Number.Config(min=0, max=16, step=1, allow_instant_update=True))
-            cs.aligned_face_id.set_number(state.aligned_face_id or 0)
-        else:
-            cs.aligned_face_id.disable()
         state.source_type = source_type
-
         self.save_state()
         self.reemit_frame_signal.send()
 
     def show_window(self):
-        state, cs = self.get_state(), self.get_control_sheet()
-        cv2.namedWindow(self._wnd_name)
         self._wnd_showing = True
+        cv2.namedWindow(self._wnd_name, cv2.WINDOW_NORMAL)
 
     def hide_window(self):
-        state, cs = self.get_state(), self.get_control_sheet()
-        if self._wnd_showing:
-            cv2.destroyAllWindows()
-            self._wnd_showing = False
+        self._wnd_showing = False
+        cv2.destroyWindow(self._wnd_name)
 
     def on_cs_show_hide_window_signal(self,):
         state, cs = self.get_state(), self.get_control_sheet()
-
         state.is_showing_window = not state.is_showing_window
         if state.is_showing_window:
-            cv2.namedWindow(self._wnd_name)
+            self.show_window()
         else:
-            cv2.destroyAllWindows()
+            self.hide_window()
         self.save_state()
         self.reemit_frame_signal.send()
-
 
     def on_cs_aligned_face_id(self, aligned_face_id):
         state, cs = self.get_state(), self.get_control_sheet()
         cfg = cs.aligned_face_id.get_config()
-        aligned_face_id = state.aligned_face_id = np.clip(aligned_face_id, cfg.min, cfg.max)
+        aligned_face_id = state.aligned_face_id = int(np.clip(aligned_face_id, cfg.min, cfg.max))
         cs.aligned_face_id.set_number(aligned_face_id)
         self.save_state()
         self.reemit_frame_signal.send()
@@ -211,22 +260,78 @@ class StreamOutputWorker(BackendWorker):
     def on_cs_is_streaming(self, is_streaming):
         state, cs = self.get_state(), self.get_control_sheet()
         state.is_streaming = is_streaming
+        
+        if is_streaming:
+            # Initialize streamer if not already done
+            if not self._initialize_streamer():
+                print("❌ Cannot start streaming - streamer initialization failed")
+                state.is_streaming = False
+                cs.is_streaming.set_flag(False, block_event=True)
+                return
+        
         self.save_state()
 
     def on_cs_stream_addr(self, stream_addr):
         state, cs = self.get_state(), self.get_control_sheet()
         state.stream_addr = stream_addr
         self.save_state()
-        self._streamer.set_addr_port(state.stream_addr, state.stream_port)
+        if self._streamer is not None:
+            self._streamer.set_addr_port(state.stream_addr, state.stream_port)
 
     def on_cs_stream_port(self, stream_port):
         state, cs = self.get_state(), self.get_control_sheet()
         state.stream_port = stream_port
         self.save_state()
-        self._streamer.set_addr_port(state.stream_addr, state.stream_port)
+        if self._streamer is not None:
+            self._streamer.set_addr_port(state.stream_addr, state.stream_port)
+
+    def _process_frame_for_streaming(self, view_image):
+        """Process frame for streaming with error handling"""
+        try:
+            if view_image is None:
+                return None
+                
+            # Convert to uint8 format for streaming
+            img = ImageProcessor(view_image).to_uint8().get_image('HWC')
+            
+            # Ensure proper dimensions
+            if len(img.shape) != 3 or img.shape[2] != 3:
+                print(f"⚠️ Invalid frame shape for streaming: {img.shape}")
+                return None
+                
+            return img
+            
+        except Exception as e:
+            current_time = time.time()
+            if current_time - self._last_error_time > 5:  # Log error only every 5 seconds
+                print(f"❌ Error processing frame for streaming: {e}")
+                self._last_error_time = current_time
+                self._error_count += 1
+            return None
+
+    def _safe_stream_frame(self, img):
+        """Safely stream a frame with error handling"""
+        try:
+            if self._streamer is not None and self._streamer_initialized:
+                self._streamer.push_frame(img)
+                self._frame_count += 1
+                return True
+        except Exception as e:
+            current_time = time.time()
+            if current_time - self._last_error_time > 5:  # Log error only every 5 seconds
+                print(f"❌ Error streaming frame: {e}")
+                self._last_error_time = current_time
+                self._error_count += 1
+                
+                # Try to reinitialize streamer on repeated errors
+                if self._error_count > 10:
+                    print("🔄 Attempting to reinitialize streamer due to repeated errors")
+                    self._initialize_streamer()
+                    self._error_count = 0
+        return False
 
     def on_tick(self):
-        cs, state = self.get_control_sheet(), self.get_state()
+        cs, state = self.get_state(), self.get_control_sheet()
 
         bcd = self.bc_in.read(timeout=0.005)
         if bcd is not None:
@@ -247,115 +352,136 @@ class StreamOutputWorker(BackendWorker):
 
                 view_image = None
 
-                if source_type == SourceType.SOURCE_FRAME:
-                    view_image = bcd.get_image(bcd.get_frame_image_name())
-                elif source_type in [SourceType.MERGED_FRAME, SourceType.MERGED_FRAME_OR_SOURCE_FRAME]:
-                    view_image = bcd.get_image(bcd.get_merged_image_name())
-                    if view_image is None and source_type == SourceType.MERGED_FRAME_OR_SOURCE_FRAME:
+                # Process frame based on source type
+                try:
+                    if source_type == SourceType.SOURCE_FRAME:
                         view_image = bcd.get_image(bcd.get_frame_image_name())
+                    elif source_type in [SourceType.MERGED_FRAME, SourceType.MERGED_FRAME_OR_SOURCE_FRAME]:
+                        view_image = bcd.get_image(bcd.get_merged_image_name())
+                        if view_image is None and source_type == SourceType.MERGED_FRAME_OR_SOURCE_FRAME:
+                            view_image = bcd.get_image(bcd.get_frame_image_name())
 
-                elif source_type == SourceType.ALIGNED_FACE:
-                    aligned_face_id = state.aligned_face_id
-                    for i, fsi in enumerate(bcd.get_face_swap_info_list()):
-                        if aligned_face_id == i:
-                            view_image = bcd.get_image(fsi.face_align_image_name)
-                            break
+                    elif source_type == SourceType.ALIGNED_FACE:
+                        aligned_face_id = state.aligned_face_id
+                        for i, fsi in enumerate(bcd.get_face_swap_info_list()):
+                            if aligned_face_id == i:
+                                view_image = bcd.get_image(fsi.face_align_image_name)
+                                break
 
-                elif source_type == SourceType.SWAPPED_FACE:
-                    for fsi in bcd.get_face_swap_info_list():
-                        view_image = bcd.get_image(fsi.face_swap_image_name)
-                        if view_image is not None:
-                            break
+                    elif source_type == SourceType.SWAPPED_FACE:
+                        for fsi in bcd.get_face_swap_info_list():
+                            view_image = bcd.get_image(fsi.face_swap_image_name)
+                            if view_image is not None:
+                                break
 
-                elif source_type in [SourceType.SOURCE_N_MERGED_FRAME, SourceType.SOURCE_N_MERGED_FRAME_OR_SOURCE_FRAME]:
-                    source_frame = bcd.get_image(bcd.get_frame_image_name())
-                    if source_frame is not None:
-                        source_frame = ImageProcessor(source_frame).to_ufloat32().get_image('HWC')
+                    elif source_type in [SourceType.SOURCE_N_MERGED_FRAME, SourceType.SOURCE_N_MERGED_FRAME_OR_SOURCE_FRAME]:
+                        source_frame = bcd.get_image(bcd.get_frame_image_name())
+                        if source_frame is not None:
+                            source_frame = ImageProcessor(source_frame).to_ufloat32().get_image('HWC')
 
-                    merged_frame = bcd.get_image(bcd.get_merged_image_name())
+                        merged_frame = bcd.get_image(bcd.get_merged_image_name())
 
-                    if merged_frame is None and source_type == SourceType.SOURCE_N_MERGED_FRAME_OR_SOURCE_FRAME:
-                        merged_frame = source_frame
+                        if merged_frame is None and source_type == SourceType.SOURCE_N_MERGED_FRAME_OR_SOURCE_FRAME:
+                            merged_frame = source_frame
 
-                    if source_frame is not None and merged_frame is not None:
-                        view_image = np.concatenate( (source_frame, merged_frame), 1 )
+                        if source_frame is not None and merged_frame is not None:
+                            view_image = np.concatenate( (source_frame, merged_frame), 1 )
 
-                elif source_type == SourceType.ALIGNED_N_SWAPPED_FACE:
-                    aligned_face_id = state.aligned_face_id
-                    aligned_face = None
-                    swapped_face = None
-                    for i, fsi in enumerate(bcd.get_face_swap_info_list()):
-                        if aligned_face_id == i:
-                            aligned_face = bcd.get_image(fsi.face_align_image_name)
-                            break
+                    elif source_type == SourceType.ALIGNED_N_SWAPPED_FACE:
+                        aligned_face_id = state.aligned_face_id
+                        aligned_face = None
+                        swapped_face = None
+                        for i, fsi in enumerate(bcd.get_face_swap_info_list()):
+                            if aligned_face_id == i:
+                                aligned_face = bcd.get_image(fsi.face_align_image_name)
+                                break
 
-                    for fsi in bcd.get_face_swap_info_list():
-                        swapped_face = bcd.get_image(fsi.face_swap_image_name)
-                        if swapped_face is not None:
-                            break
+                        for fsi in bcd.get_face_swap_info_list():
+                            swapped_face = bcd.get_image(fsi.face_swap_image_name)
+                            if swapped_face is not None:
+                                break
 
-                    if aligned_face is not None and swapped_face is not None:
-                        view_image = np.concatenate( (aligned_face, swapped_face), 1 )
+                        if aligned_face is not None and swapped_face is not None:
+                            view_image = np.concatenate( (aligned_face, swapped_face), 1 )
 
+                except Exception as e:
+                    print(f"❌ Error processing frame for source type {source_type}: {e}")
+                    view_image = None
 
                 if view_image is not None:
+                    # Add to buffer
                     buffered_frames.add_buffer( bcd.get_frame_timestamp(), view_image )
 
+                    # Save sequence if enabled
                     if state.sequence_path is not None:
-                        img = ImageProcessor(view_image, copy=True).to_uint8().get_image('HWC')
+                        try:
+                            img = ImageProcessor(view_image, copy=True).to_uint8().get_image('HWC')
+                            file_ext, cv_args = '.jpg', [int(cv2.IMWRITE_JPEG_QUALITY), 100]
 
-                        file_ext, cv_args = '.jpg', [int(cv2.IMWRITE_JPEG_QUALITY), 100]
+                            frame_diff = abs(frame_num - prev_frame_num) if state.save_fill_frame_gap else 1
+                            for i in range(frame_diff):
+                                n = frame_num - i
+                                filename = f'{n:06}'
+                                lib_cv.imwrite(state.sequence_path / (filename+file_ext), img, cv_args)
+                        except Exception as e:
+                            print(f"❌ Error saving frame sequence: {e}")
 
-                        frame_diff = abs(frame_num - prev_frame_num) if state.save_fill_frame_gap else 1
-                        for i in range(frame_diff):
-                            n = frame_num - i
-                            filename = f'{n:06}'
-                            lib_cv.imwrite(state.sequence_path / (filename+file_ext), img, cv_args)
+                    # Process buffered frame
+                    pr = buffered_frames.process()
+                    img = pr.new_data
+                    
+                    if img is not None:
+                        # Handle streaming
+                        if state.is_streaming:
+                            stream_img = self._process_frame_for_streaming(view_image)
+                            if stream_img is not None:
+                                self._safe_stream_frame(stream_img)
 
-                pr = buffered_frames.process()
+                        # Handle window display
+                        if state.is_showing_window:
+                            try:
+                                cv2.imshow(self._wnd_name, img)
+                            except Exception as e:
+                                print(f"❌ Error displaying window: {e}")
 
-                img = pr.new_data
-                if img is not None:
-                    if state.is_streaming:
-                        img = ImageProcessor(view_image).to_uint8().get_image('HWC')
-                        self._streamer.push_frame(img)
-
-                    if state.is_showing_window:
-                        cv2.imshow(self._wnd_name, img)
-
+        # Handle window events
         if state.is_showing_window:
-            cv2.waitKey(1)
+            try:
+                cv2.waitKey(1)
+            except Exception as e:
+                print(f"❌ Error in window event loop: {e}")
 
 class Sheet:
     class Host(lib_csw.Sheet.Host):
         def __init__(self):
             super().__init__()
-            self.source_type = lib_csw.DynamicSingleSwitch.Client()
-            self.aligned_face_id = lib_csw.Number.Client()
-            self.target_delay = lib_csw.Number.Client()
-            self.avg_fps = lib_csw.Number.Client()
-            self.show_hide_window = lib_csw.Signal.Client()
-            self.save_sequence_path = lib_csw.Paths.Client()
-            self.save_sequence_path_error = lib_csw.Error.Client()
-            self.save_fill_frame_gap = lib_csw.Flag.Client()
-            self.is_streaming = lib_csw.Flag.Client()
-            self.stream_addr = lib_csw.Text.Client()
-            self.stream_port = lib_csw.Number.Client()
+            self.source_type = lib_csw.DynamicSingleSwitch()
+            self.show_hide_window = lib_csw.Signal()
+            self.aligned_face_id = lib_csw.Number()
+            self.target_delay = lib_csw.Number()
+            self.avg_fps = lib_csw.Number()
+            self.save_sequence_path = lib_csw.Paths()
+            self.save_sequence_path_error = lib_csw.Error()
+            self.save_fill_frame_gap = lib_csw.Flag()
+            self.is_streaming = lib_csw.Flag()
+            self.stream_addr = lib_csw.Text()
+            self.stream_port = lib_csw.Number()
 
     class Worker(lib_csw.Sheet.Worker):
         def __init__(self):
             super().__init__()
-            self.source_type = lib_csw.DynamicSingleSwitch.Host()
-            self.aligned_face_id = lib_csw.Number.Host()
-            self.target_delay = lib_csw.Number.Host()
-            self.avg_fps = lib_csw.Number.Host()
-            self.show_hide_window = lib_csw.Signal.Host()
-            self.save_sequence_path = lib_csw.Paths.Host()
-            self.save_sequence_path_error = lib_csw.Error.Host()
-            self.save_fill_frame_gap = lib_csw.Flag.Host()
-            self.is_streaming = lib_csw.Flag.Host()
-            self.stream_addr = lib_csw.Text.Host()
-            self.stream_port = lib_csw.Number.Host()
+            self.source_type = lib_csw.DynamicSingleSwitch()
+            self.show_hide_window = lib_csw.Signal()
+            self.aligned_face_id = lib_csw.Number()
+            self.target_delay = lib_csw.Number()
+            self.avg_fps = lib_csw.Number()
+            self.save_sequence_path = lib_csw.Paths()
+            self.save_sequence_path_error = lib_csw.Error()
+            self.save_fill_frame_gap = lib_csw.Flag()
+            self.is_streaming = lib_csw.Flag()
+            self.stream_addr = lib_csw.Text()
+            self.stream_port = lib_csw.Number()
+
 
 class WorkerState(BackendWorkerState):
     source_type : SourceType = SourceType.SOURCE_FRAME

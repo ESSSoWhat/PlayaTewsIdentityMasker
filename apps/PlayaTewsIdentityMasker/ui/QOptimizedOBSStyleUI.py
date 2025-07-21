@@ -45,12 +45,13 @@ from ..backend.StreamOutput import SourceType
 class QOptimizedOBSStyleUI(QWidget):
     """Optimized OBS Studio-style UI with better space utilization"""
     
-    def __init__(self, stream_output_backend: StreamOutput, userdata_path: Path, face_swap_components=None, viewers_components=None):
+    def __init__(self, stream_output_backend: StreamOutput, userdata_path: Path, face_swap_components=None, viewers_components=None, voice_changer_backend=None):
         super().__init__()
         self.stream_output_backend = stream_output_backend
         self.userdata_path = userdata_path
         self.face_swap_components = face_swap_components or {}
         self.viewers_components = viewers_components or {}
+        self.voice_changer_backend = voice_changer_backend
         self.scenes = []
         self.current_scene = None
         self.sources_by_scene = {}
@@ -234,94 +235,29 @@ class QOptimizedOBSStyleUI(QWidget):
     
     def create_voice_changer_section(self):
         """Create voice changer section for the left panel"""
-        group = QGroupBox("Voice Changer")
-        layout = QVBoxLayout()
+        from .QCompactVoiceChanger import QCompactVoiceChanger
         
-        # Enable/disable voice changer
-        self.voice_changer_enabled = QCheckBox("Enable Voice Changer")
-        self.voice_changer_enabled.setStyleSheet("""
-            QCheckBox {
-                color: #ffffff;
-                font-size: 11px;
-                font-weight: bold;
-            }
-        """)
-        layout.addWidget(self.voice_changer_enabled)
-        
-        # Effect selection
-        effect_label = QLabel("Effect:")
-        effect_label.setStyleSheet("color: #cccccc; font-size: 10px;")
-        layout.addWidget(effect_label)
-        
-        self.voice_effect_combo = QComboBox()
-        self.voice_effect_combo.addItems([
-            "None", "Pitch Up", "Pitch Down", "Robot", "Helium", 
-            "Deep Voice", "Echo", "Reverb", "Chorus", "Distortion", "Autotune"
-        ])
-        self.voice_effect_combo.setStyleSheet("""
-            QComboBox {
-                background-color: #2d2d2d;
-                border: 1px solid #404040;
-                border-radius: 3px;
-                color: #ffffff;
-                font-size: 10px;
-                padding: 2px;
-            }
-            QComboBox::drop-down {
-                border: none;
-            }
-            QComboBox::down-arrow {
-                image: none;
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 5px solid #ffffff;
-            }
-        """)
-        layout.addWidget(self.voice_effect_combo)
-        
-        # Quick preset buttons
-        presets_label = QLabel("Quick Presets:")
-        presets_label.setStyleSheet("color: #cccccc; font-size: 10px; margin-top: 5px;")
-        layout.addWidget(presets_label)
-        
-        presets_layout = QHBoxLayout()
-        
-        # Create preset buttons
-        self.preset_buttons = {}
-        presets = [
-            ("Male", "Deep Voice"),
-            ("Female", "Pitch Up"),
-            ("Robot", "Robot"),
-            ("Echo", "Echo")
-        ]
-        
-        for preset_name, effect_name in presets:
-            btn = QPushButton(preset_name)
-            btn.setMaximumWidth(45)
-            btn.setMaximumHeight(25)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #3498db;
-                    color: white;
-                    border: none;
+        # Create the compact voice changer widget
+        if self.voice_changer_backend:
+            self.voice_changer_widget = QCompactVoiceChanger(self.voice_changer_backend.get_control_sheet())
+        else:
+            # Create a placeholder if no voice changer backend is provided
+            self.voice_changer_widget = QLabel("Voice Changer: Not Available")
+            self.voice_changer_widget.setStyleSheet("""
+                QLabel {
+                    color: #cccccc;
+                    font-size: 10px;
+                    padding: 10px;
+                    background-color: #2d2d2d;
+                    border: 1px solid #404040;
                     border-radius: 3px;
-                    font-size: 9px;
-                    font-weight: bold;
-                }
-                QPushButton:hover {
-                    background-color: #2980b9;
                 }
             """)
-            btn.clicked.connect(lambda checked, name=effect_name: self.apply_voice_preset(name))
-            presets_layout.addWidget(btn)
-            self.preset_buttons[preset_name] = btn
+            self.voice_changer_widget.setAlignment(Qt.AlignCenter)
         
-        layout.addLayout(presets_layout)
-        
-        # Effect parameters (collapsible)
-        self.voice_params_group = QGroupBox("Parameters")
-        self.voice_params_group.setMaximumHeight(120)
-        self.voice_params_group.setStyleSheet("""
+        # Create a group box to contain it
+        group = QGroupBox("Voice Changer")
+        group.setStyleSheet("""
             QGroupBox {
                 color: #cccccc;
                 font-size: 10px;
@@ -337,62 +273,10 @@ class QOptimizedOBSStyleUI(QWidget):
             }
         """)
         
-        params_layout = QVBoxLayout()
-        
-        # Pitch shift slider
-        pitch_label = QLabel("Pitch Shift:")
-        pitch_label.setStyleSheet("color: #cccccc; font-size: 9px;")
-        params_layout.addWidget(pitch_label)
-        
-        self.pitch_slider = QSlider(Qt.Horizontal)
-        self.pitch_slider.setRange(-12, 12)
-        self.pitch_slider.setValue(0)
-        self.pitch_slider.setStyleSheet("""
-            QSlider::groove:horizontal {
-                border: 1px solid #404040;
-                height: 4px;
-                background: #2d2d2d;
-                border-radius: 2px;
-            }
-            QSlider::handle:horizontal {
-                background: #3498db;
-                border: 1px solid #2980b9;
-                width: 8px;
-                margin: -2px 0;
-                border-radius: 4px;
-            }
-        """)
-        params_layout.addWidget(self.pitch_slider)
-        
-        # Echo delay slider
-        echo_label = QLabel("Echo Delay:")
-        echo_label.setStyleSheet("color: #cccccc; font-size: 9px;")
-        params_layout.addWidget(echo_label)
-        
-        self.echo_slider = QSlider(Qt.Horizontal)
-        self.echo_slider.setRange(1, 10)
-        self.echo_slider.setValue(3)
-        self.echo_slider.setStyleSheet("""
-            QSlider::groove:horizontal {
-                border: 1px solid #404040;
-                height: 4px;
-                background: #2d2d2d;
-                border-radius: 2px;
-            }
-            QSlider::handle:horizontal {
-                background: #e67e22;
-                border: 1px solid #d35400;
-                width: 8px;
-                margin: -2px 0;
-                border-radius: 4px;
-            }
-        """)
-        params_layout.addWidget(self.echo_slider)
-        
-        self.voice_params_group.setLayout(params_layout)
-        layout.addWidget(self.voice_params_group)
-        
+        layout = QVBoxLayout()
+        layout.addWidget(self.voice_changer_widget)
         group.setLayout(layout)
+        
         return group
     
     def load_dfm_models(self):
@@ -1083,14 +967,11 @@ class QOptimizedOBSStyleUI(QWidget):
         self.global_face_swap_btn.toggled.connect(self.on_global_face_swap_toggled)
         
         # Connect voice changer controls
-        if hasattr(self, 'voice_changer_enabled'):
-            self.voice_changer_enabled.toggled.connect(self.on_voice_changer_toggled)
-        if hasattr(self, 'voice_effect_combo'):
-            self.voice_effect_combo.currentTextChanged.connect(self.on_voice_effect_changed)
-        if hasattr(self, 'pitch_slider'):
-            self.pitch_slider.valueChanged.connect(self.on_pitch_changed)
-        if hasattr(self, 'echo_slider'):
-            self.echo_slider.valueChanged.connect(self.on_echo_changed)
+        if hasattr(self, 'voice_changer_widget'):
+            self.voice_changer_widget.enabled_changed.connect(self.on_voice_changer_toggled)
+            self.voice_changer_widget.effect_changed.connect(self.on_voice_effect_changed)
+            self.voice_changer_widget.pitch_changed.connect(self.on_pitch_changed)
+            self.voice_changer_widget.echo_changed.connect(self.on_echo_changed)
         
     def open_processing_window(self):
         """Open the processing window"""
@@ -1101,11 +982,8 @@ class QOptimizedOBSStyleUI(QWidget):
     # Voice changer event handlers
     def apply_voice_preset(self, effect_name):
         """Apply a voice changer preset"""
-        if hasattr(self, 'voice_effect_combo'):
-            index = self.voice_effect_combo.findText(effect_name)
-            if index >= 0:
-                self.voice_effect_combo.setCurrentIndex(index)
-                print(f"Applied voice preset: {effect_name}")
+        if hasattr(self, 'voice_changer_widget'):
+            self.voice_changer_widget.apply_preset(effect_name)
     
     def on_voice_changer_toggled(self, enabled):
         """Handle voice changer enable/disable"""

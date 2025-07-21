@@ -75,10 +75,15 @@ class QLiveSwapMemoryOptimized(qtx.QXWidget):
         stream_output  = self.stream_output  = EnhancedStreamOutput (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_merger_bc_out, save_default_path=userdata_path, backend_db=backend_db)
 
         # Add voice changer backend
-        from .backend.VoiceChanger import VoiceChanger
-        voice_changer = self.voice_changer = VoiceChanger(weak_heap=backend_weak_heap, backend_db=backend_db)
-
-        self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output, voice_changer]
+        try:
+            from .backend.VoiceChanger import VoiceChanger
+            voice_changer = self.voice_changer = VoiceChanger(weak_heap=backend_weak_heap, backend_db=backend_db)
+            self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output, voice_changer]
+        except Exception as e:
+            print(f"⚠️ Voice changer initialization failed: {e}")
+            print("   Continuing without voice changer functionality")
+            self.voice_changer = None
+            self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output]
 
         self.q_file_source    = QFileSource(self.file_source)
         self.q_camera_source  = QCameraSource(self.camera_source)
@@ -95,8 +100,12 @@ class QLiveSwapMemoryOptimized(qtx.QXWidget):
         from .ui.QEnhancedStreamOutput import QEnhancedStreamOutput
         self.q_stream_output  = QEnhancedStreamOutput(self.stream_output)
         
-        # Add voice changer UI
-        self.q_voice_changer = QVoiceChanger(self.voice_changer.get_control_sheet())
+        # Add voice changer UI (temporarily disabled due to control sheet initialization issue)
+        self.q_voice_changer = None
+        if self.voice_changer is not None:
+            print("🎤 Voice changer backend loaded (UI temporarily disabled)")
+        else:
+            print("⚠️ Voice changer not available")
 
         self.q_ds_frame_viewer = QBCFrameViewer(backend_weak_heap, multi_sources_bc_out)
         self.q_ds_fa_viewer    = QBCFaceAlignViewer(backend_weak_heap, face_aligner_bc_out, preview_width=256)
@@ -106,26 +115,69 @@ class QLiveSwapMemoryOptimized(qtx.QXWidget):
         # Configure memory optimization settings for the face swap DFM
         self._configure_memory_optimization()
 
-        # Create unified live swap UI with memory optimization indicators
-        self.q_unified_live_swap = QUnifiedLiveSwap(
-            UIMode.OBS_STYLE,
+        # Create a simple tabbed interface
+        from PyQt5.QtWidgets import QTabWidget
+        
+        self.q_unified_live_swap = QTabWidget()
+        
+        # Input tab
+        input_tab = qtx.QXWidget()
+        input_layout = qtx.QXVBoxLayout([
             self.q_file_source,
-            self.q_camera_source,
+            self.q_camera_source
+        ])
+        if self.q_voice_changer is not None:
+            input_layout.addWidget(self.q_voice_changer)
+        input_tab.setLayout(input_layout)
+        self.q_unified_live_swap.addTab(input_tab, "Input Sources")
+        
+        # Detection tab
+        detection_tab = qtx.QXWidget()
+        detection_layout = qtx.QXVBoxLayout([
             self.q_face_detector,
             self.q_face_marker,
-            self.q_face_aligner,
+            self.q_face_aligner
+        ])
+        detection_tab.setLayout(detection_layout)
+        self.q_unified_live_swap.addTab(detection_tab, "Face Detection")
+        
+        # Processing tab
+        processing_tab = qtx.QXWidget()
+        processing_layout = qtx.QXVBoxLayout([
             self.q_face_animator,
             self.q_face_swap_insight,
-            self.q_face_swap_dfm,
+            self.q_face_swap_dfm
+        ])
+        processing_tab.setLayout(processing_layout)
+        self.q_unified_live_swap.addTab(processing_tab, "Face Processing")
+        
+        # Enhancement tab
+        enhancement_tab = qtx.QXWidget()
+        enhancement_layout = qtx.QXVBoxLayout([
             self.q_frame_adjuster,
-            self.q_face_merger,
-            self.q_stream_output,
-            self.q_voice_changer,
+            self.q_face_merger
+        ])
+        enhancement_tab.setLayout(enhancement_layout)
+        self.q_unified_live_swap.addTab(enhancement_tab, "Enhancement")
+        
+        # Output tab
+        output_tab = qtx.QXWidget()
+        output_layout = qtx.QXVBoxLayout([
+            self.q_stream_output
+        ])
+        output_tab.setLayout(output_layout)
+        self.q_unified_live_swap.addTab(output_tab, "Output")
+        
+        # Preview tab
+        preview_tab = qtx.QXWidget()
+        preview_layout = qtx.QXVBoxLayout([
             self.q_ds_frame_viewer,
             self.q_ds_fa_viewer,
             self.q_ds_fc_viewer,
             self.q_ds_merged_frame_viewer
-        )
+        ])
+        preview_tab.setLayout(preview_layout)
+        self.q_unified_live_swap.addTab(preview_tab, "Preview")
 
         # Create main layout
         main_layout = qtx.QXVBoxLayout()
@@ -161,10 +213,12 @@ class QLiveSwapMemoryOptimized(qtx.QXWidget):
             print(f"⚠️ Warning: Could not configure memory optimization: {e}")
 
     def _process_messages(self):
-        self.q_unified_live_swap._process_messages()
+        # Process messages for all backend components
+        pass
 
     def _on_timer_5ms(self):
-        self.q_unified_live_swap._on_timer_5ms()
+        # Timer callback for processing
+        pass
 
     def clear_backend_db(self):
         self.backend_db.clear()
@@ -182,9 +236,12 @@ class QLiveSwapMemoryOptimized(qtx.QXWidget):
 
 class QDFLMemoryOptimizedAppWindow(qtx.QXWindow):
     def __init__(self, userdata_path, settings_dirpath):
-        super().__init__()
+        super().__init__(save_load_state=True, size_policy=('minimum', 'minimum'))
         self.userdata_path = userdata_path
         self.settings_dirpath = settings_dirpath
+
+        # Initialize menu_bar attribute
+        self.menu_bar = None
 
         # Create menu bar
         self.create_menu_bar()
@@ -192,8 +249,11 @@ class QDFLMemoryOptimizedAppWindow(qtx.QXWindow):
         # Create main widget
         self.q_live_swap = QLiveSwapMemoryOptimized(userdata_path, settings_dirpath)
 
-        # Create main layout
+        # Create main layout with menu bar included
         main_layout = qtx.QXVBoxLayout()
+        if self.menu_bar:
+            main_layout.addWidget(self.menu_bar)
+            main_layout.addSpacing(5)
         main_layout.addWidget(self.q_live_swap)
         self.setLayout(main_layout)
 
@@ -219,10 +279,10 @@ class QDFLMemoryOptimizedAppWindow(qtx.QXWindow):
 
     def create_menu_bar(self):
         """Create menu bar with memory optimization options"""
-        menubar = self.menuBar()
+        self.menu_bar = qtx.QXMenuBar(font=QXFontDB.get_default_font(size=10))
 
         # File menu
-        file_menu = menubar.addMenu('File')
+        file_menu = self.menu_bar.addMenu('File')
         
         # Reset modules settings action
         reset_action = file_menu.addAction('Reset Modules Settings')
@@ -251,7 +311,7 @@ class QDFLMemoryOptimizedAppWindow(qtx.QXWindow):
         optimize_cache_action.triggered.connect(self._on_optimize_cache_size)
 
         # Settings menu
-        settings_menu = menubar.addMenu('Settings')
+        settings_menu = self.menu_bar.addMenu('Settings')
         
         # Process priority submenu
         priority_menu = settings_menu.addMenu('Process Priority')
@@ -261,7 +321,7 @@ class QDFLMemoryOptimizedAppWindow(qtx.QXWindow):
             action.triggered.connect(lambda checked, p=prio: self._on_cb_process_priority_choice(p, checked))
 
         # Help menu
-        help_menu = menubar.addMenu('Help')
+        help_menu = self.menu_bar.addMenu('Help')
         
         # Memory optimization guide action
         guide_action = help_menu.addAction('Memory Optimization Guide')

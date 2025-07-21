@@ -71,7 +71,11 @@ class QLiveSwapOBS(qtx.QXWidget):
         from .backend.EnhancedStreamOutput import EnhancedStreamOutput
         stream_output  = self.stream_output  = EnhancedStreamOutput (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_merger_bc_out, save_default_path=userdata_path, backend_db=backend_db)
 
-        self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output]
+        # Add voice changer backend
+        from .backend.VoiceChanger import VoiceChanger
+        voice_changer = self.voice_changer = VoiceChanger(weak_heap=backend_weak_heap, backend_db=backend_db)
+
+        self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output, voice_changer]
 
         # Create UI components
         self.q_file_source    = QFileSource(self.file_source)
@@ -120,16 +124,29 @@ class QLiveSwapOBS(qtx.QXWidget):
 
         # Create OBS-style UI with integrated face-swapping components and viewers
         try:
-            from .ui.QOBSStyleUI import QOBSStyleUI
-            # Create a wrapper widget to handle the QXWindow requirement
-            obs_widget = QOBSStyleUI(self.stream_output, userdata_path, face_swap_components, viewers_components)
+            from .ui.QOptimizedOBSStyleUI import QOptimizedOBSStyleUI
+            # Create optimized OBS-style UI with voice changer integration
+            obs_widget = QOptimizedOBSStyleUI(
+                self.stream_output, 
+                userdata_path, 
+                face_swap_components, 
+                viewers_components,
+                self.voice_changer  # Pass voice changer backend
+            )
             self.q_obs_style_ui = obs_widget
         except ImportError as e:
-            print(f"Warning: Could not import QOBSStyleUI: {e}")
-            # Create a simple placeholder widget
-            self.q_obs_style_ui = qtx.QXLabel(text="OBS-Style UI not available\nUsing Traditional Interface")
-            self.q_obs_style_ui.setStyleSheet("QLabel { background-color: #2d2d2d; color: #ffffff; padding: 20px; font-size: 14px; }")
-            self.q_obs_style_ui.setAlignment(Qt.AlignCenter)
+            print(f"Warning: Could not import QOptimizedOBSStyleUI: {e}")
+            # Fallback to original OBS-style UI
+            try:
+                from .ui.QOBSStyleUI import QOBSStyleUI
+                obs_widget = QOBSStyleUI(self.stream_output, userdata_path, face_swap_components, viewers_components)
+                self.q_obs_style_ui = obs_widget
+            except ImportError as e2:
+                print(f"Warning: Could not import QOBSStyleUI: {e2}")
+                # Create a simple placeholder widget
+                self.q_obs_style_ui = qtx.QXLabel(text="OBS-Style UI not available\nUsing Traditional Interface")
+                self.q_obs_style_ui.setStyleSheet("QLabel { background-color: #2d2d2d; color: #ffffff; padding: 20px; font-size: 14px; }")
+                self.q_obs_style_ui.setAlignment(Qt.AlignCenter)
 
         # Create main layout with OBS-style UI (viewers are now integrated)
         main_layout = qtx.QXVBoxLayout()

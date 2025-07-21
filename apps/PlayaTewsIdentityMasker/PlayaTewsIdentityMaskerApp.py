@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import List
-from PyQt5.QtWidgets import QMainWindow
+from xlib import qt as qtx
 
 from localization import L, Localization
 from resources.fonts import QXFontDB
@@ -197,20 +197,17 @@ class QLiveSwap(qtx.QXWidget):
             backend_host.stop()
 
 
-class QDFLAppWindow(QMainWindow):
+class QDFLAppWindow(qtx.QXWindow):
     def __init__(self, userdata_path, settings_dirpath):
-        super().__init__()
+        super().__init__(save_load_state=True)
         self.userdata_path = userdata_path
         self.settings_dirpath = settings_dirpath
 
-        # Create menu bar
-        self.create_menu_bar()
-
         # Create main widget
         self.q_live_swap = QLiveSwap(userdata_path, settings_dirpath)
-
-        # Set central widget for QMainWindow
-        self.setCentralWidget(self.q_live_swap)
+        
+        # Add the main widget to this window
+        self.add_widget(self.q_live_swap)
 
         # Set window properties
         self.setWindowTitle("PlayaTewsIdentityMasker - Memory Optimized")
@@ -234,57 +231,9 @@ class QDFLAppWindow(QMainWindow):
 
     def create_menu_bar(self):
         """Create menu bar with memory optimization options"""
-        menubar = self.menuBar()
-
-        # File menu
-        file_menu = menubar.addMenu('File')
-        
-        # Reset modules settings action
-        reset_action = file_menu.addAction('Reset Modules Settings')
-        reset_action.triggered.connect(self._on_reset_modules_settings)
-        
-        # Memory optimization submenu
-        memory_menu = file_menu.addMenu('Memory Optimization')
-        
-        # Memory monitoring action
-        monitor_action = memory_menu.addAction('Start Memory Monitor')
-        monitor_action.triggered.connect(self._on_start_memory_monitor)
-        
-        # Memory report action
-        report_action = memory_menu.addAction('Generate Memory Report')
-        report_action.triggered.connect(self._on_generate_memory_report)
-        
-        # Cache management submenu
-        cache_menu = file_menu.addMenu('Cache Management')
-        
-        # Clear all caches action
-        clear_cache_action = cache_menu.addAction('Clear All Caches')
-        clear_cache_action.triggered.connect(self._on_clear_all_caches)
-        
-        # Optimize cache size action
-        optimize_cache_action = cache_menu.addAction('Optimize Cache Size')
-        optimize_cache_action.triggered.connect(self._on_optimize_cache_size)
-
-        # Settings menu
-        settings_menu = menubar.addMenu('Settings')
-        
-        # Process priority submenu
-        priority_menu = settings_menu.addMenu('Process Priority')
-        
-        for prio in lib_os.ProcessPriority:
-            action = priority_menu.addAction(prio.name)
-            action.triggered.connect(lambda checked, p=prio: self._on_cb_process_priority_choice(p, checked))
-
-        # Help menu
-        help_menu = menubar.addMenu('Help')
-        
-        # Memory optimization guide action
-        guide_action = help_menu.addAction('Memory Optimization Guide')
-        guide_action.triggered.connect(self._on_show_memory_guide)
-        
-        # Performance tips action
-        tips_action = help_menu.addAction('Performance Tips')
-        tips_action.triggered.connect(self._on_show_performance_tips)
+        # Note: QXWindow doesn't have built-in menu bar support
+        # Menu functionality can be implemented using custom widgets if needed
+        pass
 
     def _on_reset_modules_settings(self):
         """Reset all module settings"""

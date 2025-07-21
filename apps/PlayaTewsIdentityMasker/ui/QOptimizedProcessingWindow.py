@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
                             QCheckBox, QGroupBox, QTabWidget, QSplitter, 
                             QListWidget, QListWidgetItem, QSlider, QFrame,
                             QTextEdit, QProgressBar, QScrollArea, QSizePolicy,
-                            QMainWindow, QAction, QMenuBar, QStatusBar, QDockWidget)
+                            QAction, QMenuBar, QStatusBar, QDockWidget)
 
 from localization import L
 from resources.fonts import QXFontDB
@@ -28,11 +28,11 @@ from .widgets.QCollapsibleComponentWrapper import (
 )
 
 
-class QOptimizedProcessingWindow(QMainWindow):
+class QOptimizedProcessingWindow(qtx.QXWindow):
     """Optimized processing window with reduced tabs and better organization"""
     
     def __init__(self, face_swap_components: Dict = None, parent=None):
-        super().__init__(parent)
+        super().__init__(save_load_state=True)
         self.face_swap_components = face_swap_components or {}
         self.parent_window = parent
         self.setup_window()
@@ -58,13 +58,8 @@ class QOptimizedProcessingWindow(QMainWindow):
         except:
             pass
         
-        # Create menu bar
-        self.create_menu_bar()
-        
-        # Create status bar
-        self.status_bar = QStatusBar()
-        self.setStatusBar(self.status_bar)
-        self.status_bar.showMessage("Optimized controls ready - 4 organized tabs for better navigation")
+        # Note: QXWindow doesn't have built-in menu bar and status bar support
+        # These can be implemented using custom widgets if needed
         
     def create_menu_bar(self):
         """Create menu bar with processing options"""
@@ -119,7 +114,7 @@ class QOptimizedProcessingWindow(QMainWindow):
     def setup_ui(self):
         """Setup the optimized main UI layout with 4 tabs"""
         central_widget = QWidget()
-        self.setCentralWidget(central_widget)
+        self.add_widget(central_widget)
         
         main_layout = QHBoxLayout()
         
