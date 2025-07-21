@@ -140,7 +140,11 @@ class QOptimizedOBSStyleUI(QWidget):
         layout.addWidget(scenes_group)
         layout.addWidget(sources_group)
         
-        # Voice Changer section (new addition)
+        # DFM Quick Access section (new addition)
+        dfm_quick_access_group = self.create_dfm_quick_access_section()
+        layout.addWidget(dfm_quick_access_group)
+        
+        # Voice Changer section
         voice_changer_group = self.create_voice_changer_section()
         layout.addWidget(voice_changer_group)
         
@@ -148,6 +152,85 @@ class QOptimizedOBSStyleUI(QWidget):
         
         panel.setLayout(layout)
         return panel
+    
+    def create_dfm_quick_access_section(self):
+        """Create DFM quick access section for the left panel"""
+        group = QGroupBox("Quick DFM Models")
+        layout = QVBoxLayout()
+        
+        # Title and refresh button
+        title_layout = QHBoxLayout()
+        title_label = QLabel("Recent Models")
+        title_label.setStyleSheet("color: #ffffff; font-size: 11px; font-weight: bold;")
+        title_layout.addWidget(title_label)
+        title_layout.addStretch()
+        
+        # Refresh button
+        self.refresh_dfm_btn = QPushButton("🔄")
+        self.refresh_dfm_btn.setMaximumWidth(25)
+        self.refresh_dfm_btn.setToolTip("Refresh DFM model list")
+        self.refresh_dfm_btn.clicked.connect(self.refresh_dfm_models)
+        title_layout.addWidget(self.refresh_dfm_btn)
+        
+        layout.addLayout(title_layout)
+        
+        # DFM model buttons (2x3 grid)
+        self.dfm_buttons = []
+        self.dfm_button_layout = QGridLayout()
+        self.dfm_button_layout.setSpacing(5)
+        
+        for i in range(6):
+            row = i // 2
+            col = i % 2
+            
+            btn = QPushButton(f"DFM {i+1}")
+            btn.setMinimumHeight(50)
+            btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #2c3e50;
+                    border: 2px solid #34495e;
+                    border-radius: 5px;
+                    color: #ffffff;
+                    font-size: 10px;
+                    font-weight: bold;
+                    padding: 5px;
+                }
+                QPushButton:hover {
+                    background-color: #3498db;
+                    border-color: #2980b9;
+                }
+                QPushButton:pressed {
+                    background-color: #e74c3c;
+                    border-color: #c0392b;
+                }
+                QPushButton:disabled {
+                    background-color: #34495e;
+                    border-color: #2c3e50;
+                    color: #7f8c8d;
+                }
+            """)
+            btn.setEnabled(False)
+            btn.clicked.connect(lambda checked, idx=i: self.on_dfm_button_clicked(idx))
+            
+            self.dfm_buttons.append(btn)
+            self.dfm_button_layout.addWidget(btn, row, col)
+        
+        layout.addLayout(self.dfm_button_layout)
+        
+        # Status label
+        self.dfm_status_label = QLabel("No DFM models found")
+        self.dfm_status_label.setStyleSheet("color: #95a5a6; font-size: 9px;")
+        self.dfm_status_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.dfm_status_label)
+        
+        group.setLayout(layout)
+        
+        # Initialize DFM models
+        self.dfm_models = []
+        self.current_dfm_index = -1
+        self.load_dfm_models()
+        
+        return group
     
     def create_voice_changer_section(self):
         """Create voice changer section for the left panel"""
@@ -311,6 +394,250 @@ class QOptimizedOBSStyleUI(QWidget):
         
         group.setLayout(layout)
         return group
+    
+    def load_dfm_models(self):
+        """Load available DFM models from the universal DFM system"""
+        try:
+            # Try to import the universal DFM integration
+            import sys
+            sys.path.append(str(Path(__file__).parent.parent.parent / "universal_dfm"))
+            
+            try:
+                from dfm_integration import get_face_swap_models
+                models = get_face_swap_models()
+                
+                # Sort by priority (active first, then prebuilt)
+                models.sort(key=lambda x: 0 if x.get("priority") == "high" else 1)
+                
+                # Take the first 6 models
+                self.dfm_models = models[:6]
+                
+                # Update button states
+                self.update_dfm_buttons()
+                
+                if self.dfm_models:
+                    self.dfm_status_label.setText(f"Loaded {len(self.dfm_models)} models")
+                else:
+                    self.dfm_status_label.setText("No DFM models found")
+                    
+            except ImportError:
+                # Fallback: scan dfm_models directory directly
+                self.load_dfm_models_fallback()
+                
+        except Exception as e:
+            print(f"Error loading DFM models: {e}")
+            self.dfm_status_label.setText("Error loading models")
+            self.load_dfm_models_fallback()
+    
+    def load_dfm_models_fallback(self):
+        """Fallback method to load DFM models from local directory"""
+        try:
+            dfm_dir = self.userdata_path / "dfm_models"
+            if not dfm_dir.exists():
+                dfm_dir = Path("dfm_models")  # Try current directory
+            
+            if dfm_dir.exists():
+                dfm_files = list(dfm_dir.glob("*.dfm"))
+                # Sort by modification time (most recent first)
+                dfm_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+                
+                self.dfm_models = []
+                for dfm_file in dfm_files[:6]:
+                    self.dfm_models.append({
+                        "name": dfm_file.stem,
+                        "file": str(dfm_file),
+                        "category": "local",
+                        "priority": "medium"
+                    })
+                
+                self.update_dfm_buttons()
+                
+                if self.dfm_models:
+                    self.dfm_status_label.setText(f"Loaded {len(self.dfm_models)} local models")
+                else:
+                    self.dfm_status_label.setText("No local DFM models found")
+            else:
+                self.dfm_status_label.setText("DFM directory not found")
+                
+        except Exception as e:
+            print(f"Error in fallback DFM loading: {e}")
+            self.dfm_status_label.setText("Error loading models")
+    
+    def update_dfm_buttons(self):
+        """Update the DFM buttons with model information"""
+        for i, btn in enumerate(self.dfm_buttons):
+            if i < len(self.dfm_models):
+                model = self.dfm_models[i]
+                model_name = model.get("name", "Unknown")
+                
+                # Truncate name if too long
+                display_name = model_name[:15] + "..." if len(model_name) > 15 else model_name
+                
+                btn.setText(f"DFM {i+1}\n{display_name}")
+                btn.setToolTip(f"Model: {model_name}\nPath: {model.get('file', 'Unknown')}")
+                btn.setEnabled(True)
+                
+                # Set different colors based on priority
+                if model.get("priority") == "high":
+                    btn.setStyleSheet("""
+                        QPushButton {
+                            background-color: #27ae60;
+                            border: 2px solid #2ecc71;
+                            border-radius: 5px;
+                            color: #ffffff;
+                            font-size: 10px;
+                            font-weight: bold;
+                            padding: 5px;
+                        }
+                        QPushButton:hover {
+                            background-color: #2ecc71;
+                            border-color: #27ae60;
+                        }
+                        QPushButton:pressed {
+                            background-color: #e74c3c;
+                            border-color: #c0392b;
+                        }
+                    """)
+                else:
+                    btn.setStyleSheet("""
+                        QPushButton {
+                            background-color: #2c3e50;
+                            border: 2px solid #34495e;
+                            border-radius: 5px;
+                            color: #ffffff;
+                            font-size: 10px;
+                            font-weight: bold;
+                            padding: 5px;
+                        }
+                        QPushButton:hover {
+                            background-color: #3498db;
+                            border-color: #2980b9;
+                        }
+                        QPushButton:pressed {
+                            background-color: #e74c3c;
+                            border-color: #c0392b;
+                        }
+                    """)
+            else:
+                btn.setText(f"DFM {i+1}\nEmpty")
+                btn.setToolTip("No model available")
+                btn.setEnabled(False)
+                btn.setStyleSheet("""
+                    QPushButton {
+                        background-color: #34495e;
+                        border: 2px solid #2c3e50;
+                        border-radius: 5px;
+                        color: #7f8c8d;
+                        font-size: 10px;
+                        font-weight: bold;
+                        padding: 5px;
+                    }
+                """)
+    
+    def on_dfm_button_clicked(self, index):
+        """Handle DFM button click to switch models"""
+        if index < len(self.dfm_models):
+            model = self.dfm_models[index]
+            model_name = model.get("name", "Unknown")
+            
+            # Update button states
+            self.current_dfm_index = index
+            self.update_button_selection()
+            
+            # Try to switch the model in the face swap component
+            self.switch_dfm_model(model_name, model.get("file"))
+            
+            print(f"Switched to DFM model: {model_name}")
+    
+    def update_button_selection(self):
+        """Update button selection state"""
+        for i, btn in enumerate(self.dfm_buttons):
+            if i == self.current_dfm_index:
+                # Selected button - red background
+                btn.setStyleSheet("""
+                    QPushButton {
+                        background-color: #e74c3c;
+                        border: 2px solid #c0392b;
+                        border-radius: 5px;
+                        color: #ffffff;
+                        font-size: 10px;
+                        font-weight: bold;
+                        padding: 5px;
+                    }
+                    QPushButton:hover {
+                        background-color: #c0392b;
+                        border-color: #e74c3c;
+                    }
+                """)
+            elif i < len(self.dfm_models):
+                # Unselected button - restore original color
+                model = self.dfm_models[i]
+                if model.get("priority") == "high":
+                    btn.setStyleSheet("""
+                        QPushButton {
+                            background-color: #27ae60;
+                            border: 2px solid #2ecc71;
+                            border-radius: 5px;
+                            color: #ffffff;
+                            font-size: 10px;
+                            font-weight: bold;
+                            padding: 5px;
+                        }
+                        QPushButton:hover {
+                            background-color: #2ecc71;
+                            border-color: #27ae60;
+                        }
+                    """)
+                else:
+                    btn.setStyleSheet("""
+                        QPushButton {
+                            background-color: #2c3e50;
+                            border: 2px solid #34495e;
+                            border-radius: 5px;
+                            color: #ffffff;
+                            font-size: 10px;
+                            font-weight: bold;
+                            padding: 5px;
+                        }
+                        QPushButton:hover {
+                            background-color: #3498db;
+                            border-color: #2980b9;
+                        }
+                    """)
+    
+    def switch_dfm_model(self, model_name, model_path):
+        """Switch to the specified DFM model in the face swap component"""
+        try:
+            # Find the face swap DFM component
+            if 'face_swap_dfm' in self.face_swap_components:
+                face_swap_component = self.face_swap_components['face_swap_dfm']
+                
+                # Get the control sheet
+                cs = face_swap_component.get_control_sheet()
+                
+                # Get available models
+                available_models = cs.model.get_choices()
+                
+                # Find the model by name
+                for model in available_models:
+                    if model and hasattr(model, 'get_name') and model.get_name() == model_name:
+                        # Select the model
+                        cs.model.select(model)
+                        print(f"Successfully switched to model: {model_name}")
+                        return
+                
+                print(f"Model '{model_name}' not found in available models")
+            else:
+                print("Face swap DFM component not found")
+                
+        except Exception as e:
+            print(f"Error switching DFM model: {e}")
+    
+    def refresh_dfm_models(self):
+        """Refresh the DFM model list"""
+        print("Refreshing DFM models...")
+        self.load_dfm_models()
+        self.update_dfm_buttons()
         
     def create_optimized_center_panel(self):
         """Create optimized center panel with responsive preview"""

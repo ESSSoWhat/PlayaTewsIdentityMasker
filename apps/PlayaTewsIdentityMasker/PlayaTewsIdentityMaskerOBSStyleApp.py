@@ -286,19 +286,22 @@ class QDFLOBSAppWindow(qtx.QXWindow):
             backup_name = f"obs_auto_backup_{timestamp}"
             success = self.backup_manager.create_backup(backup_name, "OBS UI auto backup from menu")
             if success:
-                qtx.QXMessageBox.information(
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.information(
                     self,
                     "Backup Created",
                     f"OBS UI layout backup created successfully:\n{backup_name}"
                 )
             else:
-                qtx.QXMessageBox.warning(
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.warning(
                     self,
                     "Backup Failed",
                     "Failed to create OBS UI layout backup"
                 )
         except Exception as e:
-            qtx.QXMessageBox.critical(
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.critical(
                 self,
                 "Backup Error",
                 f"Error creating backup: {e}"
@@ -309,7 +312,8 @@ class QDFLOBSAppWindow(qtx.QXWindow):
         try:
             backups = self.backup_manager.list_backups()
             if not backups:
-                qtx.QXMessageBox.information(
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.information(
                     self,
                     "No Backups",
                     "No OBS UI layout backups found"
@@ -319,7 +323,8 @@ class QDFLOBSAppWindow(qtx.QXWindow):
             dialog = QBackupManagerDialog(self.backup_manager, self)
             dialog.exec_()
         except Exception as e:
-            qtx.QXMessageBox.critical(
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.critical(
                 self,
                 "Restore Error",
                 f"Error restoring layout: {e}"
@@ -332,7 +337,8 @@ class QDFLOBSAppWindow(qtx.QXWindow):
             dialog = QBackupManagerDialog(self.backup_manager, self)
             dialog.exec_()
         except Exception as e:
-            qtx.QXMessageBox.critical(
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.critical(
                 self,
                 "Backup Manager Error",
                 f"Error opening backup manager: {e}"

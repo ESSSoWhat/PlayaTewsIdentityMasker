@@ -30,7 +30,7 @@ from ..backend import StreamOutput
 from ..backend.StreamOutput import SourceType
 
 
-class QOBSStyleUI(QWidget):
+class QOBSStyleUI(qtx.QXWindow):
     """OBS Studio-style UI for DeepFaceLive with enhanced streaming and recording capabilities"""
     
     def __init__(self, stream_output_backend: StreamOutput, userdata_path: Path, face_swap_components=None, viewers_components=None):
@@ -140,24 +140,36 @@ class QOBSStyleUI(QWidget):
         top_section = QWidget()
         top_layout = QHBoxLayout()
         
-        # Preview area (left side of top section)
-        preview_group = QGroupBox("Preview")
+        # Preview area (left side of top section) - Now contains merged frame viewer
+        preview_group = QGroupBox("Active Screen")
         preview_layout = QVBoxLayout()
         
-        self.preview_label = QLabel("Preview Area")
-        self.preview_label.setMinimumSize(800, 450)  # Larger preview
-        self.preview_label.setMaximumSize(800, 450)  # Fixed size
-        self.preview_label.setStyleSheet("""
-            QLabel {
-                background-color: #1e1e1e;
-                border: 2px solid #404040;
-                border-radius: 5px;
-                color: #ffffff;
-                font-size: 16px;
-            }
-        """)
-        self.preview_label.setAlignment(Qt.AlignCenter)
-        preview_layout.addWidget(self.preview_label)
+        # Use merged frame viewer as the main preview
+        if 'merged_frame_viewer' in self.viewers_components:
+            self.main_preview = self.viewers_components['merged_frame_viewer']
+            # Remove size constraints and let it stretch to fill
+            self.main_preview.setMinimumSize(400, 300)  # Smaller minimum
+            self.main_preview.setMaximumSize(16777215, 16777215)  # Remove maximum size constraint
+            self.main_preview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Stretch to fit
+            # Set stretch factor to take all available space
+            preview_layout.addWidget(self.main_preview, 1)  # Stretch factor of 1
+        else:
+            self.main_preview = QLabel("Merged Frame Preview")
+            self.main_preview.setMinimumSize(400, 300)  # Smaller minimum
+            self.main_preview.setMaximumSize(16777215, 16777215)  # Remove maximum size constraint
+            self.main_preview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Stretch to fit
+            self.main_preview.setStyleSheet("""
+                QLabel {
+                    background-color: #1e1e1e;
+                    border: 2px solid #404040;
+                    border-radius: 5px;
+                    color: #ffffff;
+                    font-size: 16px;
+                }
+            """)
+            self.main_preview.setAlignment(Qt.AlignCenter)
+            # Set stretch factor to take all available space
+            preview_layout.addWidget(self.main_preview, 1)  # Stretch factor of 1
         
         preview_group.setLayout(preview_layout)
         
@@ -264,9 +276,9 @@ class QOBSStyleUI(QWidget):
         
         controls_group.setLayout(controls_layout)
         
-        # Add preview and controls to top section
-        top_layout.addWidget(preview_group)
-        top_layout.addWidget(controls_group)
+        # Add preview and controls to top section - give more space to preview
+        top_layout.addWidget(preview_group, 3)  # Stretch factor of 3 for preview
+        top_layout.addWidget(controls_group, 1)  # Stretch factor of 1 for controls
         top_section.setLayout(top_layout)
         
         # Bottom section: Viewers
@@ -329,36 +341,18 @@ class QOBSStyleUI(QWidget):
             """)
             face_swap_viewer.setAlignment(Qt.AlignCenter)
         
-        # Merged frame viewer (stretches to fit - much larger)
-        if 'merged_frame_viewer' in self.viewers_components:
-            merged_frame_viewer = self.viewers_components['merged_frame_viewer']
-            merged_frame_viewer.setMinimumSize(600, 200)  # Much larger
-        else:
-            merged_frame_viewer = QLabel("Merged Frame Viewer")
-            merged_frame_viewer.setMinimumSize(600, 200)  # Much larger
-            merged_frame_viewer.setStyleSheet("""
-                QLabel {
-                    background-color: #2d2d2d;
-                    border: 1px solid #404040;
-                    border-radius: 3px;
-                    color: #cccccc;
-                    font-size: 12px;
-                }
-            """)
-            merged_frame_viewer.setAlignment(Qt.AlignCenter)
-        
+        # Only show the smaller viewers in the bottom section
         viewers_layout.addWidget(frame_viewer)
         viewers_layout.addWidget(face_align_viewer)
         viewers_layout.addWidget(face_swap_viewer)
-        viewers_layout.addWidget(merged_frame_viewer, 3)  # Much more stretch weight
         
         viewers_group.setLayout(viewers_layout)
         bottom_layout.addWidget(viewers_group)
         bottom_section.setLayout(bottom_layout)
         
-        # Add sections to main layout
-        layout.addWidget(top_section)
-        layout.addWidget(bottom_section)
+        # Add sections to main layout - give more space to preview area
+        layout.addWidget(top_section, 4)  # Stretch factor of 4 for preview area
+        layout.addWidget(bottom_section, 1)  # Stretch factor of 1 for bottom viewers
         
         panel.setLayout(layout)
         return panel
@@ -562,11 +556,11 @@ class QOBSStyleUI(QWidget):
         """Open the processing controls window"""
         if self.processing_window is None or not self.processing_window.isVisible():
             try:
-                from .QProcessingWindow import QProcessingWindow
-                self.processing_window = QProcessingWindow(self.face_swap_components)
+                # Create a safer processing window that handles CSW issues
+                self.processing_window = self.create_safe_processing_window()
                 self.processing_window.show()
-            except ImportError as e:
-                print(f"Could not import QProcessingWindow: {e}")
+            except Exception as e:
+                print(f"Error creating processing window: {e}")
                 # Fallback: show a simple message
                 from PyQt5.QtWidgets import QMessageBox
                 QMessageBox.information(self, "All Controls", 
@@ -575,6 +569,273 @@ class QOBSStyleUI(QWidget):
         else:
             self.processing_window.raise_()
             self.processing_window.activateWindow()
+    
+    def create_safe_processing_window(self):
+        """Create a safe processing window that handles CSW issues"""
+        from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QWidget, QLabel, QScrollArea, QGroupBox, QPushButton
+        from PyQt5.QtCore import Qt
+        
+        # Create dialog window
+        window = QDialog(self)
+        window.setWindowTitle("PlayaTewsIdentityMasker - All Controls")
+        window.setMinimumSize(1000, 700)
+        window.setWindowFlags(window.windowFlags() | Qt.WindowStaysOnTopHint)
+        
+        # Main layout
+        layout = QVBoxLayout()
+        
+        # Create tab widget
+        tab_widget = QTabWidget()
+        
+        # Create tabs for different categories
+        tabs = {
+            "Input Sources": self.create_input_sources_tab(),
+            "Face Detection": self.create_face_detection_tab(),
+            "Face Swapping": self.create_face_swapping_tab(),
+            "Animation & Effects": self.create_animation_effects_tab(),
+            "Output & Streaming": self.create_output_streaming_tab()
+        }
+        
+        # Add tabs to widget
+        for tab_name, tab_widget_content in tabs.items():
+            tab_widget.addTab(tab_widget_content, tab_name)
+        
+        layout.addWidget(tab_widget)
+        window.setLayout(layout)
+        
+        return window
+    
+    def create_input_sources_tab(self):
+        """Create input sources tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # File Source
+        if 'file_source' in self.face_swap_components:
+            try:
+                file_source = self.face_swap_components['file_source']
+                if hasattr(file_source, 'widget'):
+                    layout.addWidget(QLabel("📁 File Source"))
+                    layout.addWidget(file_source.widget())
+                elif hasattr(file_source, '__class__'):
+                    layout.addWidget(QLabel("📁 File Source"))
+                    layout.addWidget(file_source)
+                else:
+                    layout.addWidget(QLabel("📁 File Source: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"📁 File Source: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("📁 File Source: Not Available"))
+        
+        # Camera Source
+        if 'camera_source' in self.face_swap_components:
+            try:
+                camera_source = self.face_swap_components['camera_source']
+                if hasattr(camera_source, 'widget'):
+                    layout.addWidget(QLabel("📹 Camera Source"))
+                    layout.addWidget(camera_source.widget())
+                elif hasattr(camera_source, '__class__'):
+                    layout.addWidget(QLabel("📹 Camera Source"))
+                    layout.addWidget(camera_source)
+                else:
+                    layout.addWidget(QLabel("📹 Camera Source: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"📹 Camera Source: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("📹 Camera Source: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
+    
+    def create_face_detection_tab(self):
+        """Create face detection tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # Face Detector
+        if 'face_detector' in self.face_swap_components:
+            try:
+                face_detector = self.face_swap_components['face_detector']
+                if hasattr(face_detector, 'widget'):
+                    layout.addWidget(QLabel("👁️ Face Detector"))
+                    layout.addWidget(face_detector.widget())
+                elif hasattr(face_detector, '__class__'):
+                    layout.addWidget(QLabel("👁️ Face Detector"))
+                    layout.addWidget(face_detector)
+                else:
+                    layout.addWidget(QLabel("👁️ Face Detector: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"👁️ Face Detector: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("👁️ Face Detector: Not Available"))
+        
+        # Face Marker
+        if 'face_marker' in self.face_swap_components:
+            try:
+                face_marker = self.face_swap_components['face_marker']
+                if hasattr(face_marker, 'widget'):
+                    layout.addWidget(QLabel("📍 Face Marker"))
+                    layout.addWidget(face_marker.widget())
+                elif hasattr(face_marker, '__class__'):
+                    layout.addWidget(QLabel("📍 Face Marker"))
+                    layout.addWidget(face_marker)
+                else:
+                    layout.addWidget(QLabel("📍 Face Marker: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"📍 Face Marker: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("📍 Face Marker: Not Available"))
+        
+        # Face Aligner
+        if 'face_aligner' in self.face_swap_components:
+            try:
+                face_aligner = self.face_swap_components['face_aligner']
+                if hasattr(face_aligner, 'widget'):
+                    layout.addWidget(QLabel("🎯 Face Aligner"))
+                    layout.addWidget(face_aligner.widget())
+                elif hasattr(face_aligner, '__class__'):
+                    layout.addWidget(QLabel("🎯 Face Aligner"))
+                    layout.addWidget(face_aligner)
+                else:
+                    layout.addWidget(QLabel("🎯 Face Aligner: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🎯 Face Aligner: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🎯 Face Aligner: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
+    
+    def create_face_swapping_tab(self):
+        """Create face swapping tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # Face Swap Insight
+        if 'face_swap_insight' in self.face_swap_components:
+            try:
+                face_swap_insight = self.face_swap_components['face_swap_insight']
+                if hasattr(face_swap_insight, 'widget'):
+                    layout.addWidget(QLabel("🔄 Face Swap Insight"))
+                    layout.addWidget(face_swap_insight.widget())
+                elif hasattr(face_swap_insight, '__class__'):
+                    layout.addWidget(QLabel("🔄 Face Swap Insight"))
+                    layout.addWidget(face_swap_insight)
+                else:
+                    layout.addWidget(QLabel("🔄 Face Swap Insight: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🔄 Face Swap Insight: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🔄 Face Swap Insight: Not Available"))
+        
+        # Face Swap DFM
+        if 'face_swap_dfm' in self.face_swap_components:
+            try:
+                face_swap_dfm = self.face_swap_components['face_swap_dfm']
+                if hasattr(face_swap_dfm, 'widget'):
+                    layout.addWidget(QLabel("🔄 Face Swap DFM"))
+                    layout.addWidget(face_swap_dfm.widget())
+                elif hasattr(face_swap_dfm, '__class__'):
+                    layout.addWidget(QLabel("🔄 Face Swap DFM"))
+                    layout.addWidget(face_swap_dfm)
+                else:
+                    layout.addWidget(QLabel("🔄 Face Swap DFM: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🔄 Face Swap DFM: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🔄 Face Swap DFM: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
+    
+    def create_animation_effects_tab(self):
+        """Create animation and effects tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # Face Animator
+        if 'face_animator' in self.face_swap_components:
+            try:
+                face_animator = self.face_swap_components['face_animator']
+                if hasattr(face_animator, 'widget'):
+                    layout.addWidget(QLabel("🎭 Face Animator"))
+                    layout.addWidget(face_animator.widget())
+                elif hasattr(face_animator, '__class__'):
+                    layout.addWidget(QLabel("🎭 Face Animator"))
+                    layout.addWidget(face_animator)
+                else:
+                    layout.addWidget(QLabel("🎭 Face Animator: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🎭 Face Animator: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🎭 Face Animator: Not Available"))
+        
+        # Frame Adjuster
+        if 'frame_adjuster' in self.face_swap_components:
+            try:
+                frame_adjuster = self.face_swap_components['frame_adjuster']
+                if hasattr(frame_adjuster, 'widget'):
+                    layout.addWidget(QLabel("🎨 Frame Adjuster"))
+                    layout.addWidget(frame_adjuster.widget())
+                elif hasattr(frame_adjuster, '__class__'):
+                    layout.addWidget(QLabel("🎨 Frame Adjuster"))
+                    layout.addWidget(frame_adjuster)
+                else:
+                    layout.addWidget(QLabel("🎨 Frame Adjuster: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🎨 Frame Adjuster: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🎨 Frame Adjuster: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
+    
+    def create_output_streaming_tab(self):
+        """Create output and streaming tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # Face Merger
+        if 'face_merger' in self.face_swap_components:
+            try:
+                face_merger = self.face_swap_components['face_merger']
+                if hasattr(face_merger, 'widget'):
+                    layout.addWidget(QLabel("🔗 Face Merger"))
+                    layout.addWidget(face_merger.widget())
+                elif hasattr(face_merger, '__class__'):
+                    layout.addWidget(QLabel("🔗 Face Merger"))
+                    layout.addWidget(face_merger)
+                else:
+                    layout.addWidget(QLabel("🔗 Face Merger: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🔗 Face Merger: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🔗 Face Merger: Not Available"))
+        
+        # Stream Output
+        if 'stream_output' in self.face_swap_components:
+            try:
+                stream_output = self.face_swap_components['stream_output']
+                if hasattr(stream_output, 'widget'):
+                    layout.addWidget(QLabel("📺 Stream Output"))
+                    layout.addWidget(stream_output.widget())
+                elif hasattr(stream_output, '__class__'):
+                    layout.addWidget(QLabel("📺 Stream Output"))
+                    layout.addWidget(stream_output)
+                else:
+                    layout.addWidget(QLabel("📺 Stream Output: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"📺 Stream Output: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("📺 Stream Output: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
         
     def closeEvent(self, event):
         """Handle close event - ensure processing window is closed"""

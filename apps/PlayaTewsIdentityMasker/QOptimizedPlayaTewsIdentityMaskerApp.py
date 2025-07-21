@@ -17,7 +17,7 @@ from xlib import qt as qtx
 from xlib.qt.widgets.QXLabel import QXLabel
 
 from . import backend
-from .ui.QSimpleLazyLoader import get_lazy_loader, cleanup_lazy_loader
+# Lazy loading temporarily disabled to fix widget hierarchy issues
 from .ui.QCameraSource import QCameraSource
 from .ui.QFaceAligner import QFaceAligner
 from .ui.QFaceAnimator import QFaceAnimator
@@ -67,10 +67,7 @@ class QOptimizedLiveSwap(qtx.QXWidget):
         # Initialize backend with optimized configuration
         self._init_backend(settings_dirpath, dfm_models_path, animatables_path, output_sequence_path, userdata_path)
         
-        # Initialize lazy loader
-        self.lazy_loader = get_lazy_loader()
-        
-        # Initialize UI components with lazy loading
+        # Initialize UI components directly (avoiding lazy loading for now)
         self._init_ui_components(animatables_path, dfm_models_path)
         
         # Setup layout with optimized viewers
@@ -179,9 +176,8 @@ class QOptimizedLiveSwap(qtx.QXWidget):
             backend_db=self.backend_db
         )
         
-        # Use enhanced streaming output for OBS-style functionality
-        from .backend.EnhancedStreamOutput import EnhancedStreamOutput
-        self.stream_output = EnhancedStreamOutput(
+        # Use standard streaming output for compatibility
+        self.stream_output = backend.StreamOutput(
             weak_heap=self.backend_weak_heap,
             reemit_frame_signal=self.reemit_frame_signal,
             bc_in=self.face_merger_bc_out,
@@ -205,127 +201,94 @@ class QOptimizedLiveSwap(qtx.QXWidget):
     
     def _init_ui_components(self, animatables_path: Path, dfm_models_path: Path):
         """Initialize UI components with lazy loading"""
+        # Store paths for lazy loading
+        self.animatables_path = animatables_path
+        self.dfm_models_path = dfm_models_path
+        
+        # Initialize lazy loader
+        from .ui.QSimpleLazyLoader import QSimpleLazyLoader
+        self.lazy_loader = QSimpleLazyLoader()
+        
         # Register components for lazy loading
-        self.lazy_loader.register_component(
-            'file_source',
-            lambda: QFileSource(self.file_source),
-            load_priority=5
-        )
+        self.lazy_loader.register_component("file_source", lambda: QFileSource(self.file_source))
+        self.lazy_loader.register_component("camera_source", lambda: QCameraSource(self.camera_source))
+        self.lazy_loader.register_component("face_detector", lambda: QFaceDetector(self.face_detector))
+        self.lazy_loader.register_component("face_marker", lambda: QFaceMarker(self.face_marker))
+        self.lazy_loader.register_component("face_aligner", lambda: QFaceAligner(self.face_aligner))
+        self.lazy_loader.register_component("face_animator", lambda: QFaceAnimator(self.face_animator, animatables_path=animatables_path))
+        self.lazy_loader.register_component("face_swap_insight", lambda: QFaceSwapInsight(self.face_swap_insight, faces_path=animatables_path))
+        self.lazy_loader.register_component("face_swap_dfm", lambda: QFaceSwapDFM(self.face_swap_dfm, dfm_models_path=dfm_models_path))
+        self.lazy_loader.register_component("frame_adjuster", lambda: QFrameAdjuster(self.frame_adjuster))
+        self.lazy_loader.register_component("face_merger", lambda: QFaceMerger(self.face_merger))
+        self.lazy_loader.register_component("stream_output", lambda: QStreamOutput(self.stream_output))
         
-        self.lazy_loader.register_component(
-            'camera_source',
-            lambda: QCameraSource(self.camera_source),
-            load_priority=5
-        )
+        # Register voice changer with error handling
+        def create_voice_changer():
+            try:
+                return QVoiceChanger(self.voice_changer.get_control_sheet())
+            except Exception as e:
+                self.logger.warning(f"VoiceChanger UI initialization failed: {e}")
+                from xlib.qt.widgets.QXLabel import QXLabel
+                placeholder = QXLabel("Voice Changer: Initialization Error")
+                placeholder.setStyleSheet("color: #ff6b6b; padding: 10px;")
+                return placeholder
         
-        self.lazy_loader.register_component(
-            'face_detector',
-            lambda: QFaceDetector(self.face_detector),
-            load_priority=4
-        )
+        self.lazy_loader.register_component("voice_changer", create_voice_changer)
         
-        self.lazy_loader.register_component(
-            'face_aligner',
-            lambda: QFaceAligner(self.face_aligner),
-            load_priority=4
-        )
-        
-        self.lazy_loader.register_component(
-            'face_marker',
-            lambda: QFaceMarker(self.face_marker),
-            load_priority=3
-        )
-        
-        self.lazy_loader.register_component(
-            'face_animator',
-            lambda: QFaceAnimator(self.face_animator, animatables_path=animatables_path),
-            load_priority=3
-        )
-        
-        self.lazy_loader.register_component(
-            'face_swap_insight',
-            lambda: QFaceSwapInsight(self.face_swap_insight, faces_path=animatables_path),
-            load_priority=2
-        )
-        
-        self.lazy_loader.register_component(
-            'face_swap_dfm',
-            lambda: QFaceSwapDFM(self.face_swap_dfm, dfm_models_path=dfm_models_path),
-            load_priority=2
-        )
-        
-        self.lazy_loader.register_component(
-            'frame_adjuster',
-            lambda: QFrameAdjuster(self.frame_adjuster),
-            load_priority=1
-        )
-        
-        self.lazy_loader.register_component(
-            'face_merger',
-            lambda: QFaceMerger(self.face_merger),
-            load_priority=1
-        )
-        
-        self.lazy_loader.register_component(
-            'stream_output',
-            lambda: QEnhancedStreamOutput(self.stream_output),
-            load_priority=1
-        )
-        
-        self.lazy_loader.register_component(
-            'voice_changer',
-            lambda: QVoiceChanger(self.voice_changer.get_control_sheet()),
-            load_priority=1
-        )
-        
-        # Initialize optimized viewers
-        self.q_ds_frame_viewer = QBCFrameViewer(
+        # Register viewers
+        self.lazy_loader.register_component("frame_viewer", lambda: QBCFrameViewer(
             self.backend_weak_heap,
             self.multi_sources_bc_out
-        )
+        ))
         
-        self.q_ds_fa_viewer = QBCFaceAlignViewer(
+        self.lazy_loader.register_component("fa_viewer", lambda: QBCFaceAlignViewer(
             self.backend_weak_heap,
             self.face_aligner_bc_out,
             preview_width=256
-        )
+        ))
         
-        self.q_ds_fc_viewer = QBCFaceSwapViewer(
+        self.lazy_loader.register_component("fc_viewer", lambda: QBCFaceSwapViewer(
             self.backend_weak_heap,
             self.face_merger_bc_out,
             preview_width=256
-        )
+        ))
         
-        self.q_ds_merged_frame_viewer = QBCMergedFrameViewer(
+        self.lazy_loader.register_component("merged_frame_viewer", lambda: QBCMergedFrameViewer(
             self.backend_weak_heap,
             self.face_merger_bc_out
-        )
+        ))
+        
+        # Create lazy loading placeholders
+        self.q_file_source = self.lazy_loader.create_placeholder("file_source", "File Source")
+        self.q_camera_source = self.lazy_loader.create_placeholder("camera_source", "Camera Source")
+        self.q_face_detector = self.lazy_loader.create_placeholder("face_detector", "Face Detector")
+        self.q_face_marker = self.lazy_loader.create_placeholder("face_marker", "Face Marker")
+        self.q_face_aligner = self.lazy_loader.create_placeholder("face_aligner", "Face Aligner")
+        self.q_face_animator = self.lazy_loader.create_placeholder("face_animator", "Face Animator")
+        self.q_face_swap_insight = self.lazy_loader.create_placeholder("face_swap_insight", "Face Swap Insight")
+        self.q_face_swap_dfm = self.lazy_loader.create_placeholder("face_swap_dfm", "Face Swap DFM")
+        self.q_frame_adjuster = self.lazy_loader.create_placeholder("frame_adjuster", "Frame Adjuster")
+        self.q_face_merger = self.lazy_loader.create_placeholder("face_merger", "Face Merger")
+        self.q_stream_output = self.lazy_loader.create_placeholder("stream_output", "Stream Output")
+        self.q_voice_changer = self.lazy_loader.create_placeholder("voice_changer", "Voice Changer")
+        
+        # Create viewer placeholders
+        self.q_ds_frame_viewer = self.lazy_loader.create_placeholder("frame_viewer", "Frame Viewer")
+        self.q_ds_fa_viewer = self.lazy_loader.create_placeholder("fa_viewer", "Face Align Viewer")
+        self.q_ds_fc_viewer = self.lazy_loader.create_placeholder("fc_viewer", "Face Swap Viewer")
+        self.q_ds_merged_frame_viewer = self.lazy_loader.create_placeholder("merged_frame_viewer", "Merged Frame Viewer")
     
     def _setup_layout(self):
-        """Setup layout with lazy-loaded components"""
-        # Get placeholders from lazy loader
-        file_source_placeholder = self.lazy_loader.get_placeholder('file_source')
-        camera_source_placeholder = self.lazy_loader.get_placeholder('camera_source')
-        face_detector_placeholder = self.lazy_loader.get_placeholder('face_detector')
-        face_aligner_placeholder = self.lazy_loader.get_placeholder('face_aligner')
-        face_marker_placeholder = self.lazy_loader.get_placeholder('face_marker')
-        face_animator_placeholder = self.lazy_loader.get_placeholder('face_animator')
-        face_swap_insight_placeholder = self.lazy_loader.get_placeholder('face_swap_insight')
-        face_swap_dfm_placeholder = self.lazy_loader.get_placeholder('face_swap_dfm')
-        frame_adjuster_placeholder = self.lazy_loader.get_placeholder('frame_adjuster')
-        face_merger_placeholder = self.lazy_loader.get_placeholder('face_merger')
-        stream_output_placeholder = self.lazy_loader.get_placeholder('stream_output')
-        voice_changer_placeholder = self.lazy_loader.get_placeholder('voice_changer')
-        
-        # Setup nodes layout with placeholders
+        """Setup layout with direct UI components"""
+        # Setup nodes layout with direct components
         q_nodes = qtx.QXWidgetHBox([
-            qtx.QXWidgetVBox([file_source_placeholder, camera_source_placeholder], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([face_detector_placeholder, face_aligner_placeholder], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([face_marker_placeholder, face_animator_placeholder, 
-                             face_swap_insight_placeholder, face_swap_dfm_placeholder], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([frame_adjuster_placeholder, face_merger_placeholder, 
-                             stream_output_placeholder], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([voice_changer_placeholder], spacing=5, fixed_width=300),
+            qtx.QXWidgetVBox([self.q_file_source, self.q_camera_source], spacing=5, fixed_width=256),
+            qtx.QXWidgetVBox([self.q_face_detector, self.q_face_aligner], spacing=5, fixed_width=256),
+            qtx.QXWidgetVBox([self.q_face_marker, self.q_face_animator, 
+                             self.q_face_swap_insight, self.q_face_swap_dfm], spacing=5, fixed_width=256),
+            qtx.QXWidgetVBox([self.q_frame_adjuster, self.q_face_merger, 
+                             self.q_stream_output], spacing=5, fixed_width=256),
+            qtx.QXWidgetVBox([self.q_voice_changer], spacing=5, fixed_width=300),
         ], spacing=5, size_policy=('fixed', 'fixed'))
         
         # Setup viewers layout
@@ -368,11 +331,10 @@ class QOptimizedLiveSwap(qtx.QXWidget):
             self.start_time = current_time
             self.last_fps_update = current_time
             
-            # Update performance display with lazy loading stats
-            lazy_stats = self.lazy_loader.get_stats()
-            perf_text = (f"FPS: {self.current_fps:.1f} | "
-                        f"Components: {lazy_stats['loaded_components']}/{lazy_stats['total_components']} | "
-                        f"Loading Progress: {lazy_stats['loading_progress']:.1%}")
+            # Update performance display with lazy loading info
+            loaded_components = len(self.lazy_loader.get_loaded_components()) if hasattr(self, 'lazy_loader') else 0
+            total_components = len(self.lazy_loader.get_registered_components()) if hasattr(self, 'lazy_loader') else 0
+            perf_text = f"FPS: {self.current_fps:.1f} | Lazy Loading: {loaded_components}/{total_components} | Optimized Mode Active"
             self.performance_label.setText(perf_text)
     
     def _on_timer_10ms(self):
@@ -396,6 +358,31 @@ class QOptimizedLiveSwap(qtx.QXWidget):
             bcknd.restore_on_off_state(default_state=default_state)
         
         self.logger.info("Optimized initialization completed")
+        
+        # Preload essential components for better performance
+        self._preload_essential_components()
+    
+    def _preload_essential_components(self):
+        """Preload essential components for better performance"""
+        try:
+            self.logger.info("Preloading essential components...")
+            
+            # Preload core components that are commonly used
+            essential_components = [
+                "face_detector", "face_aligner", "face_merger", "stream_output"
+            ]
+            
+            for component_name in essential_components:
+                try:
+                    self.lazy_loader.preload_component(component_name)
+                    self.logger.debug(f"Preloaded component: {component_name}")
+                except Exception as e:
+                    self.logger.warning(f"Failed to preload {component_name}: {e}")
+            
+            self.logger.info("Essential components preloaded")
+            
+        except Exception as e:
+            self.logger.warning(f"Error during component preloading: {e}")
     
     def finalize(self):
         """Clean up resources"""
@@ -414,12 +401,23 @@ class QOptimizedLiveSwap(qtx.QXWidget):
         
         self.backend_db.finish_pending_jobs()
         
-        # Clear viewers
-        self.q_ds_frame_viewer.clear()
-        self.q_ds_fa_viewer.clear()
+        # Clear viewers with lazy loading support
+        try:
+            if hasattr(self.q_ds_frame_viewer, 'clear'):
+                self.q_ds_frame_viewer.clear()
+            if hasattr(self.q_ds_fa_viewer, 'clear'):
+                self.q_ds_fa_viewer.clear()
+        except Exception as e:
+            self.logger.warning(f"Error clearing viewers: {e}")
         
-        # Clean up lazy loader
-        cleanup_lazy_loader()
+        # Cleanup lazy loader
+        if hasattr(self, 'lazy_loader'):
+            try:
+                self.lazy_loader.cleanup()
+            except Exception as e:
+                self.logger.warning(f"Error cleaning up lazy loader: {e}")
+        
+        # Cleanup completed
         
         self.logger.info("Optimized application finalization completed")
 

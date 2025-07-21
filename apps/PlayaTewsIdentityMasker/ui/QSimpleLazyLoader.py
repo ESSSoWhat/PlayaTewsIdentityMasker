@@ -40,6 +40,14 @@ class QLazyLoadPlaceholder(qtx.QXWidget):
                 border: 2px dashed #dee2e6;
                 border-radius: 8px;
                 margin: 2px;
+
+    def create_placeholder(self, component_name: str):
+        """Create a placeholder widget for lazy loading"""
+        from xlib.qt.widgets.QXLabel import QXLabel
+        placeholder = QXLabel(f"Loading {component_name}...")
+        placeholder.setStyleSheet("QLabel { color: gray; font-style: italic; }")
+        return placeholder
+
             }
             QWidget:hover {
                 background-color: #e9ecef;
@@ -188,17 +196,20 @@ class QSimpleLazyLoader:
         
         return None
     
-    def get_placeholder(self, name: str) -> Optional[QLazyLoadPlaceholder]:
+    def get_placeholder(self, name: str, parent=None) -> Optional[QLazyLoadPlaceholder]:
         """Get the placeholder for a component (creates if needed)"""
         if name not in self.components:
             return None
         
         component_info = self.components[name]
         if component_info['placeholder'] is None:
-            # Create placeholder on demand
-            component_info['placeholder'] = QLazyLoadPlaceholder(
+            # Create placeholder on demand with proper parent
+            placeholder = QLazyLoadPlaceholder(
                 name, component_info['factory'], component_info['priority']
             )
+            if parent:
+                placeholder.setParent(parent)
+            component_info['placeholder'] = placeholder
         
         return component_info['placeholder']
     
