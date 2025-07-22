@@ -1,0 +1,19 @@
+{
+  "extraction": {
+    "frame_interval": 10,
+    "min_face_size": 100,
+    "detector": "yolov5",
+    "quality_threshold": 0.8
+  },
+  "training": {
+    "model_type": "SAEHD",
+    "max_epochs": 1000,
+    "batch_size": 4,
+    "learning_rate": 0.001
+  },
+  "conversion": {
+    "output_format": "dfm",
+    "compression": true,
+    "metadata_inclusion": true
+  }
+}

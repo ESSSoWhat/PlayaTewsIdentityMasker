@@ -23,8 +23,8 @@ class QFaceDetector(QBackendPanel):
         self._timer = qtx.QXTimer(interval=10, timeout=self._on_timer_10ms, start=True)
 
         face_coords_label = self._q_face_coords_label = qtx.QXLabel(font=QXFontDB.get_fixedwidth_font(size=7), word_wrap=False)
-        q_detected_faces  = self._q_detected_faces    = qtx.QXCollapsibleSection(title=L('@QFaceDetector.detected_faces'),
-                                                                                 content_layout=qtx.QXVBoxLayout([face_coords_label]), is_opened=True)
+        q_detected_faces  = self._q_detected_faces    = qtx.QXCollapsibleSection(L('@QFaceDetector.detected_faces'),
+                                                                                 qtx.QXVBoxLayout([face_coords_label]), is_opened=True)
 
         cs = backend.get_control_sheet()
 
@@ -79,31 +79,34 @@ class QFaceDetector(QBackendPanel):
             self._q_face_coords_label.clear()
 
     def _on_timer_10ms(self):
+        try:
+            if self._q_detected_faces.is_opened() and not self.get_top_QXWindow().is_minimized():
+                bcd_id = self._bc_out.get_write_id()
+                if self._bcd_id != bcd_id:
+                    # Has new bcd version
+                    bcd, self._bcd_id = self._bc_out.get_by_id(bcd_id), bcd_id
 
-        if self._q_detected_faces.is_opened() and not self.get_top_QXWindow().is_minimized():
-            bcd_id = self._bc_out.get_write_id()
-            if self._bcd_id != bcd_id:
-                # Has new bcd version
-                bcd, self._bcd_id = self._bc_out.get_by_id(bcd_id), bcd_id
+                    if bcd is not None:
+                        bcd.assign_weak_heap(self._weak_heap)
 
-                if bcd is not None:
-                    bcd.assign_weak_heap(self._weak_heap)
+                        frame_image = bcd.get_image(bcd.get_frame_image_name())
+                        frame_image_w_h = None
+                        if frame_image is not None:
+                            h,w = frame_image.shape[0:2]
+                            frame_image_w_h = (w,h)
 
-                    frame_image = bcd.get_image(bcd.get_frame_image_name())
-                    frame_image_w_h = None
-                    if frame_image is not None:
-                        h,w = frame_image.shape[0:2]
-                        frame_image_w_h = (w,h)
+                        info = []
+                        for face_id, fsi in enumerate(bcd.get_face_swap_info_list()):
+                            info_str = f'{face_id}: '
 
-                    info = []
-                    for face_id, fsi in enumerate(bcd.get_face_swap_info_list()):
-                        info_str = f'{face_id}: '
+                            if fsi.face_urect is not None:
+                                l,t,r,b = fsi.face_urect.as_ltrb_bbox(frame_image_w_h).astype(np.int)
+                                info_str += f'[{l},{t},{r},{b}]'
 
-                        if fsi.face_urect is not None:
-                            l,t,r,b = fsi.face_urect.as_ltrb_bbox(frame_image_w_h).astype(np.int)
-                            info_str += f'[{l},{t},{r},{b}]'
+                            info.append(info_str)
 
-                        info.append(info_str)
-
-                    info = '\n'.join(info)
-                    self._q_face_coords_label.setText(info)
+                        info = '\n'.join(info)
+                        self._q_face_coords_label.setText(info)
+        except Exception:
+            # Handle case where top window is not found - just return without processing
+            pass

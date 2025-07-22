@@ -1,0 +1,31 @@
+{
+  "backup_name": "ui_crash_fixed_backup_20250720_211649",
+  "timestamp": "20250720_211649",
+  "created_at": "2025-07-20T21:16:50.058711",
+  "description": "UI backup after crash fixes and component reorganization",
+  "fixes_applied": [
+    "Fixed QRect float arguments in QXFixedLayeredImages",
+    "Added comprehensive error handling for face swap components",
+    "Made QProcessingWindow constructor safe with optional parameters",
+    "Moved all UI controls to popup window",
+    "Fixed top_QXWindow errors in viewer components",
+    "Cleaned up old UI component references"
+  ],
+  "files_backed_up": [
+    "QOBSStyleUI.py",
+    "QProcessingWindow.py",
+    "QOptimizedPlayaTewsIdentityMaskerApp.py",
+    "PlayaTewsIdentityMaskerOBSStyleApp.py",
+    "PlayaTewsIdentityMaskerApp.py",
+    "main.py",
+    "run_obs_fixed.py",
+    "xlib/qt/widgets/QXFixedLayeredImages.py",
+    "xlib/qt/widgets/QFaceDetector.py",
+    "xlib/qt/widgets/QBCFrameViewer.py",
+    "xlib/qt/widgets/QBCMergedFrameViewer.py",
+    "xlib/qt/widgets/QBCFaceAlignViewer.py",
+    "xlib/qt/widgets/QBCFaceSwapViewer.py",
+    "xlib/qt/widgets/QOptimizedFrameViewer.py"
+  ],
+  "backup_version": "2.0"
+}

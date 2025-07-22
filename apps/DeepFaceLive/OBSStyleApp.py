@@ -879,7 +879,7 @@ class QOBSStyleAppWindow(qtx.QXWindow):
             settings_dirpath=self._settings_dirpath
         )
         
-        self.setCentralWidget(self.q_live_swap)
+        self.add_widget(self.q_live_swap)
         
         # Initialize
         self.q_live_swap.initialize()

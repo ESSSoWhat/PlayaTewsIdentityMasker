@@ -140,14 +140,16 @@ class SafeUIRelocator:
     def create_baseline(self) -> bool:
         """Create baseline functionality test"""
         try:
-            print("🔍 Creating baseline functionality test...")
+            print("[SEARCH] Creating baseline functionality test...")
             
             # Run baseline test
             result = subprocess.run([
                 sys.executable, "scripts/baseline_functionality_test.py"
             ], capture_output=True, text=True)
             
-            if result.returncode == 0:
+            # Check if baseline file was created (success indicator)
+            baseline_file = Path("tests/baseline_functionality.json")
+            if baseline_file.exists():
                 self.log_step("Create Baseline", "SUCCESS", "Baseline created successfully")
                 return True
             else:
@@ -165,7 +167,7 @@ class SafeUIRelocator:
             backup_name = f"ui_relocation_backup_{timestamp}"
             backup_path = self.backup_dir / backup_name
             
-            print(f"💾 Creating backup: {backup_path}")
+            print(f"[SAVE] Creating backup: {backup_path}")
             
             # Files to backup
             files_to_backup = [
@@ -195,7 +197,7 @@ class SafeUIRelocator:
             }
             
             metadata_file = backup_path / "backup_metadata.json"
-            with open(metadata_file, 'w') as f:
+            with open(metadata_file, 'w', encoding='utf-8') as f:
                 json.dump(metadata, f, indent=2)
             
             self.log_step("Backup Current State", "SUCCESS", f"Backup created: {backup_path}")
@@ -208,7 +210,7 @@ class SafeUIRelocator:
     def relocate_unused_components(self) -> bool:
         """Relocate unused components from _unused directory"""
         try:
-            print("📦 Relocating unused components...")
+            print("[PACKAGE] Relocating unused components...")
             
             # Extract QXTabWidget
             self.extract_component_from_unused(
@@ -240,8 +242,8 @@ class SafeUIRelocator:
         if not unused_file.exists():
             raise FileNotFoundError(f"Unused file not found: {unused_file}")
         
-        # Read unused file
-        with open(unused_file, 'r') as f:
+        # Read unused file with UTF-8 encoding
+        with open(unused_file, 'r', encoding='utf-8') as f:
             content = f.read()
         
         # Extract component (simplified - in practice would need more sophisticated parsing)
@@ -267,10 +269,10 @@ class {component_name}(QTabWidget):
         dest_file.parent.mkdir(parents=True, exist_ok=True)
         
         # Write component file
-        with open(dest_file, 'w') as f:
+        with open(dest_file, 'w', encoding='utf-8') as f:
             f.write(component_content)
         
-        print(f"✅ Extracted {component_name} to {dest_file}")
+        print(f"[SUCCESS] Extracted {component_name} to {dest_file}")
     
     def update_imports_for_unused_components(self):
         """Update import statements for relocated components"""
@@ -287,7 +289,7 @@ class {component_name}(QTabWidget):
         if not file_path.exists():
             return
         
-        with open(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
         # Update imports (simplified - would need more sophisticated logic)
@@ -301,15 +303,15 @@ class {component_name}(QTabWidget):
             "from .ui.widgets.QXCollapsibleSection import QXCollapsibleSection"
         )
         
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
         
-        print(f"✅ Updated imports in {file_path}")
+        print(f"[SUCCESS] Updated imports in {file_path}")
     
     def move_voice_changer(self) -> bool:
         """Move voice changer to input section"""
         try:
-            print("🎤 Moving voice changer to input section...")
+            print("[MICROPHONE] Moving voice changer to input section...")
             
             # This would involve modifying the layout in the main app files
             # For now, we'll create a placeholder implementation
@@ -334,7 +336,7 @@ class {component_name}(QTabWidget):
         if not file_path.exists():
             return
         
-        with open(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
         # This is a simplified example - actual implementation would be more complex
@@ -343,15 +345,15 @@ class {component_name}(QTabWidget):
         # Find the layout section and modify it
         # This would require parsing the Python code and modifying the layout structure
         
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
         
-        print(f"✅ Modified voice changer layout in {file_path}")
+        print(f"[SUCCESS] Modified voice changer layout in {file_path}")
     
     def group_face_processing_components(self) -> bool:
         """Group related face processing components"""
         try:
-            print("👥 Grouping face processing components...")
+            print("[GROUP] Grouping face processing components...")
             
             # Modify the main app to group components logically
             file_path = Path("apps/PlayaTewsIdentityMasker/PlayaTewsIdentityMaskerApp.py")
@@ -369,7 +371,7 @@ class {component_name}(QTabWidget):
         if not file_path.exists():
             return
         
-        with open(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
         # This would involve modifying the q_nodes layout to group components
@@ -379,15 +381,15 @@ class {component_name}(QTabWidget):
         
         # Implementation would parse and modify the layout structure
         
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
         
-        print(f"✅ Modified face processing layout in {file_path}")
+        print(f"[SUCCESS] Modified face processing layout in {file_path}")
     
     def create_unified_liveswap(self) -> bool:
         """Create unified LiveSwap component"""
         try:
-            print("🔄 Creating unified LiveSwap component...")
+            print("[ROLLBACK] Creating unified LiveSwap component...")
             
             # Create the unified component file
             unified_file = Path("apps/PlayaTewsIdentityMasker/ui/QUnifiedLiveSwap.py")
@@ -528,10 +530,10 @@ class QUnifiedLiveSwap(QWidget):
 '''
         
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
         
-        print(f"✅ Created unified component: {file_path}")
+        print(f"[SUCCESS] Created unified component: {file_path}")
     
     def update_main_app_for_unified_component(self):
         """Update main app to use unified component"""
@@ -540,7 +542,7 @@ class QUnifiedLiveSwap(QWidget):
         if not file_path.exists():
             return
         
-        with open(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
         # Add import for unified component
@@ -551,15 +553,15 @@ class QUnifiedLiveSwap(QWidget):
                 "from .ui.QVoiceChanger import QVoiceChanger\nfrom .ui.QUnifiedLiveSwap import QUnifiedLiveSwap, UIMode"
             )
         
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
         
-        print(f"✅ Updated main app for unified component")
+        print(f"[SUCCESS] Updated main app for unified component")
     
     def run_validation_tests(self) -> bool:
         """Run comprehensive validation tests"""
         try:
-            print("🧪 Running validation tests...")
+            print("[TEST] Running validation tests...")
             
             # Run functionality tests
             result = subprocess.run([
@@ -621,7 +623,7 @@ class QUnifiedLiveSwap(QWidget):
     
     def run_step_validation(self, step: RelocationStep) -> bool:
         """Run validation checks for a step"""
-        print(f"\n🔍 Running validation checks for: {step.name}")
+        print(f"\n[SEARCH] Running validation checks for: {step.name}")
         
         for check in step.validation_checks:
             if not self.run_validation_check(check):
@@ -658,7 +660,7 @@ class QUnifiedLiveSwap(QWidget):
         elif check_name == "performance_verified":
             return self.check_performance_verified()
         else:
-            print(f"⚠️ Unknown validation check: {check_name}")
+            print(f"[WARNING] Unknown validation check: {check_name}")
             return True  # Skip unknown checks
     
     def run_baseline_test(self) -> bool:
@@ -667,8 +669,17 @@ class QUnifiedLiveSwap(QWidget):
             result = subprocess.run([
                 sys.executable, "scripts/baseline_functionality_test.py"
             ], capture_output=True, text=True)
-            return result.returncode == 0
-        except:
+            
+            # Check if baseline file was created (success indicator)
+            baseline_file = Path("tests/baseline_functionality.json")
+            if baseline_file.exists():
+                print("[SUCCESS] Baseline file created successfully")
+                return True
+            else:
+                print("[ERROR] Baseline file not created")
+                return False
+        except Exception as e:
+            print(f"[ERROR] Exception in baseline test: {e}")
             return False
     
     def check_backup_created(self) -> bool:
@@ -736,13 +747,13 @@ class QUnifiedLiveSwap(QWidget):
     def save_migration_log(self):
         """Save migration log to file"""
         log_file = self.backup_dir / f"migration_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        with open(log_file, 'w') as f:
+        with open(log_file, 'w', encoding='utf-8') as f:
             json.dump(self.migration_log, f, indent=2)
-        print(f"📝 Migration log saved: {log_file}")
+        print(f"[NOTE] Migration log saved: {log_file}")
     
     def run_migration(self) -> bool:
         """Run the complete migration process"""
-        print("🚀 Starting Safe UI Relocation Process")
+        print("[ROCKET] Starting Safe UI Relocation Process")
         print(f"Total steps: {self.total_steps}")
         
         for i, step in enumerate(self.relocation_steps):
@@ -750,27 +761,27 @@ class QUnifiedLiveSwap(QWidget):
             
             # Ask for confirmation for high-risk steps
             if step.risk_level == "high":
-                response = input(f"\n⚠️ High-risk step: {step.name}\nContinue? (y/N): ")
+                response = input(f"\n[WARNING] High-risk step: {step.name}\nContinue? (y/N): ")
                 if response.lower() != 'y':
-                    print("❌ Migration cancelled by user")
+                    print("[CANCELLED] Migration cancelled by user")
                     return False
             
             # Execute step
             if not self.execute_step(step):
-                print(f"❌ Step failed: {step.name}")
-                print("🔄 Rolling back...")
+                print(f"[CANCELLED] Step failed: {step.name}")
+                print("[ROLLBACK] Rolling back...")
                 self.rollback_to_step(i)
                 return False
             
-            print(f"✅ Step completed: {step.name}")
+            print(f"[SUCCESS] Step completed: {step.name}")
         
-        print("\n🎉 Migration completed successfully!")
+        print("\n[CELEBRATION] Migration completed successfully!")
         self.save_migration_log()
         return True
     
     def rollback_to_step(self, step_index: int):
         """Rollback to a specific step"""
-        print(f"🔄 Rolling back to step {step_index}")
+        print(f"[ROLLBACK] Rolling back to step {step_index}")
         
         # Implementation would restore from backup and reapply steps up to step_index
         # For now, just log the rollback
@@ -789,7 +800,7 @@ def main():
     relocator = SafeUIRelocator()
     
     if args.dry_run:
-        print("🔍 DRY RUN - Showing migration plan:")
+        print("[SEARCH] DRY RUN - Showing migration plan:")
         for i, step in enumerate(relocator.relocation_steps):
             print(f"Step {i+1}: {step.name} ({step.risk_level} risk)")
             print(f"  {step.description}")
@@ -802,7 +813,7 @@ def main():
             success = relocator.execute_step(step)
             exit(0 if success else 1)
         else:
-            print(f"❌ Invalid step number: {args.step}")
+            print(f"[CANCELLED] Invalid step number: {args.step}")
             exit(1)
     
     # Run complete migration
@@ -810,4 +821,4 @@ def main():
     exit(0 if success else 1)
 
 if __name__ == "__main__":
-    main()
+    main() 

@@ -33,17 +33,18 @@ class QXCollapsibleSection(QXFrame):
         if allow_open_close:
             btn.toggled.connect(self.on_btn_toggled)
 
-        frame = self.frame = QXFrame(layout=content_layout, size_policy=(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding), hided=True)
+        frame = self.frame = QXFrame(layout=content_layout, size_policy=(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
+        frame.hide()  # Hide the frame initially
 
         if vertical:
-            main_l = QXHBoxLayout([ ( QXFrameVBox([ (btn, Qt.AlignTop),
-                                                    (label_title, Qt.AlignCenter)
-                                                  ], size_policy=('fixed', 'fixed') ), Qt.AlignTop),
+            main_l = QXHBoxLayout([ ( QXFrameVBox([ (btn, Qt.AlignmentFlag.AlignTop),
+                                                    (label_title, Qt.AlignmentFlag.AlignCenter)
+                                                  ], size_policy=('fixed', 'fixed') ), Qt.AlignmentFlag.AlignTop),
                                     frame])
         else:
-            main_l = QXVBoxLayout( [ ( QXFrameHBox([ (btn, Qt.AlignTop),
-                                                     (label_title, Qt.AlignCenter)
-                                                   ], size_policy=('fixed', 'fixed')) , Qt.AlignTop),
+            main_l = QXVBoxLayout( [ ( QXFrameHBox([ (btn, Qt.AlignmentFlag.AlignTop),
+                                                     (label_title, Qt.AlignmentFlag.AlignCenter)
+                                                   ], size_policy=('fixed', 'fixed')) , Qt.AlignmentFlag.AlignTop),
                                     frame])
         super().__init__(layout=main_l)
 

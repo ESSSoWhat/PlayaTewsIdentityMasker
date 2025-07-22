@@ -1,0 +1,7 @@
+{
+  "model_type": "insightfaceswap_wrapper",
+  "model_name": "kevin_hart_model",
+  "original_model": "InsightFaceSwap",
+  "created_date": "2025-07-21 01:57:28",
+  "description": "InsightFaceSwap compatible wrapper for face swapping"
+}

@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "created_date": "2025-07-20 16:32:17",
+  "base_directory": "universal_dfm",
+  "dfm_directory": "universal_dfm\\models",
+  "temp_directory": "universal_dfm\\temp",
+  "backup_directory": "universal_dfm\\backups",
+  "logs_directory": "universal_dfm\\logs",
+  "config_directory": "universal_dfm\\config",
+  "settings": {
+    "auto_backup": true,
+    "backup_interval_hours": 24,
+    "max_temp_files": 1000,
+    "log_retention_days": 30,
+    "model_validation": true
+  }
+}

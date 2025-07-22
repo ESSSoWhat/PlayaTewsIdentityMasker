@@ -1,5 +1,7 @@
 from pathlib import Path
 from typing import List
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QSplitter
 
 from localization import L, Localization
 from resources.fonts import QXFontDB
@@ -69,7 +71,11 @@ class QLiveSwapOBS(qtx.QXWidget):
         from .backend.EnhancedStreamOutput import EnhancedStreamOutput
         stream_output  = self.stream_output  = EnhancedStreamOutput (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_merger_bc_out, save_default_path=userdata_path, backend_db=backend_db)
 
-        self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output]
+        # Add voice changer backend
+        from .backend.VoiceChanger import VoiceChanger
+        voice_changer = self.voice_changer = VoiceChanger(weak_heap=backend_weak_heap, backend_db=backend_db)
+
+        self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output, voice_changer]
 
         # Create UI components
         self.q_file_source    = QFileSource(self.file_source)
@@ -93,47 +99,59 @@ class QLiveSwapOBS(qtx.QXWidget):
         self.q_ds_fc_viewer    = QBCFaceSwapViewer(backend_weak_heap, face_merger_bc_out, preview_width=256)
         self.q_ds_merged_frame_viewer = QBCMergedFrameViewer(backend_weak_heap, face_merger_bc_out)
 
-        # Create OBS-style UI
-        self.q_obs_style_ui = QOBSStyleUI(self.stream_output, userdata_path)
+        # Create face-swapping components dictionary
+        face_swap_components = {
+            'file_source': self.q_file_source,
+            'camera_source': self.q_camera_source,
+            'face_detector': self.q_face_detector,
+            'face_marker': self.q_face_marker,
+            'face_aligner': self.q_face_aligner,
+            'face_animator': self.q_face_animator,
+            'face_swap_insight': self.q_face_swap_insight,
+            'face_swap_dfm': self.q_face_swap_dfm,
+            'frame_adjuster': self.q_frame_adjuster,
+            'face_merger': self.q_face_merger,
+            'stream_output': self.q_stream_output
+        }
 
-        # Create a splitter to show both OBS-style UI and traditional controls
-        splitter = qtx.QXSplitter(Qt.Horizontal)
-        
-        # Left side: OBS-style UI
-        left_widget = qtx.QXWidget()
-        left_layout = qtx.QXVBoxLayout()
-        left_layout.addWidget(self.q_obs_style_ui)
-        left_widget.setLayout(left_layout)
-        
-        # Right side: Traditional controls (collapsible)
-        right_widget = qtx.QXWidget()
-        right_layout = qtx.QXVBoxLayout()
-        
-        # Traditional control panels
-        q_nodes = qtx.QXWidgetHBox([    
-            qtx.QXWidgetVBox([self.q_file_source, self.q_camera_source], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([self.q_face_detector,  self.q_face_aligner,  ], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([self.q_face_marker, self.q_face_animator, self.q_face_swap_insight, self.q_face_swap_dfm], spacing=5, fixed_width=256),
-            qtx.QXWidgetVBox([self.q_frame_adjuster, self.q_face_merger, self.q_stream_output], spacing=5, fixed_width=256),
-        ], spacing=5, size_policy=('fixed', 'fixed') )
+        # Create viewers dictionary
+        viewers_components = {
+            'frame_viewer': self.q_ds_frame_viewer,
+            'face_align_viewer': self.q_ds_fa_viewer,
+            'face_swap_viewer': self.q_ds_fc_viewer,
+            'merged_frame_viewer': self.q_ds_merged_frame_viewer
+        }
 
-        q_view_nodes = qtx.QXWidgetHBox([   
-            (qtx.QXWidgetVBox([self.q_ds_frame_viewer], fixed_width=256), qtx.AlignTop),
-            (qtx.QXWidgetVBox([self.q_ds_fa_viewer], fixed_width=256), qtx.AlignTop),
-            (qtx.QXWidgetVBox([self.q_ds_fc_viewer], fixed_width=256), qtx.AlignTop),
-            (qtx.QXWidgetVBox([self.q_ds_merged_frame_viewer], fixed_width=256), qtx.AlignTop),
-        ], spacing=5, size_policy=('fixed', 'fixed') )
+        # Create OBS-style UI with integrated face-swapping components and viewers
+        try:
+            from .ui.QOptimizedOBSStyleUI import QOptimizedOBSStyleUI
+            # Create optimized OBS-style UI with voice changer integration
+            obs_widget = QOptimizedOBSStyleUI(
+                self.stream_output, 
+                userdata_path, 
+                face_swap_components, 
+                viewers_components,
+                self.voice_changer  # Pass voice changer backend
+            )
+            self.q_obs_style_ui = obs_widget
+        except ImportError as e:
+            print(f"Warning: Could not import QOptimizedOBSStyleUI: {e}")
+            # Fallback to original OBS-style UI
+            try:
+                from .ui.QOBSStyleUI import QOBSStyleUI
+                obs_widget = QOBSStyleUI(self.stream_output, userdata_path, face_swap_components, viewers_components)
+                self.q_obs_style_ui = obs_widget
+            except ImportError as e2:
+                print(f"Warning: Could not import QOBSStyleUI: {e2}")
+                # Create a simple placeholder widget
+                self.q_obs_style_ui = qtx.QXLabel(text="OBS-Style UI not available\nUsing Traditional Interface")
+                self.q_obs_style_ui.setStyleSheet("QLabel { background-color: #2d2d2d; color: #ffffff; padding: 20px; font-size: 14px; }")
+                self.q_obs_style_ui.setAlignment(Qt.AlignCenter)
 
-        right_layout.addWidget(q_nodes)
-        right_layout.addWidget(q_view_nodes)
-        right_widget.setLayout(right_layout)
-        
-        # Add widgets to splitter
-        splitter.addWidget(left_widget)
-        splitter.addWidget(right_widget)
-        splitter.setSizes([800, 400])  # Give more space to OBS-style UI
-        
-        self.setLayout(qtx.QXVBoxLayout([splitter]))
+        # Create main layout with OBS-style UI (viewers are now integrated)
+        main_layout = qtx.QXVBoxLayout()
+        main_layout.addWidget(self.q_obs_style_ui)
+        self.setLayout(main_layout)
 
         self._timer = qtx.QXTimer(interval=5, timeout=self._on_timer_5ms, start=True)
 
@@ -181,6 +199,10 @@ class QDFLOBSAppWindow(qtx.QXWindow):
         self._userdata_path = userdata_path
         self._settings_dirpath = settings_dirpath
 
+        # Initialize backup manager
+        from .ui.UILayoutBackupManager import UILayoutBackupManager
+        self.backup_manager = UILayoutBackupManager(settings_dirpath, userdata_path)
+
         menu_bar = qtx.QXMenuBar( font=QXFontDB.get_default_font(size=10), size_policy=('fixed', 'minimumexpanding') )
         menu_file = menu_bar.addMenu( L('@QDFLAppWindow.file') )
         menu_language = menu_bar.addMenu( L('@QDFLAppWindow.language') )
@@ -191,6 +213,17 @@ class QDFLOBSAppWindow(qtx.QXWindow):
 
         menu_file_action_reset_settings = menu_file.addAction( L('@QDFLAppWindow.reset_modules_settings') )
         menu_file_action_reset_settings.triggered.connect(self._on_reset_modules_settings)
+
+        # Add backup manager menu items
+        menu_file.addSeparator()
+        menu_file_action_backup_layout = menu_file.addAction( "Backup UI Layout" )
+        menu_file_action_backup_layout.triggered.connect(self._on_backup_layout)
+        
+        menu_file_action_restore_layout = menu_file.addAction( "Restore UI Layout" )
+        menu_file_action_restore_layout.triggered.connect(self._on_restore_layout)
+        
+        menu_file_action_manage_backups = menu_file.addAction( "Manage Layout Backups" )
+        menu_file_action_manage_backups.triggered.connect(self._on_manage_backups)
 
         menu_file_action_quit = menu_file.addAction( L('@QDFLAppWindow.quit') )
         menu_file_action_quit.triggered.connect(lambda: qtx.QXMainApplication.quit() )
@@ -262,6 +295,72 @@ class QDFLOBSAppWindow(qtx.QXWindow):
         else:
             self.showFullScreen()
 
+    def _on_backup_layout(self):
+        """Handle backup layout menu action"""
+        try:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_name = f"obs_auto_backup_{timestamp}"
+            success = self.backup_manager.create_backup(backup_name, "OBS UI auto backup from menu")
+            if success:
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.information(
+                    self,
+                    "Backup Created",
+                    f"OBS UI layout backup created successfully:\n{backup_name}"
+                )
+            else:
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.warning(
+                    self,
+                    "Backup Failed",
+                    "Failed to create OBS UI layout backup"
+                )
+        except Exception as e:
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.critical(
+                self,
+                "Backup Error",
+                f"Error creating backup: {e}"
+            )
+
+    def _on_restore_layout(self):
+        """Handle restore layout menu action"""
+        try:
+            backups = self.backup_manager.list_backups()
+            if not backups:
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.information(
+                    self,
+                    "No Backups",
+                    "No OBS UI layout backups found"
+                )
+                return
+            from .ui.QBackupManagerUI import QBackupManagerDialog
+            dialog = QBackupManagerDialog(self.backup_manager, self)
+            dialog.exec_()
+        except Exception as e:
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.critical(
+                self,
+                "Restore Error",
+                f"Error restoring layout: {e}"
+            )
+
+    def _on_manage_backups(self):
+        """Handle manage backups menu action"""
+        try:
+            from .ui.QBackupManagerUI import QBackupManagerDialog
+            dialog = QBackupManagerDialog(self.backup_manager, self)
+            dialog.exec_()
+        except Exception as e:
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.critical(
+                self,
+                "Backup Manager Error",
+                f"Error opening backup manager: {e}"
+            )
+
     def finalize(self):
         if self.q_live_swap is not None:
             self.q_live_swap.finalize()
@@ -273,10 +372,7 @@ class QDFLOBSAppWindow(qtx.QXWindow):
 class PlayaTewsIdentityMaskerOBSStyleApp(qtx.QXMainApplication):
     def __init__(self, userdata_path):
         super().__init__(app_name='PlayaTewsIdentityMasker OBS Style',
-                         app_version='1.0',
-                         app_icon=QXImageDB.get('icon.png'),
-                         language='en-US',
-                         splash_wnd_cls=None)
+                         settings_dirpath=userdata_path / 'settings')
 
         self._userdata_path = userdata_path
         self._settings_dirpath = userdata_path / 'settings'
@@ -284,14 +380,31 @@ class PlayaTewsIdentityMaskerOBSStyleApp(qtx.QXMainApplication):
 
         self._wnd = QDFLOBSAppWindow(userdata_path, self._settings_dirpath)
         self._wnd.show()
+        
+        # Initialize the main content
+        self.initialize()
 
     def on_reinitialize(self):
         if self._wnd.q_live_swap is not None:
             self._wnd.q_live_swap.finalize()
 
+        # Create the live swap component as a regular widget, not a window
         self._wnd.q_live_swap = QLiveSwapOBS(self._userdata_path, self._settings_dirpath)
         self._wnd.content_l.addWidget(self._wnd.q_live_swap)
         self._wnd.q_live_swap.initialize()
+        
+        # Ensure all backend components are properly initialized
+        print("Initializing backend components...")
+        from . import backend as backend_module
+        for backend in self._wnd.q_live_swap.all_backends:
+            print(f"Initializing {backend.__class__.__name__}")
+            # Use restore_on_off_state instead of direct start
+            default_state = True
+            if isinstance(backend, (backend_module.CameraSource, 
+                                   backend_module.FaceAnimator, 
+                                   backend_module.FaceSwapInsight)):
+                default_state = False
+            backend.restore_on_off_state(default_state=default_state)
 
     def initialize(self):
         self.on_reinitialize()
