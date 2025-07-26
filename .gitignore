@@ -28,6 +28,7 @@ ENV/
 env/
 .venv.bak/
 venv.bak/
+Python311/
 
 # IDE
 .vscode/
@@ -48,6 +49,7 @@ Thumbs.db
 # Logs
 *.log
 logs/
+logfile.txt
 
 # Temporary files
 *.tmp
@@ -62,12 +64,22 @@ DeepFaceLab/
 *.dfm
 *.pb
 *.onnx
+*.dfm.part
+*.pth
+*.pth.part*
+*.part*
 models/
+dfm_models/
+modelhub/
 
 # Data files
 data_src/
 data_dst/
 workspace/
+
+# User data and backups
+userdata/
+backups/
 
 # Build artifacts
 *.spec
@@ -78,3 +90,48 @@ workspace/
 *.rpm
 dist/
 build/
+
+# Configuration and environment files
+.env
+.env.local
+.env.production
+.env.development
+config.ini
+settings.json
+*.cfg
+
+# Test and debug files
+test_results.json
+debug_optimize_report.json
+debug_optimize_report.md
+simple_debug_report.json
+simple_debug_report.md
+memory_optimization_test_report.txt
+process_info.md
+
+# Backup and temporary files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Large binary files
+*.dll
+*.lib
+*.a
+*.o
+
+# Development tools
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache/
+.mypy_cache/
+
+# Documentation and reports (optional - uncomment if you want to ignore these)
+# *.md
+# *_README.md
+# *_SUMMARY.md
+# *_GUIDE.md
+# *_REPORT.md
