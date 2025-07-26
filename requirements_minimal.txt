@@ -1,0 +1,25 @@
+# PlayaTewsIdentityMasker - Minimal Dependencies
+# Core requirements for basic functionality
+
+# Essential Python packages
+numpy>=1.21.0,<1.28.0
+opencv-python>=4.5.0,<4.10.0
+
+# GUI Framework (Standardized on PyQt5)
+
+PyQt5>=5.15.0,<5.16.0
+
+# System monitoring
+psutil>=5.8.0
+
+# Optional: For basic image processing without GPU
+Pillow>=8.0.0
+
+# Async support
+asyncio-compat>=0.1.0
+
+# Logging and configuration
+pyyaml>=6.0
+
+# Streaming and recording support
+ffmpeg-python>=0.2.0

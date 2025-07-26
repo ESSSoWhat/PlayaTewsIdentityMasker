@@ -1,0 +1,32 @@
+# DeepFaceLive - GPU-Optimized Dependencies
+# High-performance ML and GPU acceleration
+
+# Include minimal requirements
+-r requirements_minimal.txt
+
+# ONNX Runtime with GPU support
+onnxruntime-gpu>=1.15.0,<1.17.0
+
+# PyTorch with CUDA support (for training and advanced processing)
+torch>=2.0.0,<2.2.0
+torchvision>=0.15.0,<0.17.0
+--extra-index-url https://download.pytorch.org/whl/cu118
+
+# TensorFlow with GPU support (optional, for legacy models)
+tensorflow>=2.12.0,<2.16.0; python_version<"3.12"
+
+# CUDA Python (optional, for low-level GPU operations)
+cuda-python>=12.0.0,<13.0.0; sys_platform=="linux"
+
+# GPU monitoring
+gputil>=1.4.0
+pynvml>=11.4.0
+
+# Advanced image processing
+opencv-contrib-python>=4.5.0,<4.9.0
+
+# Memory profiling
+memory-profiler>=0.60.0
+
+# Model optimization
+optimum>=1.12.0

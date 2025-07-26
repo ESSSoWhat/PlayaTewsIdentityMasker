@@ -1,0 +1,12 @@
+# Simple Live Translator Requirements
+# Basic speech recognition and translation
+
+# Core dependencies
+SpeechRecognition>=3.10.0
+googletrans==4.0.2
+gtts>=2.3.0
+pygame>=2.5.0
+pyaudio>=0.2.11
+
+# Optional for better audio handling
+numpy>=1.24.0

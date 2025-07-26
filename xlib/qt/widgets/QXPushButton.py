@@ -68,24 +68,19 @@ QPushButton:pressed {{
                 rect_aspect = w / h
 
                 size = image.size()
-                # Check if image size is valid to avoid division by zero
-                if size.height() != 0:
-                    pixmap_aspect = size.width() / size.height()
+                pixmap_aspect = size.width() / size.height()
 
-                    if pixmap_aspect != rect_aspect:
-                        if pixmap_aspect > rect_aspect:
-                            pw, ph = w, int(h * (rect_aspect / pixmap_aspect))
-                            px, py = 0, h/2-ph/2
-                        elif pixmap_aspect < rect_aspect:
-                            pw, ph = int( w * (pixmap_aspect / rect_aspect) ), h
-                            px, py = w/2-pw/2, 0
-                    else:
-                        px, py, pw, ph = 0, 0, w, h
-
-                    self.setIconSize( QSize(pw-4,ph-4) )
+                if pixmap_aspect != rect_aspect:
+                    if pixmap_aspect > rect_aspect:
+                        pw, ph = w, int(h * (rect_aspect / pixmap_aspect))
+                        px, py = 0, h/2-ph/2
+                    elif pixmap_aspect < rect_aspect:
+                        pw, ph = int( w * (pixmap_aspect / rect_aspect) ), h
+                        px, py = w/2-pw/2, 0
                 else:
-                    # Fallback for invalid image size
-                    self.setIconSize( QSize(w-4,h-4) )
+                    px, py, pw, ph = 0, 0, w, h
+
+                self.setIconSize( QSize(pw-4,ph-4) )
 
     def _set_image(self, image : QXImage ):
         self._image = image

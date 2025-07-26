@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple test script to verify DeepFaceLive features
-Includes comprehensive testing of StreamFaceLabs components
+Simple test script to verify PlayaTewsIdentityMasker features
 """
 
 import sys
@@ -14,15 +13,15 @@ def test_basic_imports():
     
     try:
         # Test backend imports
-        from apps.DeepFaceLive.backend import StreamFaceLabs
+        from apps.PlayaTewsIdentityMasker.backend import StreamFaceLabs
         print("✅ Backend components imported successfully")
         
         # Test UI imports
-        from apps.DeepFaceLive.ui import QStreamFaceLabsPanel
+        from apps.PlayaTewsIdentityMasker.ui import QStreamFaceLabsPanel
         print("✅ UI components imported successfully")
         
         # Test main app import
-        from apps.DeepFaceLive.DeepFaceLiveApp import DeepFaceLiveApp
+        from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
         print("✅ Main application imported successfully")
         
         return True
@@ -35,9 +34,9 @@ def test_file_structure():
     print("\n🔍 Testing file structure...")
     
     required_files = [
-        "apps/DeepFaceLive/backend/StreamFaceLabs.py",
-        "apps/DeepFaceLive/ui/QStreamFaceLabs.py",
-        "apps/DeepFaceLive/DeepFaceLiveApp.py",
+        "apps/PlayaTewsIdentityMasker/backend/StreamFaceLabs.py",
+        "apps/PlayaTewsIdentityMasker/ui/QStreamFaceLabs.py",
+        "apps/PlayaTewsIdentityMasker/PlayaTewsIdentityMaskerApp.py",
         "localization/en-US.py"
     ]
     
@@ -70,16 +69,14 @@ def test_directories():
     return all_created
 
 def test_stream_face_labs():
-    """Test StreamFaceLabs component (backend and UI)"""
+    """Test StreamFaceLabs component"""
     print("\n🔍 Testing StreamFaceLabs component...")
     
     try:
-        from apps.DeepFaceLive.backend import StreamFaceLabs
-        from apps.DeepFaceLive.ui import QStreamFaceLabsPanel
+        from apps.PlayaTewsIdentityMasker.backend import StreamFaceLabs
+        from apps.PlayaTewsIdentityMasker.ui import QStreamFaceLabsPanel
         
-        print("✅ StreamFaceLabs backend component available")
-        print("✅ StreamFaceLabs UI component available")
-        print("✅ StreamFaceLabs component fully integrated")
+        print("✅ StreamFaceLabs component available")
         return True
     except Exception as e:
         print(f"❌ StreamFaceLabs test failed: {e}")
