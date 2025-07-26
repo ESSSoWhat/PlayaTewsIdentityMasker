@@ -93,12 +93,9 @@ class QEnhancedStreamOutput(QBackendPanel):
     """Enhanced streaming output panel with multi-platform support and scene management"""
     
     def __init__(self, backend: EnhancedStreamOutput):
-        super().__init__(backend, L('@QEnhancedStreamOutput.module_title'))
         self.backend = backend
-        self.setup_ui()
         
-    def setup_ui(self):
-        """Setup the enhanced UI layout"""
+        # Create the main layout first
         main_layout = QVBoxLayout()
         
         # Create tab widget for different sections
@@ -121,7 +118,9 @@ class QEnhancedStreamOutput(QBackendPanel):
         self.tabs.addTab(settings_tab, "Settings")
         
         main_layout.addWidget(self.tabs)
-        self.setLayout(main_layout)
+        
+        # Pass the layout to the parent
+        super().__init__(backend, L('@QEnhancedStreamOutput.module_title'), main_layout)
         
     def create_streaming_tab(self):
         """Create the streaming configuration tab"""
@@ -137,7 +136,12 @@ class QEnhancedStreamOutput(QBackendPanel):
         # FPS display
         q_average_fps_label = QLabelPopupInfo(label=L('@QEnhancedStreamOutput.avg_fps'), 
                                              popup_info_text=L('@QEnhancedStreamOutput.help.avg_fps'))
-        q_average_fps = QLabelCSWNumber(cs.avg_fps, reflect_state_widgets=[q_average_fps_label])
+        try:
+            q_average_fps = QLabelCSWNumber(cs.avg_fps, reflect_state_widgets=[q_average_fps_label])
+        except Exception as e:
+            print(f"Warning: Could not create FPS display: {e}")
+            q_average_fps = QLabel("0.0")
+            q_average_fps.setStyleSheet("QLabel { color: #888888; }")
         
         # Streaming toggle
         q_is_streaming_label = QLabelPopupInfo(label='Multi-Platform Streaming')

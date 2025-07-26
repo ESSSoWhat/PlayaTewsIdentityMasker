@@ -57,6 +57,8 @@ class ThreadFileDownloader:
         return self._error
 
     def _thread(self):
+        f = None
+        url_req = None
         try:
             url_req = urllib.request.urlopen(self._url)
             file_size = self._file_size = int( url_req.getheader('content-length') )
@@ -67,33 +69,60 @@ class ThreadFileDownloader:
             if partpath is not None:
                 if partpath.exists():
                     partpath.unlink()
-                f = open(partpath, 'wb')
-            else:
-                f = io.BytesIO()
+                # Use context manager for proper file handling
+                with open(partpath, 'wb') as f:
+                    while url_req is not None:
+                        buffer = url_req.read(8192)
+                        if not buffer:
+                            break
 
-            while url_req is not None:
-                buffer = url_req.read(8192)
-                if not buffer:
-                    break
+                        f.write(buffer)
 
-                f.write(buffer)
+                        new_file_size_dl = self._file_size_dl + len(buffer)
 
-                new_file_size_dl = self._file_size_dl + len(buffer)
+                        if new_file_size_dl >= file_size:
+                            break
 
-                if new_file_size_dl >= file_size:
-                    if partpath is not None:
-                        f.close()
+                        self._file_size_dl = new_file_size_dl
+                    
+                    # Complete the download
+                    if self._file_size_dl >= file_size:
                         if savepath.exists():
                             savepath.unlink()
                         partpath.rename(savepath)
-                    else:
+            else:
+                # Use BytesIO for in-memory download
+                with io.BytesIO() as f:
+                    while url_req is not None:
+                        buffer = url_req.read(8192)
+                        if not buffer:
+                            break
+
+                        f.write(buffer)
+
+                        new_file_size_dl = self._file_size_dl + len(buffer)
+
+                        if new_file_size_dl >= file_size:
+                            break
+
+                        self._file_size_dl = new_file_size_dl
+                    
+                    # Get the bytes if download completed
+                    if self._file_size_dl >= file_size:
                         self._bytes = f.getvalue()
-                        f.close()
-                    url_req.close()
-                    url_req = None
-
-                self._file_size_dl = new_file_size_dl
-
 
         except Exception as e:
             self._error = str(e)
+            # Clean up partial file on error
+            if partpath is not None and partpath.exists():
+                try:
+                    partpath.unlink()
+                except Exception:
+                    pass  # Ignore cleanup errors
+        finally:
+            # Ensure URL connection is closed
+            if url_req is not None:
+                try:
+                    url_req.close()
+                except Exception:
+                    pass  # Ignore close errors

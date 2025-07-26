@@ -88,7 +88,20 @@ class QVoiceChanger(QWidget):
             ("Autotune", lambda: self._apply_preset("autotune"))
         ]
         
-        for i, (name, callback) in enumerate(presets):
+        # Add realistic voice presets
+        voice_presets = [
+            ("Male", lambda: self._apply_preset("male")),
+            ("Female", lambda: self._apply_preset("female")),
+            ("Child", lambda: self._apply_preset("child")),
+            ("Elderly", lambda: self._apply_preset("elderly")),
+            ("British", lambda: self._apply_preset("british")),
+            ("Southern", lambda: self._apply_preset("southern"))
+        ]
+        
+        # Add all presets to layout
+        all_presets = presets + voice_presets
+        
+        for i, (name, callback) in enumerate(all_presets):
             btn = QPushButton(name)
             btn.clicked.connect(callback)
             presets_layout.addWidget(btn, i // 4, i % 4)
@@ -280,11 +293,11 @@ class QVoiceChanger(QWidget):
         """Apply a preset configuration"""
         presets = {
             "helium": {
-                "effect_type": 1,  # PITCH_SHIFT
+                "effect_type": 4,  # HELIUM
                 "pitch_shift": 4.0
             },
             "deep": {
-                "effect_type": 1,  # PITCH_SHIFT
+                "effect_type": 5,  # DEEP
                 "pitch_shift": -4.0
             },
             "robot": {
@@ -313,6 +326,25 @@ class QVoiceChanger(QWidget):
             "autotune": {
                 "effect_type": 10,  # AUTOTUNE
                 "autotune_sensitivity": 0.1
+            },
+            # New realistic voice presets
+            "male": {
+                "effect_type": 11,  # MALE_VOICE
+            },
+            "female": {
+                "effect_type": 12,  # FEMALE_VOICE
+            },
+            "child": {
+                "effect_type": 13,  # CHILD_VOICE
+            },
+            "elderly": {
+                "effect_type": 14,  # ELDERLY_VOICE
+            },
+            "british": {
+                "effect_type": 15,  # BRITISH_ACCENT
+            },
+            "southern": {
+                "effect_type": 16,  # SOUTHERN_ACCENT
             }
         }
         

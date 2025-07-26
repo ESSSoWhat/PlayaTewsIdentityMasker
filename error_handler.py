@@ -152,53 +152,61 @@ class ErrorRecoveryManager:
         """Attempt to recover from an error"""
         recovery_actions = self.get_recovery_actions(error_info)
         
-        for action in recovery_actions:
-            if action.condition and not action.condition(error_info):
-                continue
-            
-            for attempt in range(action.max_attempts):
-                try:
-                    logger.info(f"🔄 Recovery attempt {attempt + 1}/{action.max_attempts} "
-                              f"using {action.strategy.value} strategy")
-                    
-                    start_time = time.time()
-                    
-                    if action.action:
-                        success = action.action(error_info)
-                    else:
-                        success = self._default_recovery_action(action.strategy, error_info)
-                    
-                    recovery_time = (time.time() - start_time) * 1000
-                    
-                    if success:
-                        error_info.recovery_successful = True
-                        error_info.recovery_time_ms = recovery_time
-                        self.recovered_errors += 1
-                        
-                        logger.info(f"✅ Recovery successful using {action.strategy.value} "
-                                  f"in {recovery_time:.1f}ms")
-                        
-                        # Record recovery
-                        self.recovery_history.append({
-                            'timestamp': time.time(),
-                            'error_type': error_info.error_type,
-                            'strategy': action.strategy.value,
-                            'attempts': attempt + 1,
-                            'recovery_time_ms': recovery_time
-                        })
-                        
-                        return True
-                    else:
-                        logger.warning(f"⚠️ Recovery attempt {attempt + 1} failed")
-                        
-                        if attempt < action.max_attempts - 1:
-                            delay = action.delay_seconds * (action.backoff_multiplier ** attempt)
-                            time.sleep(delay)
+        # Add thread safety
+        with threading.Lock():
+            for action in recovery_actions:
+                if action.condition and not action.condition(error_info):
+                    continue
                 
-                except Exception as e:
-                    logger.error(f"❌ Recovery action failed: {e}")
-                    if attempt < action.max_attempts - 1:
-                        time.sleep(action.delay_seconds)
+                for attempt in range(action.max_attempts):
+                    try:
+                        logger.info(f"🔄 Recovery attempt {attempt + 1}/{action.max_attempts} "
+                                  f"using {action.strategy.value} strategy")
+                        
+                        start_time = time.time()
+                        
+                        if action.action:
+                            success = action.action(error_info)
+                        else:
+                            success = self._default_recovery_action(action.strategy, error_info)
+                        
+                        recovery_time = (time.time() - start_time) * 1000
+                        
+                        if success:
+                            error_info.recovery_successful = True
+                            error_info.recovery_time_ms = recovery_time
+                            self.recovered_errors += 1
+                            
+                            logger.info(f"✅ Recovery successful using {action.strategy.value} "
+                                      f"in {recovery_time:.1f}ms")
+                            
+                            # Record recovery with cleanup
+                            self.recovery_history.append({
+                                'timestamp': time.time(),
+                                'error_type': error_info.error_type,
+                                'strategy': action.strategy.value,
+                                'attempts': attempt + 1,
+                                'recovery_time_ms': recovery_time
+                            })
+                            
+                            # Clean up old recovery history entries
+                            if len(self.recovery_history) > 100:
+                                self.recovery_history = self.recovery_history[-50:]  # Keep last 50
+                            
+                            return True
+                        else:
+                            logger.warning(f"⚠️ Recovery attempt {attempt + 1} failed")
+                            
+                            if attempt < action.max_attempts - 1:
+                                # Use bounded exponential backoff
+                                delay = min(30.0, action.delay_seconds * (action.backoff_multiplier ** attempt))
+                                time.sleep(delay)
+                    
+                    except Exception as e:
+                        logger.error(f"❌ Recovery action failed: {e}")
+                        if attempt < action.max_attempts - 1:
+                            # Use fixed delay for recovery action failures
+                            time.sleep(min(5.0, action.delay_seconds))
         
         error_info.recovery_attempted = True
         logger.error(f"❌ All recovery attempts failed for {error_info.error_type}")

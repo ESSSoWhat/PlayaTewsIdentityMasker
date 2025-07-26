@@ -203,15 +203,19 @@ class ConfigManager:
         self.config_file = config_file
         self.config = ApplicationConfig()
         self.validators = ConfigValidator()
-        self._observers: List[weakref.ref] = []
         self._lock = threading.RLock()
-        self._last_file_check = 0
-        self._file_check_interval = 5.0  # Check for changes every 5 seconds
+        self._observers: List[weakref.ref] = []
+        
+        # File monitoring
+        self._monitoring = False
+        self._monitor_thread: Optional[threading.Thread] = None
+        self._last_file_check = time.time()
+        self._file_check_interval = 1.0  # Check every second
         
         # Load configuration
         self._load_config()
         
-        # Setup file monitoring if hot-reload is enabled
+        # Start file monitoring if enabled
         if self.config.system.enable_hot_reload and self.config_file:
             self._start_file_monitoring()
     
@@ -433,8 +437,13 @@ class ConfigManager:
     
     def _start_file_monitoring(self):
         """Start file monitoring for hot-reload"""
+        if self._monitoring:
+            return
+        
+        self._monitoring = True
+        
         def monitor_file():
-            while True:
+            while self._monitoring:
                 try:
                     if self.config_file and os.path.exists(self.config_file):
                         current_time = time.time()
@@ -449,11 +458,33 @@ class ConfigManager:
                 except Exception as e:
                     logger.error(f"❌ File monitoring error: {e}")
                 
-                time.sleep(1.0)
+                # Sleep with interruption check
+                for _ in range(10):  # Check every 0.1 seconds
+                    if not self._monitoring:
+                        break
+                    time.sleep(0.1)
         
-        monitor_thread = threading.Thread(target=monitor_file, daemon=True)
-        monitor_thread.start()
+        self._monitor_thread = threading.Thread(target=monitor_file, daemon=True)
+        self._monitor_thread.start()
         logger.info("👁️ File monitoring started for hot-reload")
+    
+    def stop_file_monitoring(self):
+        """Stop file monitoring"""
+        if not self._monitoring:
+            return
+        
+        self._monitoring = False
+        
+        if self._monitor_thread and self._monitor_thread.is_alive():
+            self._monitor_thread.join(timeout=2.0)
+            if self._monitor_thread.is_alive():
+                logger.warning("⚠️ File monitoring thread did not stop gracefully")
+        
+        logger.info("👁️ File monitoring stopped")
+    
+    def __del__(self):
+        """Cleanup when config manager is destroyed"""
+        self.stop_file_monitoring()
     
     def get_config_summary(self) -> Dict[str, Any]:
         """Get configuration summary for debugging"""

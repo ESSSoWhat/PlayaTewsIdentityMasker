@@ -595,15 +595,20 @@ class MemoryManager:
     
     def _monitoring_loop(self):
         """Background monitoring loop"""
+        retry_count = 0
+        max_retry_count = 5
+        
         while self.monitoring:
             try:
                 # Collect memory stats
                 stats = self.get_memory_summary()
                 self.memory_stats_history.append(stats)
                 
-                # Keep only last 100 entries
+                # Keep only last 100 entries - more efficient cleanup
                 if len(self.memory_stats_history) > 100:
-                    self.memory_stats_history.pop(0)
+                    # Remove oldest entries in chunks for better performance
+                    excess = len(self.memory_stats_history) - 100
+                    self.memory_stats_history = self.memory_stats_history[excess:]
                 
                 # Check for memory issues
                 if stats['system_memory_mb'] > 3072:  # 3GB warning
@@ -617,14 +622,23 @@ class MemoryManager:
                 # Periodic cleanup
                 self.gpu_pool.cleanup_unused()
                 
+                # Reset retry count on successful iteration
+                retry_count = 0
+                
                 time.sleep(self.cleanup_interval)
                 
             except Exception as e:
                 self.logger.error(f"Memory monitoring error: {e}")
-                # Use exponential backoff for retry instead of fixed sleep
-                retry_delay = min(10, 2 ** getattr(self, '_retry_count', 0))
-                self._retry_count = getattr(self, '_retry_count', 0) + 1
-                time.sleep(retry_delay)
+                retry_count += 1
+                
+                # Use exponential backoff with maximum limit
+                if retry_count <= max_retry_count:
+                    retry_delay = min(30, 2 ** retry_count)  # Cap at 30 seconds
+                    self.logger.warning(f"Retrying in {retry_delay} seconds (attempt {retry_count}/{max_retry_count})")
+                    time.sleep(retry_delay)
+                else:
+                    self.logger.error(f"Too many consecutive errors ({retry_count}), stopping monitoring")
+                    break
 
 # Global memory manager instance
 _global_memory_manager: Optional[MemoryManager] = None

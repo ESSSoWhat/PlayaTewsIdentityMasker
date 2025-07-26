@@ -5,6 +5,8 @@ Controllable Subprocess Worker
 
 from .CSWBase import (DB, Control, ControlClient, ControlHost, Host, Sheet,
                       Worker, WorkerState)
+from .ControlSignal import ControlSignal
+from .ControlViewer import ControlViewer
 from .DynamicSingleSwitch import DynamicSingleSwitch
 from .Error import Error
 from .Flag import Flag

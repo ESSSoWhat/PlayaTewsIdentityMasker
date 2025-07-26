@@ -162,3 +162,13 @@ After implementing the fix:
 3. Verify that "SOURCE_FRAME" is selected by default
 4. Confirm the output component functions correctly
 5. Test switching between different source types
+
+## Testing
+
+To verify the fix works in the application:
+1. Start the application
+2. Navigate to the Stream Output component
+3. Verify that "SOURCE_FRAME" is selected by default instead of "None"
+4. Check that no "Selected None, choice: None" messages appear in the logs
+5. Confirm the output component functions correctly
+main

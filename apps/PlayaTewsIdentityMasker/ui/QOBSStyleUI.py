@@ -30,15 +30,18 @@ from ..backend import StreamOutput
 from ..backend.StreamOutput import SourceType
 
 
-class QOBSStyleUI(QWidget):
+class QOBSStyleUI(qtx.QXWindow):
     """OBS Studio-style UI for DeepFaceLive with enhanced streaming and recording capabilities"""
     
-    def __init__(self, stream_output_backend: StreamOutput, userdata_path: Path):
+    def __init__(self, stream_output_backend: StreamOutput, userdata_path: Path, face_swap_components=None, viewers_components=None):
         super().__init__()
         self.stream_output_backend = stream_output_backend
         self.userdata_path = userdata_path
+        self.face_swap_components = face_swap_components or {}
+        self.viewers_components = viewers_components or {}
         self.scenes = []
         self.current_scene = None
+        self.sources_by_scene = {}  # Track sources per scene
         self.streaming_platforms = {
             'twitch': {'name': 'Twitch', 'rtmp': 'rtmp://live.twitch.tv/app/'},
             'youtube': {'name': 'YouTube', 'rtmp': 'rtmp://a.rtmp.youtube.com/live2/'},
@@ -62,15 +65,11 @@ class QOBSStyleUI(QWidget):
         # Center panel - Preview and Controls
         center_panel = self.create_center_panel()
         
-        # Right panel - Settings and Audio
-        right_panel = self.create_right_panel()
-        
-        # Create splitter for resizable panels
+        # Create splitter for resizable panels (removed right panel)
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(left_panel)
         splitter.addWidget(center_panel)
-        splitter.addWidget(right_panel)
-        splitter.setSizes([250, 600, 300])
+        splitter.setSizes([250, 800])  # Adjusted sizes for two panels
         
         main_layout.addWidget(splitter)
         self.setLayout(main_layout)
@@ -133,33 +132,50 @@ class QOBSStyleUI(QWidget):
         return panel
         
     def create_center_panel(self):
-        """Create the center panel with preview and main controls"""
+        """Create the center panel with preview, controls, and viewers"""
         panel = QWidget()
         layout = QVBoxLayout()
         
-        # Preview area
-        preview_group = QGroupBox("Preview")
+        # Top section: Preview and Controls
+        top_section = QWidget()
+        top_layout = QHBoxLayout()
+        
+        # Preview area (left side of top section) - Now contains merged frame viewer
+        preview_group = QGroupBox("Active Screen")
         preview_layout = QVBoxLayout()
         
-        self.preview_label = QLabel("Preview Area")
-        self.preview_label.setMinimumSize(640, 360)
-        self.preview_label.setStyleSheet("""
-            QLabel {
-                background-color: #1e1e1e;
-                border: 2px solid #404040;
-                border-radius: 5px;
-                color: #ffffff;
-                font-size: 16px;
-            }
-        """)
-        self.preview_label.setAlignment(Qt.AlignCenter)
-        preview_layout.addWidget(self.preview_label)
+        # Use merged frame viewer as the main preview
+        if 'merged_frame_viewer' in self.viewers_components:
+            self.main_preview = self.viewers_components['merged_frame_viewer']
+            # Remove size constraints and let it stretch to fill
+            self.main_preview.setMinimumSize(400, 300)  # Smaller minimum
+            self.main_preview.setMaximumSize(16777215, 16777215)  # Remove maximum size constraint
+            self.main_preview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Stretch to fit
+            # Set stretch factor to take all available space
+            preview_layout.addWidget(self.main_preview, 1)  # Stretch factor of 1
+        else:
+            self.main_preview = QLabel("Merged Frame Preview")
+            self.main_preview.setMinimumSize(400, 300)  # Smaller minimum
+            self.main_preview.setMaximumSize(16777215, 16777215)  # Remove maximum size constraint
+            self.main_preview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Stretch to fit
+            self.main_preview.setStyleSheet("""
+                QLabel {
+                    background-color: #1e1e1e;
+                    border: 2px solid #404040;
+                    border-radius: 5px;
+                    color: #ffffff;
+                    font-size: 16px;
+                }
+            """)
+            self.main_preview.setAlignment(Qt.AlignCenter)
+            # Set stretch factor to take all available space
+            preview_layout.addWidget(self.main_preview, 1)  # Stretch factor of 1
         
         preview_group.setLayout(preview_layout)
         
-        # Main controls
+        # Controls area (right side of top section)
         controls_group = QGroupBox("Controls")
-        controls_layout = QGridLayout()
+        controls_layout = QVBoxLayout()
         
         # Streaming controls
         self.stream_btn = QPushButton("Start Streaming")
@@ -201,18 +217,142 @@ class QOBSStyleUI(QWidget):
             }
         """)
         
+        # Global Face Swap Control Button
+        self.global_face_swap_btn = QPushButton("Face Swap: ON")
+        self.global_face_swap_btn.setMinimumHeight(40)
+        self.global_face_swap_btn.setCheckable(True)
+        self.global_face_swap_btn.setChecked(True)  # Default to ON
+        self.global_face_swap_btn.setToolTip("Click to toggle all face swap components on/off\nGreen = ON, Red = OFF")
+        self.global_face_swap_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #27ae60;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #229954;
+            }
+            QPushButton:checked {
+                background-color: #27ae60;
+            }
+            QPushButton:!checked {
+                background-color: #e74c3c;
+            }
+        """)
+        
         # Settings button
         self.settings_btn = QPushButton("Settings")
         self.settings_btn.setMinimumHeight(30)
         
-        controls_layout.addWidget(self.stream_btn, 0, 0, 1, 2)
-        controls_layout.addWidget(self.record_btn, 1, 0, 1, 2)
-        controls_layout.addWidget(self.settings_btn, 2, 0, 1, 2)
+        # Processing window button
+        self.processing_btn = QPushButton("All Controls")
+        self.processing_btn.setMinimumHeight(30)
+        self.processing_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2196F3;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+            QPushButton:hover {
+                background-color: #1976D2;
+            }
+            QPushButton:pressed {
+                background-color: #0D47A1;
+            }
+        """)
+        
+        controls_layout.addWidget(self.stream_btn)
+        controls_layout.addWidget(self.record_btn)
+        controls_layout.addWidget(self.global_face_swap_btn)
+        controls_layout.addWidget(self.settings_btn)
+        controls_layout.addWidget(self.processing_btn)
+        controls_layout.addStretch()
         
         controls_group.setLayout(controls_layout)
         
-        layout.addWidget(preview_group)
-        layout.addWidget(controls_group)
+        # Add preview and controls to top section - give more space to preview
+        top_layout.addWidget(preview_group, 3)  # Stretch factor of 3 for preview
+        top_layout.addWidget(controls_group, 1)  # Stretch factor of 1 for controls
+        top_section.setLayout(top_layout)
+        
+        # Bottom section: Viewers
+        bottom_section = QWidget()
+        bottom_layout = QVBoxLayout()
+        
+        # Viewers group
+        viewers_group = QGroupBox("Processing Views")
+        viewers_layout = QHBoxLayout()
+        
+        # Use actual viewers if available, otherwise create placeholders
+        if 'frame_viewer' in self.viewers_components:
+            frame_viewer = self.viewers_components['frame_viewer']
+            frame_viewer.setMinimumSize(150, 120)  # Smaller size
+        else:
+            frame_viewer = QLabel("Frame Viewer")
+            frame_viewer.setMinimumSize(150, 120)  # Smaller size
+            frame_viewer.setStyleSheet("""
+                QLabel {
+                    background-color: #2d2d2d;
+                    border: 1px solid #404040;
+                    border-radius: 3px;
+                    color: #cccccc;
+                    font-size: 12px;
+                }
+            """)
+            frame_viewer.setAlignment(Qt.AlignCenter)
+        
+        if 'face_align_viewer' in self.viewers_components:
+            face_align_viewer = self.viewers_components['face_align_viewer']
+            face_align_viewer.setMinimumSize(150, 120)  # Smaller size
+        else:
+            face_align_viewer = QLabel("Face Align Viewer")
+            face_align_viewer.setMinimumSize(150, 120)  # Smaller size
+            face_align_viewer.setStyleSheet("""
+                QLabel {
+                    background-color: #2d2d2d;
+                    border: 1px solid #404040;
+                    border-radius: 3px;
+                    color: #cccccc;
+                    font-size: 12px;
+                }
+            """)
+            face_align_viewer.setAlignment(Qt.AlignCenter)
+        
+        if 'face_swap_viewer' in self.viewers_components:
+            face_swap_viewer = self.viewers_components['face_swap_viewer']
+            face_swap_viewer.setMinimumSize(150, 120)  # Smaller size
+        else:
+            face_swap_viewer = QLabel("Face Swap Viewer")
+            face_swap_viewer.setMinimumSize(150, 120)  # Smaller size
+            face_swap_viewer.setStyleSheet("""
+                QLabel {
+                    background-color: #2d2d2d;
+                    border: 1px solid #404040;
+                    border-radius: 3px;
+                    color: #cccccc;
+                    font-size: 12px;
+                }
+            """)
+            face_swap_viewer.setAlignment(Qt.AlignCenter)
+        
+        # Only show the smaller viewers in the bottom section
+        viewers_layout.addWidget(frame_viewer)
+        viewers_layout.addWidget(face_align_viewer)
+        viewers_layout.addWidget(face_swap_viewer)
+        
+        viewers_group.setLayout(viewers_layout)
+        bottom_layout.addWidget(viewers_group)
+        bottom_section.setLayout(bottom_layout)
+        
+        # Add sections to main layout - give more space to preview area
+        layout.addWidget(top_section, 4)  # Stretch factor of 4 for preview area
+        layout.addWidget(bottom_section, 1)  # Stretch factor of 1 for bottom viewers
         
         panel.setLayout(layout)
         return panel
@@ -222,258 +362,39 @@ class QOBSStyleUI(QWidget):
         panel = QWidget()
         layout = QVBoxLayout()
         
-        # Create tab widget for different settings
-        self.settings_tabs = QTabWidget()
+        # Create simplified right panel with just info
+        info_label = QLabel("PlayaTewsIdentityMasker OBS-Style Interface\n\nAll controls have been moved to the All Controls window for a cleaner interface.\n\nClick the 'All Controls' button in the center panel to access:\n• Face Swap Processing\n• Streaming Settings\n• Recording Settings\n• Audio Settings\n• Video Settings\n• Performance Controls")
+        info_label.setAlignment(Qt.AlignCenter)
+        info_label.setWordWrap(True)
+        info_label.setStyleSheet("""
+            QLabel {
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
+                border-radius: 5px;
+                color: #ffffff;
+                font-size: 12px;
+                padding: 30px;
+                line-height: 1.5;
+            }
+        """)
         
-        # Streaming settings tab
-        streaming_tab = self.create_streaming_tab()
-        self.settings_tabs.addTab(streaming_tab, "Streaming")
+        # Create simple layout for right panel
+        right_layout = QVBoxLayout()
+        right_layout.addWidget(info_label)
+        right_layout.addStretch()
         
-        # Recording settings tab
-        recording_tab = self.create_recording_tab()
-        self.settings_tabs.addTab(recording_tab, "Recording")
+        # Create a simple widget instead of tab widget
+        right_widget = QWidget()
+        right_widget.setLayout(right_layout)
         
-        # Audio settings tab
-        audio_tab = self.create_audio_tab()
-        self.settings_tabs.addTab(audio_tab, "Audio")
-        
-        # Video settings tab
-        video_tab = self.create_video_tab()
-        self.settings_tabs.addTab(video_tab, "Video")
-        
-        layout.addWidget(self.settings_tabs)
+        layout.addWidget(right_widget)
         layout.addStretch()
         
         panel.setLayout(layout)
         return panel
         
-    def create_streaming_tab(self):
-        """Create streaming settings tab"""
-        tab = QWidget()
-        layout = QVBoxLayout()
-        
-        # Platform selection
-        platform_group = QGroupBox("Streaming Platform")
-        platform_layout = QVBoxLayout()
-        
-        self.platform_combo = QComboBox()
-        for key, platform in self.streaming_platforms.items():
-            self.platform_combo.addItem(platform['name'], key)
-        
-        platform_layout.addWidget(QLabel("Platform:"))
-        platform_layout.addWidget(self.platform_combo)
-        
-        # Stream key
-        self.stream_key_edit = QLineEdit()
-        self.stream_key_edit.setPlaceholderText("Enter your stream key")
-        self.stream_key_edit.setEchoMode(QLineEdit.Password)
-        
-        platform_layout.addWidget(QLabel("Stream Key:"))
-        platform_layout.addWidget(self.stream_key_edit)
-        
-        # Custom RTMP URL
-        self.custom_rtmp_edit = QLineEdit()
-        self.custom_rtmp_edit.setPlaceholderText("rtmp://your-server.com/live/stream-key")
-        
-        platform_layout.addWidget(QLabel("Custom RTMP URL:"))
-        platform_layout.addWidget(self.custom_rtmp_edit)
-        
-        platform_group.setLayout(platform_layout)
-        
-        # Stream settings
-        stream_settings_group = QGroupBox("Stream Settings")
-        stream_settings_layout = QGridLayout()
-        
-        self.stream_quality_combo = QComboBox()
-        self.stream_quality_combo.addItems(['1080p', '720p', '480p', '360p'])
-        self.stream_quality_combo.setCurrentText('720p')
-        
-        self.stream_fps_combo = QComboBox()
-        self.stream_fps_combo.addItems(['30', '60'])
-        self.stream_fps_combo.setCurrentText('30')
-        
-        self.stream_bitrate_spin = QSpinBox()
-        self.stream_bitrate_spin.setRange(1000, 8000)
-        self.stream_bitrate_spin.setValue(2500)
-        self.stream_bitrate_spin.setSuffix(" kbps")
-        
-        stream_settings_layout.addWidget(QLabel("Quality:"), 0, 0)
-        stream_settings_layout.addWidget(self.stream_quality_combo, 0, 1)
-        stream_settings_layout.addWidget(QLabel("FPS:"), 1, 0)
-        stream_settings_layout.addWidget(self.stream_fps_combo, 1, 1)
-        stream_settings_layout.addWidget(QLabel("Bitrate:"), 2, 0)
-        stream_settings_layout.addWidget(self.stream_bitrate_spin, 2, 1)
-        
-        stream_settings_group.setLayout(stream_settings_layout)
-        
-        layout.addWidget(platform_group)
-        layout.addWidget(stream_settings_group)
-        layout.addStretch()
-        
-        tab.setLayout(layout)
-        return tab
-        
-    def create_recording_tab(self):
-        """Create recording settings tab"""
-        tab = QWidget()
-        layout = QVBoxLayout()
-        
-        # Recording format
-        format_group = QGroupBox("Recording Format")
-        format_layout = QVBoxLayout()
-        
-        self.recording_format_combo = QComboBox()
-        self.recording_format_combo.addItems(self.recording_formats)
-        self.recording_format_combo.setCurrentText('mp4')
-        
-        format_layout.addWidget(QLabel("Format:"))
-        format_layout.addWidget(self.recording_format_combo)
-        
-        format_group.setLayout(format_layout)
-        
-        # Recording quality
-        quality_group = QGroupBox("Recording Quality")
-        quality_layout = QGridLayout()
-        
-        self.recording_quality_combo = QComboBox()
-        self.recording_quality_combo.addItems(self.recording_qualities)
-        self.recording_quality_combo.setCurrentText('1080p')
-        
-        self.recording_fps_combo = QComboBox()
-        self.recording_fps_combo.addItems(['30', '60'])
-        self.recording_fps_combo.setCurrentText('30')
-        
-        self.recording_bitrate_spin = QSpinBox()
-        self.recording_bitrate_spin.setRange(1000, 50000)
-        self.recording_bitrate_spin.setValue(8000)
-        self.recording_bitrate_spin.setSuffix(" kbps")
-        
-        quality_layout.addWidget(QLabel("Quality:"), 0, 0)
-        quality_layout.addWidget(self.recording_quality_combo, 0, 1)
-        quality_layout.addWidget(QLabel("FPS:"), 1, 0)
-        quality_layout.addWidget(self.recording_fps_combo, 1, 1)
-        quality_layout.addWidget(QLabel("Bitrate:"), 2, 0)
-        quality_layout.addWidget(self.recording_bitrate_spin, 2, 1)
-        
-        quality_group.setLayout(quality_layout)
-        
-        # Recording path
-        path_group = QGroupBox("Recording Path")
-        path_layout = QVBoxLayout()
-        
-        self.recording_path_edit = QLineEdit()
-        self.recording_path_edit.setText(str(self.userdata_path / "recordings"))
-        
-        path_layout.addWidget(QLabel("Save recordings to:"))
-        path_layout.addWidget(self.recording_path_edit)
-        
-        path_group.setLayout(path_layout)
-        
-        layout.addWidget(format_group)
-        layout.addWidget(quality_group)
-        layout.addWidget(path_group)
-        layout.addStretch()
-        
-        tab.setLayout(layout)
-        return tab
-        
-    def create_audio_tab(self):
-        """Create audio settings tab"""
-        tab = QWidget()
-        layout = QVBoxLayout()
-        
-        # Audio sources
-        audio_sources_group = QGroupBox("Audio Sources")
-        audio_sources_layout = QVBoxLayout()
-        
-        self.mic_volume_slider = QSlider(Qt.Horizontal)
-        self.mic_volume_slider.setRange(0, 100)
-        self.mic_volume_slider.setValue(50)
-        
-        self.desktop_audio_checkbox = QCheckBox("Include Desktop Audio")
-        self.desktop_audio_checkbox.setChecked(True)
-        
-        audio_sources_layout.addWidget(QLabel("Microphone Volume:"))
-        audio_sources_layout.addWidget(self.mic_volume_slider)
-        audio_sources_layout.addWidget(self.desktop_audio_checkbox)
-        
-        audio_sources_group.setLayout(audio_sources_layout)
-        
-        # Audio monitoring
-        monitoring_group = QGroupBox("Audio Monitoring")
-        monitoring_layout = QVBoxLayout()
-        
-        self.monitor_audio_checkbox = QCheckBox("Monitor Audio Output")
-        self.monitor_volume_slider = QSlider(Qt.Horizontal)
-        self.monitor_volume_slider.setRange(0, 100)
-        self.monitor_volume_slider.setValue(30)
-        
-        monitoring_layout.addWidget(self.monitor_audio_checkbox)
-        monitoring_layout.addWidget(QLabel("Monitor Volume:"))
-        monitoring_layout.addWidget(self.monitor_volume_slider)
-        
-        monitoring_group.setLayout(monitoring_layout)
-        
-        layout.addWidget(audio_sources_group)
-        layout.addWidget(monitoring_group)
-        layout.addStretch()
-        
-        tab.setLayout(layout)
-        return tab
-        
-    def create_video_tab(self):
-        """Create video settings tab"""
-        tab = QWidget()
-        layout = QVBoxLayout()
-        
-        # Video settings
-        video_settings_group = QGroupBox("Video Settings")
-        video_settings_layout = QGridLayout()
-        
-        self.base_resolution_combo = QComboBox()
-        self.base_resolution_combo.addItems(['1920x1080', '1280x720', '854x480'])
-        self.base_resolution_combo.setCurrentText('1920x1080')
-        
-        self.output_resolution_combo = QComboBox()
-        self.output_resolution_combo.addItems(['1920x1080', '1280x720', '854x480'])
-        self.output_resolution_combo.setCurrentText('1280x720')
-        
-        self.downscale_filter_combo = QComboBox()
-        self.downscale_filter_combo.addItems(['Bicubic', 'Bilinear', 'Lanczos'])
-        self.downscale_filter_combo.setCurrentText('Bicubic')
-        
-        video_settings_layout.addWidget(QLabel("Base Resolution:"), 0, 0)
-        video_settings_layout.addWidget(self.base_resolution_combo, 0, 1)
-        video_settings_layout.addWidget(QLabel("Output Resolution:"), 1, 0)
-        video_settings_layout.addWidget(self.output_resolution_combo, 1, 1)
-        video_settings_layout.addWidget(QLabel("Downscale Filter:"), 2, 0)
-        video_settings_layout.addWidget(self.downscale_filter_combo, 2, 1)
-        
-        video_settings_group.setLayout(video_settings_layout)
-        
-        # Face swap settings
-        face_swap_group = QGroupBox("Face Swap Settings")
-        face_swap_layout = QVBoxLayout()
-        
-        self.face_swap_enabled_checkbox = QCheckBox("Enable Face Swap")
-        self.face_swap_enabled_checkbox.setChecked(True)
-        
-        self.face_swap_quality_combo = QComboBox()
-        self.face_swap_quality_combo.addItems(['High', 'Medium', 'Low'])
-        self.face_swap_quality_combo.setCurrentText('High')
-        
-        face_swap_layout.addWidget(self.face_swap_enabled_checkbox)
-        face_swap_layout.addWidget(QLabel("Face Swap Quality:"))
-        face_swap_layout.addWidget(self.face_swap_quality_combo)
-        
-        face_swap_group.setLayout(face_swap_layout)
-        
-        layout.addWidget(video_settings_group)
-        layout.addWidget(face_swap_group)
-        layout.addStretch()
-        
-        tab.setLayout(layout)
-        return tab
+
+
         
     def setup_styles(self):
         """Setup the OBS Studio-like dark theme"""
@@ -619,240 +540,438 @@ class QOBSStyleUI(QWidget):
         
     def setup_connections(self):
         """Setup signal connections"""
-        self.stream_btn.clicked.connect(self.toggle_streaming)
-        self.record_btn.clicked.connect(self.toggle_recording)
-        self.settings_btn.clicked.connect(self.open_settings)
+        # Connect processing window button
+        self.processing_btn.clicked.connect(self.open_processing_window)
         
-        self.add_scene_btn.clicked.connect(self.add_scene)
-        self.remove_scene_btn.clicked.connect(self.remove_scene)
-        self.duplicate_scene_btn.clicked.connect(self.duplicate_scene)
+        # Connect global face swap control
+        self.global_face_swap_btn.toggled.connect(self.on_global_face_swap_toggled)
         
-        self.add_source_btn.clicked.connect(self.add_source)
-        self.remove_source_btn.clicked.connect(self.remove_source)
-        self.source_properties_btn.clicked.connect(self.source_properties)
+        # Initialize processing window
+        self.processing_window = None
         
-        self.platform_combo.currentIndexChanged.connect(self.on_platform_changed)
+        # Initialize global face swap state
+        self.initialize_global_face_swap_state()
         
-        # Initialize default scene
-        self.add_default_scene()
-        
-    def add_default_scene(self):
-        """Add a default scene"""
-        scene_item = QListWidgetItem("Default Scene")
-        self.scenes_list.addItem(scene_item)
-        self.scenes_list.setCurrentItem(scene_item)
-        self.current_scene = "Default Scene"
-        
-        # Add default sources
-        sources = ["Camera Source", "Face Swap", "Audio Input"]
-        for source in sources:
-            source_item = QListWidgetItem(source)
-            self.sources_list.addItem(source_item)
-            
-    def toggle_streaming(self):
-        """Toggle streaming on/off"""
-        if self.stream_btn.text() == "Start Streaming":
-            self.start_streaming()
+    def open_processing_window(self):
+        """Open the processing controls window"""
+        if self.processing_window is None or not self.processing_window.isVisible():
+            try:
+                # Create a safer processing window that handles CSW issues
+                self.processing_window = self.create_safe_processing_window()
+                self.processing_window.show()
+            except Exception as e:
+                print(f"Error creating processing window: {e}")
+                # Fallback: show a simple message
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.information(self, "All Controls", 
+                                      "All controls window not available.\n"
+                                      "Controls are integrated in the main interface.")
         else:
-            self.stop_streaming()
-            
-    def start_streaming(self):
-        """Start streaming"""
-        platform_key = self.platform_combo.currentData()
-        stream_key = self.stream_key_edit.text()
+            self.processing_window.raise_()
+            self.processing_window.activateWindow()
+    
+    def create_safe_processing_window(self):
+        """Create a safe processing window that handles CSW issues"""
+        from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QWidget, QLabel, QScrollArea, QGroupBox, QPushButton
+        from PyQt5.QtCore import Qt
         
-        if not stream_key:
-            # Show error message
-            return
-            
-        # Configure streaming backend
-        cs = self.stream_output_backend.get_control_sheet()
-        cs.is_streaming.set_flag(True)
+        # Create dialog window
+        window = QDialog(self)
+        window.setWindowTitle("PlayaTewsIdentityMasker - All Controls")
+        window.setMinimumSize(1000, 700)
+        window.setWindowFlags(window.windowFlags() | Qt.WindowStaysOnTopHint)
         
-        # Set stream address based on platform
-        if platform_key == 'custom':
-            rtmp_url = self.custom_rtmp_edit.text()
-        else:
-            platform = self.streaming_platforms[platform_key]
-            rtmp_url = platform['rtmp'] + stream_key
-            
-        # Parse RTMP URL to get address and port
-        if rtmp_url.startswith('rtmp://'):
-            parts = rtmp_url[7:].split('/')
-            if len(parts) > 0:
-                addr_port = parts[0].split(':')
-                if len(addr_port) == 2:
-                    cs.stream_addr.set_text(addr_port[0])
-                    cs.stream_port.set_number(int(addr_port[1]))
+        # Main layout
+        layout = QVBoxLayout()
+        
+        # Create tab widget
+        tab_widget = QTabWidget()
+        
+        # Create tabs for different categories
+        tabs = {
+            "Input Sources": self.create_input_sources_tab(),
+            "Face Detection": self.create_face_detection_tab(),
+            "Face Swapping": self.create_face_swapping_tab(),
+            "Animation & Effects": self.create_animation_effects_tab(),
+            "Output & Streaming": self.create_output_streaming_tab()
+        }
+        
+        # Add tabs to widget
+        for tab_name, tab_widget_content in tabs.items():
+            tab_widget.addTab(tab_widget_content, tab_name)
+        
+        layout.addWidget(tab_widget)
+        window.setLayout(layout)
+        
+        return window
+    
+    def create_input_sources_tab(self):
+        """Create input sources tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # File Source
+        if 'file_source' in self.face_swap_components:
+            try:
+                file_source = self.face_swap_components['file_source']
+                if hasattr(file_source, 'widget'):
+                    layout.addWidget(QLabel("📁 File Source"))
+                    layout.addWidget(file_source.widget())
+                elif hasattr(file_source, '__class__'):
+                    layout.addWidget(QLabel("📁 File Source"))
+                    layout.addWidget(file_source)
                 else:
-                    cs.stream_addr.set_text(addr_port[0])
-                    cs.stream_port.set_number(1935)  # Default RTMP port
-        
-        self.stream_btn.setText("Stop Streaming")
-        self.stream_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #27ae60;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton:hover {
-                background-color: #229954;
-            }
-            QPushButton:pressed {
-                background-color: #1e8449;
-            }
-        """)
-        
-    def stop_streaming(self):
-        """Stop streaming"""
-        cs = self.stream_output_backend.get_control_sheet()
-        cs.is_streaming.set_flag(False)
-        
-        self.stream_btn.setText("Start Streaming")
-        self.stream_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #e74c3c;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton:hover {
-                background-color: #c0392b;
-            }
-            QPushButton:pressed {
-                background-color: #a93226;
-            }
-        """)
-        
-    def toggle_recording(self):
-        """Toggle recording on/off"""
-        if self.record_btn.text() == "Start Recording":
-            self.start_recording()
+                    layout.addWidget(QLabel("📁 File Source: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"📁 File Source: Error - {e}"))
         else:
-            self.stop_recording()
-            
-    def start_recording(self):
-        """Start recording"""
-        # Configure recording settings
-        format_type = self.recording_format_combo.currentText()
-        quality = self.recording_quality_combo.currentText()
-        fps = int(self.recording_fps_combo.currentText())
-        bitrate = self.recording_bitrate_spin.value()
+            layout.addWidget(QLabel("📁 File Source: Not Available"))
         
-        # Set recording path
-        recording_path = Path(self.recording_path_edit.text())
-        recording_path.mkdir(parents=True, exist_ok=True)
-        
-        # Configure backend for recording
-        cs = self.stream_output_backend.get_control_sheet()
-        cs.save_sequence_path.set_paths([recording_path])
-        
-        self.record_btn.setText("Stop Recording")
-        self.record_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #27ae60;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton:hover {
-                background-color: #229954;
-            }
-            QPushButton:pressed {
-                background-color: #1e8449;
-            }
-        """)
-        
-    def stop_recording(self):
-        """Stop recording"""
-        cs = self.stream_output_backend.get_control_sheet()
-        cs.save_sequence_path.set_paths([])
-        
-        self.record_btn.setText("Start Recording")
-        self.record_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #e67e22;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton:hover {
-                background-color: #d35400;
-            }
-            QPushButton:pressed {
-                background-color: #ba4a00;
-            }
-        """)
-        
-    def open_settings(self):
-        """Open settings dialog"""
-        # This could open a more detailed settings dialog
-        pass
-        
-    def add_scene(self):
-        """Add a new scene"""
-        scene_name = f"Scene {self.scenes_list.count() + 1}"
-        scene_item = QListWidgetItem(scene_name)
-        self.scenes_list.addItem(scene_item)
-        self.scenes_list.setCurrentItem(scene_item)
-        
-    def remove_scene(self):
-        """Remove the selected scene"""
-        current_item = self.scenes_list.currentItem()
-        if current_item and self.scenes_list.count() > 1:
-            self.scenes_list.takeItem(self.scenes_list.row(current_item))
-            
-    def duplicate_scene(self):
-        """Duplicate the selected scene"""
-        current_item = self.scenes_list.currentItem()
-        if current_item:
-            scene_name = f"{current_item.text()} (Copy)"
-            scene_item = QListWidgetItem(scene_name)
-            self.scenes_list.addItem(scene_item)
-            
-    def add_source(self):
-        """Add a new source"""
-        source_types = ["Camera", "Image", "Video", "Audio", "Text", "Browser"]
-        # This could open a dialog to select source type
-        source_name = f"Source {self.sources_list.count() + 1}"
-        source_item = QListWidgetItem(source_name)
-        self.sources_list.addItem(source_item)
-        
-    def remove_source(self):
-        """Remove the selected source"""
-        current_item = self.sources_list.currentItem()
-        if current_item:
-            self.sources_list.takeItem(self.sources_list.row(current_item))
-            
-    def source_properties(self):
-        """Open source properties dialog"""
-        current_item = self.sources_list.currentItem()
-        if current_item:
-            # This could open a properties dialog for the selected source
-            pass
-            
-    def on_platform_changed(self):
-        """Handle platform selection change"""
-        platform_key = self.platform_combo.currentData()
-        if platform_key == 'custom':
-            self.custom_rtmp_edit.setEnabled(True)
-            self.stream_key_edit.setEnabled(False)
+        # Camera Source
+        if 'camera_source' in self.face_swap_components:
+            try:
+                camera_source = self.face_swap_components['camera_source']
+                if hasattr(camera_source, 'widget'):
+                    layout.addWidget(QLabel("📹 Camera Source"))
+                    layout.addWidget(camera_source.widget())
+                elif hasattr(camera_source, '__class__'):
+                    layout.addWidget(QLabel("📹 Camera Source"))
+                    layout.addWidget(camera_source)
+                else:
+                    layout.addWidget(QLabel("📹 Camera Source: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"📹 Camera Source: Error - {e}"))
         else:
-            self.custom_rtmp_edit.setEnabled(False)
-            self.stream_key_edit.setEnabled(True)
+            layout.addWidget(QLabel("📹 Camera Source: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
+    
+    def create_face_detection_tab(self):
+        """Create face detection tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # Face Detector
+        if 'face_detector' in self.face_swap_components:
+            try:
+                face_detector = self.face_swap_components['face_detector']
+                if hasattr(face_detector, 'widget'):
+                    layout.addWidget(QLabel("👁️ Face Detector"))
+                    layout.addWidget(face_detector.widget())
+                elif hasattr(face_detector, '__class__'):
+                    layout.addWidget(QLabel("👁️ Face Detector"))
+                    layout.addWidget(face_detector)
+                else:
+                    layout.addWidget(QLabel("👁️ Face Detector: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"👁️ Face Detector: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("👁️ Face Detector: Not Available"))
+        
+        # Face Marker
+        if 'face_marker' in self.face_swap_components:
+            try:
+                face_marker = self.face_swap_components['face_marker']
+                if hasattr(face_marker, 'widget'):
+                    layout.addWidget(QLabel("📍 Face Marker"))
+                    layout.addWidget(face_marker.widget())
+                elif hasattr(face_marker, '__class__'):
+                    layout.addWidget(QLabel("📍 Face Marker"))
+                    layout.addWidget(face_marker)
+                else:
+                    layout.addWidget(QLabel("📍 Face Marker: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"📍 Face Marker: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("📍 Face Marker: Not Available"))
+        
+        # Face Aligner
+        if 'face_aligner' in self.face_swap_components:
+            try:
+                face_aligner = self.face_swap_components['face_aligner']
+                if hasattr(face_aligner, 'widget'):
+                    layout.addWidget(QLabel("🎯 Face Aligner"))
+                    layout.addWidget(face_aligner.widget())
+                elif hasattr(face_aligner, '__class__'):
+                    layout.addWidget(QLabel("🎯 Face Aligner"))
+                    layout.addWidget(face_aligner)
+                else:
+                    layout.addWidget(QLabel("🎯 Face Aligner: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🎯 Face Aligner: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🎯 Face Aligner: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
+    
+    def create_face_swapping_tab(self):
+        """Create face swapping tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # Face Swap Insight
+        if 'face_swap_insight' in self.face_swap_components:
+            try:
+                face_swap_insight = self.face_swap_components['face_swap_insight']
+                if hasattr(face_swap_insight, 'widget'):
+                    layout.addWidget(QLabel("🔄 Face Swap Insight"))
+                    layout.addWidget(face_swap_insight.widget())
+                elif hasattr(face_swap_insight, '__class__'):
+                    layout.addWidget(QLabel("🔄 Face Swap Insight"))
+                    layout.addWidget(face_swap_insight)
+                else:
+                    layout.addWidget(QLabel("🔄 Face Swap Insight: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🔄 Face Swap Insight: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🔄 Face Swap Insight: Not Available"))
+        
+        # Face Swap DFM
+        if 'face_swap_dfm' in self.face_swap_components:
+            try:
+                face_swap_dfm = self.face_swap_components['face_swap_dfm']
+                if hasattr(face_swap_dfm, 'widget'):
+                    layout.addWidget(QLabel("🔄 Face Swap DFM"))
+                    layout.addWidget(face_swap_dfm.widget())
+                elif hasattr(face_swap_dfm, '__class__'):
+                    layout.addWidget(QLabel("🔄 Face Swap DFM"))
+                    layout.addWidget(face_swap_dfm)
+                else:
+                    layout.addWidget(QLabel("🔄 Face Swap DFM: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🔄 Face Swap DFM: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🔄 Face Swap DFM: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
+    
+    def create_animation_effects_tab(self):
+        """Create animation and effects tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # Face Animator
+        if 'face_animator' in self.face_swap_components:
+            try:
+                face_animator = self.face_swap_components['face_animator']
+                if hasattr(face_animator, 'widget'):
+                    layout.addWidget(QLabel("🎭 Face Animator"))
+                    layout.addWidget(face_animator.widget())
+                elif hasattr(face_animator, '__class__'):
+                    layout.addWidget(QLabel("🎭 Face Animator"))
+                    layout.addWidget(face_animator)
+                else:
+                    layout.addWidget(QLabel("🎭 Face Animator: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🎭 Face Animator: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🎭 Face Animator: Not Available"))
+        
+        # Frame Adjuster
+        if 'frame_adjuster' in self.face_swap_components:
+            try:
+                frame_adjuster = self.face_swap_components['frame_adjuster']
+                if hasattr(frame_adjuster, 'widget'):
+                    layout.addWidget(QLabel("🎨 Frame Adjuster"))
+                    layout.addWidget(frame_adjuster.widget())
+                elif hasattr(frame_adjuster, '__class__'):
+                    layout.addWidget(QLabel("🎨 Frame Adjuster"))
+                    layout.addWidget(frame_adjuster)
+                else:
+                    layout.addWidget(QLabel("🎨 Frame Adjuster: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🎨 Frame Adjuster: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🎨 Frame Adjuster: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
+    
+    def create_output_streaming_tab(self):
+        """Create output and streaming tab"""
+        tab = QWidget()
+        layout = QVBoxLayout()
+        
+        # Face Merger
+        if 'face_merger' in self.face_swap_components:
+            try:
+                face_merger = self.face_swap_components['face_merger']
+                if hasattr(face_merger, 'widget'):
+                    layout.addWidget(QLabel("🔗 Face Merger"))
+                    layout.addWidget(face_merger.widget())
+                elif hasattr(face_merger, '__class__'):
+                    layout.addWidget(QLabel("🔗 Face Merger"))
+                    layout.addWidget(face_merger)
+                else:
+                    layout.addWidget(QLabel("🔗 Face Merger: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"🔗 Face Merger: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("🔗 Face Merger: Not Available"))
+        
+        # Stream Output
+        if 'stream_output' in self.face_swap_components:
+            try:
+                stream_output = self.face_swap_components['stream_output']
+                if hasattr(stream_output, 'widget'):
+                    layout.addWidget(QLabel("📺 Stream Output"))
+                    layout.addWidget(stream_output.widget())
+                elif hasattr(stream_output, '__class__'):
+                    layout.addWidget(QLabel("📺 Stream Output"))
+                    layout.addWidget(stream_output)
+                else:
+                    layout.addWidget(QLabel("📺 Stream Output: Not Available"))
+            except Exception as e:
+                layout.addWidget(QLabel(f"📺 Stream Output: Error - {e}"))
+        else:
+            layout.addWidget(QLabel("📺 Stream Output: Not Available"))
+        
+        layout.addStretch()
+        tab.setLayout(layout)
+        return tab
+        
+    def closeEvent(self, event):
+        """Handle close event - ensure processing window is closed"""
+        if self.processing_window and self.processing_window.isVisible():
+            self.processing_window.close()
+        event.accept()
+    
+    # Global face swap control methods
+    def on_global_face_swap_toggled(self, enabled):
+        """Handle global face swap enable/disable"""
+        try:
+            if enabled:
+                self.global_face_swap_btn.setText("Face Swap: ON")
+                self.global_face_swap_btn.setToolTip("Face swap is ENABLED\nAll components are running\nClick to disable")
+                self.enable_all_face_swap_components()
+                print("Global face swap enabled")
+            else:
+                self.global_face_swap_btn.setText("Face Swap: OFF")
+                self.global_face_swap_btn.setToolTip("Face swap is DISABLED\nAll components are stopped\nClick to enable")
+                self.disable_all_face_swap_components()
+                print("Global face swap disabled")
             
-    def update_preview(self, frame):
-        """Update the preview with a new frame"""
-        if frame is not None:
-            # Convert frame to QPixmap and display in preview_label
-            # This would need to be implemented based on the frame format
-            pass
+            # Save the state
+            self.save_global_face_swap_state(enabled)
+            
+        except Exception as e:
+            print(f"Error toggling global face swap: {e}")
+    
+    def enable_all_face_swap_components(self):
+        """Enable all face swap components"""
+        if not self.face_swap_components:
+            return
+        
+        # List of components to enable
+        components_to_enable = [
+            'face_detector', 'face_marker', 'face_aligner', 
+            'face_animator', 'face_swap_insight', 'face_swap_dfm',
+            'frame_adjuster', 'face_merger'
+        ]
+        
+        for component_name in components_to_enable:
+            if component_name in self.face_swap_components:
+                component = self.face_swap_components[component_name]
+                try:
+                    # Try to enable the component through its backend
+                    if hasattr(component, '_backend') and hasattr(component._backend, 'start'):
+                        component._backend.start()
+                    # Also try to enable any checkboxes in the component
+                    self._enable_component_checkboxes(component, True)
+                except Exception as e:
+                    print(f"Error enabling {component_name}: {e}")
+    
+    def disable_all_face_swap_components(self):
+        """Disable all face swap components"""
+        if not self.face_swap_components:
+            return
+        
+        # List of components to disable
+        components_to_disable = [
+            'face_detector', 'face_marker', 'face_aligner', 
+            'face_animator', 'face_swap_insight', 'face_swap_dfm',
+            'frame_adjuster', 'face_merger'
+        ]
+        
+        for component_name in components_to_disable:
+            if component_name in self.face_swap_components:
+                component = self.face_swap_components[component_name]
+                try:
+                    # Try to disable the component through its backend
+                    if hasattr(component, '_backend') and hasattr(component._backend, 'stop'):
+                        component._backend.stop()
+                    # Also try to disable any checkboxes in the component
+                    self._enable_component_checkboxes(component, False)
+                except Exception as e:
+                    print(f"Error disabling {component_name}: {e}")
+    
+    def _enable_component_checkboxes(self, component, enabled):
+        """Enable or disable checkboxes in a component"""
+        try:
+            from PyQt5.QtWidgets import QCheckBox
+            checkboxes = component.findChildren(QCheckBox)
+            for checkbox in checkboxes:
+                if checkbox.isCheckable():
+                    checkbox.setChecked(enabled)
+        except Exception as e:
+            print(f"Error setting checkboxes in component: {e}")
+    
+    def save_global_face_swap_state(self, enabled):
+        """Save the global face swap state to persistent storage"""
+        try:
+            import json
+            from pathlib import Path
+            
+            # Create settings directory if it doesn't exist
+            settings_dir = Path(self.userdata_path) / 'settings'
+            settings_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Save to a JSON file
+            state_file = settings_dir / 'global_face_swap_state.json'
+            state_data = {
+                'enabled': enabled,
+                'timestamp': str(Path().stat().st_mtime) if Path().exists() else '0'
+            }
+            
+            with open(state_file, 'w') as f:
+                json.dump(state_data, f, indent=2)
+                
+        except Exception as e:
+            print(f"Error saving global face swap state: {e}")
+    
+    def load_global_face_swap_state(self):
+        """Load the global face swap state from persistent storage"""
+        try:
+            import json
+            from pathlib import Path
+            
+            state_file = Path(self.userdata_path) / 'settings' / 'global_face_swap_state.json'
+            
+            if state_file.exists():
+                with open(state_file, 'r') as f:
+                    state_data = json.load(f)
+                
+                enabled = state_data.get('enabled', True)  # Default to True
+                return enabled
+            else:
+                return True  # Default to enabled if no saved state
+                
+        except Exception as e:
+            print(f"Error loading global face swap state: {e}")
+            return True  # Default to enabled on error
+    
+    def initialize_global_face_swap_state(self):
+        """Initialize the global face swap state on startup"""
+        try:
+            enabled = self.load_global_face_swap_state()
+            self.global_face_swap_btn.setChecked(enabled)
+            self.on_global_face_swap_toggled(enabled)
+        except Exception as e:
+            print(f"Error initializing global face swap state: {e}")
