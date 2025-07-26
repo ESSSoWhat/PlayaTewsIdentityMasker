@@ -1,0 +1,368 @@
+2025-07-17 22:43:16,308 - __main__ - INFO - Initializing OptimizedDeepFaceLive with userdata: data
+2025-07-17 22:43:16,309 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-17 22:43:16,310 - __main__ - INFO - Starting optimized initialization...
+2025-07-17 22:43:16,311 - performance_monitor - INFO - Performance monitoring started
+2025-07-17 22:43:16,312 - memory_manager - INFO - Cleaned up unused memory blocks older than 300.0s
+2025-07-17 22:43:16,312 - memory_manager - INFO - Memory monitoring started
+2025-07-17 22:43:16,312 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-17 22:43:16,312 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-17 22:43:16,312 - __main__ - INFO - Setting up model caching system...
+2025-07-17 22:43:16,312 - __main__ - INFO - Configured model cache for 1 models
+2025-07-17 22:43:16,312 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-17 22:43:16,312 - __main__ - INFO - Video processor configured: 2 workers, buffer size 3
+2025-07-17 22:43:16,312 - __main__ - INFO - Initializing GUI components...
+2025-07-17 22:43:16,826 - performance_monitor - INFO - Startup completed in 0.52 seconds
+2025-07-17 22:43:16,826 - __main__ - INFO - Optimized initialization completed in 0.52 seconds
+2025-07-17 22:43:16,826 - __main__ - INFO - Application ready - starting main loop
+2025-07-17 22:43:16,826 - async_processor - INFO - Started 2 processing workers
+2025-07-17 22:43:16,827 - __main__ - INFO - Running demo processing loop...
+2025-07-17 22:43:16,829 - __main__ - INFO - Frame 0: FPS=1.9, Latency=0.0ms
+2025-07-17 22:43:16,829 - async_processor - INFO - Processing worker 0 started
+2025-07-17 22:43:16,829 - async_processor - INFO - Processing worker 1 started
+2025-07-17 22:43:18,216 - __main__ - INFO - Frame 30: FPS=21.6, Latency=0.0ms
+2025-07-17 22:43:19,602 - __main__ - INFO - Frame 60: FPS=21.6, Latency=0.0ms
+2025-07-17 22:43:20,969 - __main__ - INFO - Frame 90: FPS=22.0, Latency=0.0ms
+2025-07-17 22:43:21,430 - async_processor - INFO - Processing worker 0 stopped
+2025-07-17 22:43:21,430 - async_processor - INFO - Processing worker 1 stopped
+2025-07-17 22:43:21,430 - async_processor - INFO - Processing pipeline stopped
+2025-07-17 22:43:21,432 - __main__ - INFO - Cleaning up resources...
+2025-07-17 22:43:22,313 - performance_monitor - INFO - Performance monitoring stopped
+2025-07-17 22:43:23,322 - memory_manager - INFO - Memory monitoring stopped
+2025-07-17 22:43:23,322 - memory_manager - INFO - Cleaned up unused memory blocks older than 0s
+2025-07-17 22:43:23,370 - memory_manager - INFO - Forced memory cleanup completed
+2025-07-17 22:43:23,371 - performance_monitor - INFO - Performance metrics exported to performance_report.json
+2025-07-17 22:43:23,371 - __main__ - INFO - Performance report exported
+2025-07-17 22:43:58,792 - __main__ - INFO - Initializing OptimizedDeepFaceLive with userdata: data
+2025-07-17 22:43:58,793 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-17 22:43:58,794 - __main__ - INFO - Starting optimized initialization...
+2025-07-17 22:43:58,795 - performance_monitor - INFO - Performance monitoring started
+2025-07-17 22:43:58,795 - memory_manager - INFO - Cleaned up unused memory blocks older than 300.0s
+2025-07-17 22:43:58,796 - memory_manager - INFO - Memory monitoring started
+2025-07-17 22:43:58,796 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-17 22:43:58,796 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-17 22:43:58,796 - __main__ - INFO - Setting up model caching system...
+2025-07-17 22:43:58,796 - __main__ - INFO - Configured model cache for 1 models
+2025-07-17 22:43:58,796 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-17 22:43:58,796 - __main__ - INFO - Video processor configured: 2 workers, buffer size 3
+2025-07-17 22:43:58,797 - __main__ - INFO - Initializing GUI components...
+2025-07-17 22:43:59,310 - performance_monitor - INFO - Startup completed in 0.52 seconds
+2025-07-17 22:43:59,310 - __main__ - INFO - Optimized initialization completed in 0.52 seconds
+2025-07-17 22:43:59,310 - __main__ - INFO - Application ready - starting main loop
+2025-07-17 22:43:59,310 - async_processor - INFO - Started 2 processing workers
+2025-07-17 22:43:59,310 - __main__ - INFO - Running demo processing loop...
+2025-07-17 22:43:59,314 - __main__ - INFO - Frame 0: FPS=1.9, Latency=0.0ms
+2025-07-17 22:43:59,314 - async_processor - INFO - Processing worker 0 started
+2025-07-17 22:43:59,314 - async_processor - INFO - Processing worker 1 started
+2025-07-17 22:44:00,704 - __main__ - INFO - Frame 30: FPS=21.6, Latency=0.0ms
+2025-07-17 22:44:02,081 - __main__ - INFO - Frame 60: FPS=21.8, Latency=0.0ms
+2025-07-17 22:44:03,465 - __main__ - INFO - Frame 90: FPS=21.7, Latency=0.0ms
+2025-07-17 22:44:03,924 - async_processor - INFO - Processing worker 0 stopped
+2025-07-17 22:44:03,924 - async_processor - INFO - Processing worker 1 stopped
+2025-07-17 22:44:03,924 - async_processor - INFO - Processing pipeline stopped
+2025-07-17 22:44:03,925 - __main__ - INFO - Cleaning up resources...
+2025-07-17 22:44:04,798 - performance_monitor - INFO - Performance monitoring stopped
+2025-07-17 22:44:05,805 - memory_manager - INFO - Memory monitoring stopped
+2025-07-17 22:44:05,805 - memory_manager - INFO - Cleaned up unused memory blocks older than 0s
+2025-07-17 22:44:05,853 - memory_manager - INFO - Forced memory cleanup completed
+2025-07-17 22:44:05,855 - performance_monitor - INFO - Performance metrics exported to performance_report.json
+2025-07-17 22:44:05,855 - __main__ - INFO - Performance report exported
+2025-07-17 22:49:10,687 - __main__ - INFO - Initializing OptimizedDeepFaceLive with userdata: data
+2025-07-17 22:49:10,687 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-17 22:49:10,688 - __main__ - INFO - Starting optimized initialization...
+2025-07-17 22:49:10,689 - performance_monitor - INFO - Performance monitoring started
+2025-07-17 22:49:10,690 - memory_manager - INFO - Cleaned up unused memory blocks older than 300.0s
+2025-07-17 22:49:10,690 - memory_manager - INFO - Memory monitoring started
+2025-07-17 22:49:10,691 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-17 22:49:10,691 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-17 22:49:10,691 - __main__ - INFO - Setting up model caching system...
+2025-07-17 22:49:10,691 - __main__ - INFO - Configured model cache for 1 models
+2025-07-17 22:49:10,691 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-17 22:49:10,692 - __main__ - INFO - Video processor configured: 2 workers, buffer size 3
+2025-07-17 22:49:10,692 - __main__ - INFO - Initializing GUI components...
+2025-07-17 22:49:11,198 - performance_monitor - INFO - Startup completed in 0.51 seconds
+2025-07-17 22:49:11,198 - __main__ - INFO - Optimized initialization completed in 0.51 seconds
+2025-07-17 22:49:11,198 - __main__ - INFO - Application ready - starting main loop
+2025-07-17 22:49:11,198 - async_processor - INFO - Started 2 processing workers
+2025-07-17 22:49:11,198 - __main__ - INFO - Running demo processing loop...
+2025-07-17 22:49:11,202 - __main__ - INFO - Frame 0: FPS=1.9, Latency=0.0ms
+2025-07-17 22:49:11,202 - async_processor - INFO - Processing worker 0 started
+2025-07-17 22:49:11,202 - async_processor - INFO - Processing worker 1 started
+2025-07-17 22:49:12,575 - __main__ - INFO - Frame 30: FPS=21.8, Latency=0.0ms
+2025-07-17 22:49:13,951 - __main__ - INFO - Frame 60: FPS=21.8, Latency=0.0ms
+2025-07-17 22:49:15,330 - __main__ - INFO - Frame 90: FPS=21.8, Latency=0.0ms
+2025-07-17 22:49:15,783 - async_processor - INFO - Processing worker 0 stopped
+2025-07-17 22:49:15,784 - async_processor - INFO - Processing worker 1 stopped
+2025-07-17 22:49:15,784 - async_processor - INFO - Processing pipeline stopped
+2025-07-17 22:49:15,785 - __main__ - INFO - Cleaning up resources...
+2025-07-17 22:49:16,692 - performance_monitor - INFO - Performance monitoring stopped
+2025-07-17 22:49:17,704 - memory_manager - INFO - Memory monitoring stopped
+2025-07-17 22:49:17,704 - memory_manager - INFO - Cleaned up unused memory blocks older than 0s
+2025-07-17 22:49:17,754 - memory_manager - INFO - Forced memory cleanup completed
+2025-07-17 22:49:17,756 - performance_monitor - INFO - Performance metrics exported to performance_report.json
+2025-07-17 22:49:17,756 - __main__ - INFO - Performance report exported
+2025-07-18 01:07:10,229 - __main__ - INFO - Initializing Enhanced OptimizedDeepFaceLive with userdata: userdata
+2025-07-18 01:07:10,229 - __main__ - INFO - Optimization mode: balanced
+2025-07-18 01:07:10,229 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-18 01:07:10,231 - __main__ - INFO - Starting enhanced optimized initialization...
+2025-07-18 01:07:10,231 - integrated_optimizer - INFO - Initializing integrated optimization system
+2025-07-18 01:07:10,231 - ui_optimizer - INFO - UI optimizations enabled
+2025-07-18 01:07:10,232 - enhanced_memory_manager - INFO - Resource monitoring started
+2025-07-18 01:07:10,232 - enhanced_memory_manager - INFO - Memory manager optimized for inference
+2025-07-18 01:07:10,263 - enhanced_async_processor - INFO - Processing mode changed to: balanced
+2025-07-18 01:07:10,264 - enhanced_async_processor - INFO - Frame skip strategy changed to: adaptive
+2025-07-18 01:07:10,264 - enhanced_async_processor - INFO - Target FPS changed to: 30.0
+2025-07-18 01:07:10,264 - integrated_optimizer - INFO - All optimization modules initialized successfully
+2025-07-18 01:07:10,264 - integrated_optimizer - INFO - Applied optimizations for high_end system profile
+2025-07-18 01:07:10,264 - integrated_optimizer - INFO - Starting optimization system
+2025-07-18 01:07:10,266 - integrated_optimizer - INFO - Performance monitoring started
+2025-07-18 01:07:10,266 - __main__ - INFO - Integrated optimization system started
+2025-07-18 01:07:10,267 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-18 01:07:10,267 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-18 01:07:10,267 - __main__ - INFO - Setting up model caching system...
+2025-07-18 01:07:10,268 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-18 01:07:10,268 - __main__ - INFO - Initializing GUI components...
+2025-07-18 01:07:10,786 - __main__ - ERROR - Initialization task 1 failed: 'OptimizedDeepFaceLiveApp' object has no attribute 'memory_manager'
+2025-07-18 01:07:10,812 - __main__ - ERROR - Failed to initialize application
+2025-07-18 01:07:10,818 - __main__ - INFO - Cleaning up resources...
+2025-07-18 01:07:53,921 - __main__ - INFO - Initializing Enhanced OptimizedDeepFaceLive with userdata: userdata
+2025-07-18 01:07:53,921 - __main__ - INFO - Optimization mode: balanced
+2025-07-18 01:07:53,921 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-18 01:07:53,923 - __main__ - INFO - Starting enhanced optimized initialization...
+2025-07-18 01:07:53,923 - integrated_optimizer - INFO - Initializing integrated optimization system
+2025-07-18 01:07:53,923 - ui_optimizer - INFO - UI optimizations enabled
+2025-07-18 01:07:53,926 - enhanced_memory_manager - INFO - Resource monitoring started
+2025-07-18 01:07:53,927 - enhanced_memory_manager - INFO - Memory manager optimized for inference
+2025-07-18 01:07:53,953 - enhanced_async_processor - INFO - Processing mode changed to: balanced
+2025-07-18 01:07:53,954 - enhanced_async_processor - INFO - Frame skip strategy changed to: adaptive
+2025-07-18 01:07:53,954 - enhanced_async_processor - INFO - Target FPS changed to: 30.0
+2025-07-18 01:07:53,954 - integrated_optimizer - INFO - All optimization modules initialized successfully
+2025-07-18 01:07:53,954 - integrated_optimizer - INFO - Applied optimizations for high_end system profile
+2025-07-18 01:07:53,955 - integrated_optimizer - INFO - Starting optimization system
+2025-07-18 01:07:53,957 - integrated_optimizer - INFO - Performance monitoring started
+2025-07-18 01:07:53,957 - __main__ - INFO - Integrated optimization system started
+2025-07-18 01:07:53,957 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-18 01:07:53,958 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-18 01:07:53,958 - __main__ - INFO - Setting up model caching system...
+2025-07-18 01:07:53,959 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-18 01:07:53,959 - __main__ - INFO - Initializing GUI components...
+2025-07-18 01:07:54,467 - __main__ - ERROR - Initialization task 1 failed: 'IntegratedOptimizer' object has no attribute 'get_memory_info'
+2025-07-18 01:07:54,467 - __main__ - ERROR - Failed to initialize application
+2025-07-18 01:07:54,468 - __main__ - INFO - Cleaning up resources...
+2025-07-18 01:10:41,879 - __main__ - INFO - Initializing Enhanced OptimizedDeepFaceLive with userdata: userdata
+2025-07-18 01:10:41,880 - __main__ - INFO - Optimization mode: balanced
+2025-07-18 01:10:41,880 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-18 01:10:41,881 - __main__ - INFO - Starting enhanced optimized initialization...
+2025-07-18 01:10:41,881 - integrated_optimizer - INFO - Initializing integrated optimization system
+2025-07-18 01:10:41,881 - ui_optimizer - INFO - UI optimizations enabled
+2025-07-18 01:10:41,883 - enhanced_memory_manager - INFO - Resource monitoring started
+2025-07-18 01:10:41,883 - enhanced_memory_manager - INFO - Memory manager optimized for inference
+2025-07-18 01:10:41,910 - enhanced_async_processor - INFO - Processing mode changed to: balanced
+2025-07-18 01:10:41,910 - enhanced_async_processor - INFO - Frame skip strategy changed to: adaptive
+2025-07-18 01:10:41,910 - enhanced_async_processor - INFO - Target FPS changed to: 30.0
+2025-07-18 01:10:41,910 - integrated_optimizer - INFO - All optimization modules initialized successfully
+2025-07-18 01:10:41,911 - integrated_optimizer - INFO - Applied optimizations for high_end system profile
+2025-07-18 01:10:41,912 - integrated_optimizer - INFO - Starting optimization system
+2025-07-18 01:10:41,913 - integrated_optimizer - INFO - Performance monitoring started
+2025-07-18 01:10:41,913 - __main__ - INFO - Integrated optimization system started
+2025-07-18 01:10:41,913 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-18 01:10:41,914 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-18 01:10:41,914 - __main__ - INFO - Setting up model caching system...
+2025-07-18 01:10:41,914 - __main__ - INFO - Configured model cache for 1 models
+2025-07-18 01:10:41,915 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-18 01:10:41,915 - __main__ - INFO - Initializing GUI components...
+2025-07-18 01:10:42,417 - __main__ - ERROR - Initialization task 2 failed: name 'AsyncVideoProcessor' is not defined
+2025-07-18 01:10:42,417 - __main__ - ERROR - Failed to initialize application
+2025-07-18 01:10:42,418 - __main__ - INFO - Cleaning up resources...
+2025-07-18 01:10:42,418 - __main__ - INFO - Integrated optimizer cleanup completed (no explicit cleanup method)
+2025-07-18 01:11:16,372 - __main__ - INFO - Initializing Enhanced OptimizedDeepFaceLive with userdata: userdata
+2025-07-18 01:11:16,373 - __main__ - INFO - Optimization mode: balanced
+2025-07-18 01:11:16,373 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-18 01:11:16,375 - __main__ - INFO - Starting enhanced optimized initialization...
+2025-07-18 01:11:16,376 - integrated_optimizer - INFO - Initializing integrated optimization system
+2025-07-18 01:11:16,376 - ui_optimizer - INFO - UI optimizations enabled
+2025-07-18 01:11:16,378 - enhanced_memory_manager - INFO - Resource monitoring started
+2025-07-18 01:11:16,405 - enhanced_memory_manager - INFO - Memory manager optimized for inference
+2025-07-18 01:11:16,412 - enhanced_async_processor - INFO - Processing mode changed to: balanced
+2025-07-18 01:11:16,413 - enhanced_async_processor - INFO - Frame skip strategy changed to: adaptive
+2025-07-18 01:11:16,413 - enhanced_async_processor - INFO - Target FPS changed to: 30.0
+2025-07-18 01:11:16,413 - integrated_optimizer - INFO - All optimization modules initialized successfully
+2025-07-18 01:11:16,413 - integrated_optimizer - INFO - Applied optimizations for high_end system profile
+2025-07-18 01:11:16,416 - integrated_optimizer - INFO - Starting optimization system
+2025-07-18 01:11:16,419 - integrated_optimizer - INFO - Performance monitoring started
+2025-07-18 01:11:16,420 - __main__ - INFO - Integrated optimization system started
+2025-07-18 01:11:16,421 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-18 01:11:16,421 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-18 01:11:16,422 - __main__ - INFO - Setting up model caching system...
+2025-07-18 01:11:16,422 - __main__ - INFO - Configured model cache for 1 models
+2025-07-18 01:11:16,422 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-18 01:11:16,423 - __main__ - INFO - Video processor configured: 2 workers, buffer size 3
+2025-07-18 01:11:16,424 - __main__ - INFO - Initializing GUI components...
+2025-07-18 01:11:16,925 - __main__ - INFO - Enhanced initialization completed in 0.55 seconds
+2025-07-18 01:11:16,937 - __main__ - INFO - System profile: high_end
+2025-07-18 01:11:16,943 - __main__ - INFO - Optimization level: balanced
+2025-07-18 01:11:16,967 - __main__ - INFO - Processing mode: balanced
+2025-07-18 01:11:16,991 - __main__ - INFO - Application ready - starting main loop
+2025-07-18 01:11:17,030 - async_processor - INFO - Started 2 processing workers
+2025-07-18 01:11:17,071 - __main__ - INFO - Running demo processing loop...
+2025-07-18 01:11:17,080 - async_processor - INFO - Processing pipeline stopped
+2025-07-18 01:11:17,089 - __main__ - ERROR - Application error: 'IntegratedOptimizer' object has no attribute 'record_frame_processing'
+2025-07-18 01:11:17,145 - __main__ - INFO - Cleaning up resources...
+2025-07-18 01:11:17,158 - __main__ - INFO - Integrated optimizer cleanup completed (no explicit cleanup method)
+2025-07-18 01:11:35,857 - __main__ - INFO - Initializing Enhanced OptimizedDeepFaceLive with userdata: userdata
+2025-07-18 01:11:35,857 - __main__ - INFO - Optimization mode: balanced
+2025-07-18 01:11:35,857 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-18 01:11:35,859 - __main__ - INFO - Starting enhanced optimized initialization...
+2025-07-18 01:11:35,859 - integrated_optimizer - INFO - Initializing integrated optimization system
+2025-07-18 01:11:35,859 - ui_optimizer - INFO - UI optimizations enabled
+2025-07-18 01:11:35,860 - enhanced_memory_manager - INFO - Resource monitoring started
+2025-07-18 01:11:35,880 - enhanced_memory_manager - INFO - Memory manager optimized for inference
+2025-07-18 01:11:35,885 - enhanced_async_processor - INFO - Processing mode changed to: balanced
+2025-07-18 01:11:35,885 - enhanced_async_processor - INFO - Frame skip strategy changed to: adaptive
+2025-07-18 01:11:35,885 - enhanced_async_processor - INFO - Target FPS changed to: 30.0
+2025-07-18 01:11:35,885 - integrated_optimizer - INFO - All optimization modules initialized successfully
+2025-07-18 01:11:35,886 - integrated_optimizer - INFO - Applied optimizations for high_end system profile
+2025-07-18 01:11:35,886 - integrated_optimizer - INFO - Starting optimization system
+2025-07-18 01:11:35,887 - integrated_optimizer - INFO - Performance monitoring started
+2025-07-18 01:11:35,887 - __main__ - INFO - Integrated optimization system started
+2025-07-18 01:11:35,888 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-18 01:11:35,888 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-18 01:11:35,889 - __main__ - INFO - Setting up model caching system...
+2025-07-18 01:11:35,889 - __main__ - INFO - Configured model cache for 1 models
+2025-07-18 01:11:35,889 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-18 01:11:35,890 - __main__ - INFO - Video processor configured: 2 workers, buffer size 3
+2025-07-18 01:11:35,890 - __main__ - INFO - Initializing GUI components...
+2025-07-18 01:11:36,397 - __main__ - INFO - Enhanced initialization completed in 0.54 seconds
+2025-07-18 01:11:36,397 - __main__ - INFO - System profile: high_end
+2025-07-18 01:11:36,397 - __main__ - INFO - Optimization level: balanced
+2025-07-18 01:11:36,397 - __main__ - INFO - Processing mode: balanced
+2025-07-18 01:11:36,397 - __main__ - INFO - Application ready - starting main loop
+2025-07-18 01:11:36,399 - async_processor - INFO - Started 2 processing workers
+2025-07-18 01:11:36,399 - __main__ - INFO - Running demo processing loop...
+2025-07-18 01:11:36,401 - async_processor - INFO - Processing pipeline stopped
+2025-07-18 01:11:36,402 - __main__ - ERROR - Application error: 'IntegratedOptimizer' object has no attribute 'get_performance_summary'
+2025-07-18 01:11:36,402 - __main__ - INFO - Cleaning up resources...
+2025-07-18 01:11:36,402 - __main__ - INFO - Integrated optimizer cleanup completed (no explicit cleanup method)
+2025-07-18 01:11:57,020 - __main__ - INFO - Initializing Enhanced OptimizedDeepFaceLive with userdata: userdata
+2025-07-18 01:11:57,021 - __main__ - INFO - Optimization mode: balanced
+2025-07-18 01:11:57,021 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-18 01:11:57,023 - __main__ - INFO - Starting enhanced optimized initialization...
+2025-07-18 01:11:57,023 - integrated_optimizer - INFO - Initializing integrated optimization system
+2025-07-18 01:11:57,024 - ui_optimizer - INFO - UI optimizations enabled
+2025-07-18 01:11:57,025 - enhanced_memory_manager - INFO - Resource monitoring started
+2025-07-18 01:11:57,025 - enhanced_memory_manager - INFO - Memory manager optimized for inference
+2025-07-18 01:11:57,051 - enhanced_async_processor - INFO - Processing mode changed to: balanced
+2025-07-18 01:11:57,052 - enhanced_async_processor - INFO - Frame skip strategy changed to: adaptive
+2025-07-18 01:11:57,052 - enhanced_async_processor - INFO - Target FPS changed to: 30.0
+2025-07-18 01:11:57,053 - integrated_optimizer - INFO - All optimization modules initialized successfully
+2025-07-18 01:11:57,054 - integrated_optimizer - INFO - Applied optimizations for high_end system profile
+2025-07-18 01:11:57,055 - integrated_optimizer - INFO - Starting optimization system
+2025-07-18 01:11:57,056 - integrated_optimizer - INFO - Performance monitoring started
+2025-07-18 01:11:57,058 - __main__ - INFO - Integrated optimization system started
+2025-07-18 01:11:57,060 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-18 01:11:57,061 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-18 01:11:57,061 - __main__ - INFO - Setting up model caching system...
+2025-07-18 01:11:57,062 - __main__ - INFO - Configured model cache for 1 models
+2025-07-18 01:11:57,062 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-18 01:11:57,063 - __main__ - INFO - Video processor configured: 2 workers, buffer size 3
+2025-07-18 01:11:57,063 - __main__ - INFO - Initializing GUI components...
+2025-07-18 01:11:57,572 - __main__ - INFO - Enhanced initialization completed in 0.55 seconds
+2025-07-18 01:11:57,579 - __main__ - INFO - System profile: high_end
+2025-07-18 01:11:57,579 - __main__ - INFO - Optimization level: balanced
+2025-07-18 01:11:57,579 - __main__ - INFO - Processing mode: balanced
+2025-07-18 01:11:57,580 - __main__ - INFO - Application ready - starting main loop
+2025-07-18 01:11:57,580 - async_processor - INFO - Started 2 processing workers
+2025-07-18 01:11:57,581 - __main__ - INFO - Running demo processing loop...
+2025-07-18 01:11:57,590 - __main__ - INFO - Frame 0: FPS=0.0, Latency=0.0ms
+2025-07-18 01:11:57,591 - async_processor - INFO - Processing worker 0 started
+2025-07-18 01:11:57,592 - async_processor - INFO - Processing worker 1 started
+2025-07-18 01:11:58,979 - __main__ - INFO - Frame 30: FPS=0.0, Latency=0.0ms
+2025-07-18 01:12:00,370 - __main__ - INFO - Frame 60: FPS=0.0, Latency=0.1ms
+2025-07-18 01:12:01,754 - __main__ - INFO - Frame 90: FPS=0.0, Latency=0.0ms
+2025-07-18 01:12:02,213 - async_processor - INFO - Processing worker 0 stopped
+2025-07-18 01:12:02,213 - async_processor - INFO - Processing worker 1 stopped
+2025-07-18 01:12:02,213 - async_processor - INFO - Processing pipeline stopped
+2025-07-18 01:12:02,215 - __main__ - INFO - Cleaning up resources...
+2025-07-18 01:12:02,215 - __main__ - INFO - Integrated optimizer cleanup completed (no explicit cleanup method)
+2025-07-18 01:13:19,499 - __main__ - INFO - Initializing Enhanced OptimizedDeepFaceLive with userdata: userdata
+2025-07-18 01:13:19,500 - __main__ - INFO - Optimization mode: performance
+2025-07-18 01:13:19,500 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-18 01:13:19,502 - __main__ - INFO - Starting enhanced optimized initialization...
+2025-07-18 01:13:19,502 - integrated_optimizer - INFO - Initializing integrated optimization system
+2025-07-18 01:13:19,502 - ui_optimizer - INFO - UI optimizations enabled
+2025-07-18 01:13:19,504 - enhanced_memory_manager - INFO - Resource monitoring started
+2025-07-18 01:13:19,504 - enhanced_memory_manager - INFO - Memory manager optimized for inference
+2025-07-18 01:13:19,527 - enhanced_async_processor - INFO - Processing mode changed to: realtime
+2025-07-18 01:13:19,528 - enhanced_async_processor - INFO - Frame skip strategy changed to: adaptive
+2025-07-18 01:13:19,528 - enhanced_async_processor - INFO - Target FPS changed to: 30.0
+2025-07-18 01:13:19,528 - integrated_optimizer - INFO - All optimization modules initialized successfully
+2025-07-18 01:13:19,528 - integrated_optimizer - INFO - Applied optimizations for high_end system profile
+2025-07-18 01:13:19,528 - integrated_optimizer - INFO - Starting optimization system
+2025-07-18 01:13:19,530 - integrated_optimizer - INFO - Performance monitoring started
+2025-07-18 01:13:19,530 - __main__ - INFO - Integrated optimization system started
+2025-07-18 01:13:19,531 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-18 01:13:19,532 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-18 01:13:19,532 - __main__ - INFO - Setting up model caching system...
+2025-07-18 01:13:19,532 - __main__ - INFO - Configured model cache for 1 models
+2025-07-18 01:13:19,532 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-18 01:13:19,534 - __main__ - INFO - Video processor configured: 2 workers, buffer size 3
+2025-07-18 01:13:19,534 - __main__ - INFO - Initializing GUI components...
+2025-07-18 01:13:20,046 - __main__ - INFO - Enhanced initialization completed in 0.54 seconds
+2025-07-18 01:13:20,046 - __main__ - INFO - System profile: high_end
+2025-07-18 01:13:20,046 - __main__ - INFO - Optimization level: aggressive
+2025-07-18 01:13:20,046 - __main__ - INFO - Processing mode: balanced
+2025-07-18 01:13:20,047 - __main__ - INFO - Application ready - starting main loop
+2025-07-18 01:13:20,047 - async_processor - INFO - Started 2 processing workers
+2025-07-18 01:13:20,048 - __main__ - INFO - Running demo processing loop...
+2025-07-18 01:13:20,051 - __main__ - INFO - Frame 0: FPS=0.0, Latency=0.0ms
+2025-07-18 01:13:20,051 - async_processor - INFO - Processing worker 0 started
+2025-07-18 01:13:20,051 - async_processor - INFO - Processing worker 1 started
+2025-07-18 01:13:21,420 - __main__ - INFO - Frame 30: FPS=0.0, Latency=0.0ms
+2025-07-18 01:13:22,805 - __main__ - INFO - Frame 60: FPS=0.0, Latency=0.0ms
+2025-07-18 01:13:24,158 - __main__ - INFO - Frame 90: FPS=0.0, Latency=0.0ms
+2025-07-18 01:13:24,623 - async_processor - INFO - Processing worker 0 stopped
+2025-07-18 01:13:24,623 - async_processor - INFO - Processing worker 1 stopped
+2025-07-18 01:13:24,624 - async_processor - INFO - Processing pipeline stopped
+2025-07-18 01:13:24,625 - __main__ - INFO - Cleaning up resources...
+2025-07-18 01:13:24,625 - __main__ - INFO - Integrated optimizer cleanup completed (no explicit cleanup method)
+2025-07-18 01:16:07,181 - __main__ - INFO - Initializing Enhanced OptimizedDeepFaceLive with userdata: userdata
+2025-07-18 01:16:07,181 - __main__ - INFO - Optimization mode: balanced
+2025-07-18 01:16:07,183 - __main__ - INFO - Starting OptimizedDeepFaceLive...
+2025-07-18 01:16:07,185 - __main__ - INFO - Starting enhanced optimized initialization...
+2025-07-18 01:16:07,185 - integrated_optimizer - INFO - Initializing integrated optimization system
+2025-07-18 01:16:07,186 - ui_optimizer - INFO - UI optimizations enabled
+2025-07-18 01:16:07,188 - enhanced_memory_manager - INFO - Resource monitoring started
+2025-07-18 01:16:07,220 - enhanced_memory_manager - INFO - Memory manager optimized for inference
+2025-07-18 01:16:07,226 - enhanced_async_processor - INFO - Processing mode changed to: balanced
+2025-07-18 01:16:07,226 - enhanced_async_processor - INFO - Frame skip strategy changed to: adaptive
+2025-07-18 01:16:07,226 - enhanced_async_processor - INFO - Target FPS changed to: 30.0
+2025-07-18 01:16:07,227 - integrated_optimizer - INFO - All optimization modules initialized successfully
+2025-07-18 01:16:07,227 - integrated_optimizer - INFO - Applied optimizations for high_end system profile
+2025-07-18 01:16:07,228 - integrated_optimizer - INFO - Starting optimization system
+2025-07-18 01:16:07,229 - integrated_optimizer - INFO - Performance monitoring started
+2025-07-18 01:16:07,229 - __main__ - INFO - Integrated optimization system started
+2025-07-18 01:16:07,231 - __main__ - INFO - Detecting GPU capabilities...
+2025-07-18 01:16:07,231 - __main__ - INFO - ONNX Runtime GPU provider available
+2025-07-18 01:16:07,231 - __main__ - INFO - Setting up model caching system...
+2025-07-18 01:16:07,232 - __main__ - INFO - Configured model cache for 1 models
+2025-07-18 01:16:07,232 - __main__ - INFO - Setting up video processing pipeline...
+2025-07-18 01:16:07,232 - __main__ - INFO - Video processor configured: 2 workers, buffer size 3
+2025-07-18 01:16:07,233 - __main__ - INFO - Initializing GUI components...
+2025-07-18 01:16:07,758 - __main__ - INFO - Enhanced initialization completed in 0.57 seconds
+2025-07-18 01:16:07,777 - __main__ - INFO - System profile: high_end
+2025-07-18 01:16:07,789 - __main__ - INFO - Optimization level: balanced
+2025-07-18 01:16:07,790 - __main__ - INFO - Processing mode: balanced
+2025-07-18 01:16:07,791 - __main__ - INFO - Application ready - starting main loop
+2025-07-18 01:16:07,792 - async_processor - INFO - Started 2 processing workers
+2025-07-18 01:16:07,803 - __main__ - INFO - Running demo processing loop...
+2025-07-18 01:16:07,809 - __main__ - INFO - Frame 0: FPS=0.0, Latency=0.0ms
+2025-07-18 01:16:07,825 - async_processor - INFO - Processing worker 0 started
+2025-07-18 01:16:07,829 - async_processor - INFO - Processing worker 1 started
+2025-07-18 01:16:08,278 - enhanced_memory_manager - WARNING - CPU pressure detected: {'type': 'cpu', 'usage_percent': 85.7}
+2025-07-18 01:16:09,200 - __main__ - INFO - Frame 30: FPS=0.0, Latency=0.0ms
+2025-07-18 01:16:10,584 - __main__ - INFO - Frame 60: FPS=0.0, Latency=0.0ms
+2025-07-18 01:16:11,975 - __main__ - INFO - Frame 90: FPS=0.0, Latency=0.0ms
+2025-07-18 01:16:12,416 - async_processor - INFO - Processing worker 0 stopped
+2025-07-18 01:16:12,417 - async_processor - INFO - Processing worker 1 stopped
+2025-07-18 01:16:12,417 - async_processor - INFO - Processing pipeline stopped
+2025-07-18 01:16:12,418 - __main__ - INFO - Cleaning up resources...
+2025-07-18 01:16:12,418 - __main__ - INFO - Integrated optimizer cleanup completed (no explicit cleanup method)

@@ -1,0 +1,279 @@
+2025-07-20 11:50:48,554 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:50:52,306 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:50:54,602 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:50,290 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:50,946 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:51,569 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:52,666 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:53,268 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:53,788 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:54,394 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:54,933 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:55,449 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:55,961 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:56,466 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:51:56,473 - __main__ - WARNING - ⚠️  Path does not exist: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\test
+2025-07-20 11:51:56,508 - __main__ - INFO - 📁 Created directory: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\test
+2025-07-20 11:51:56,509 - __main__ - INFO - Registered component: xlib_appargs (priority: CRITICAL)
+2025-07-20 11:51:56,509 - __main__ - INFO - Registered component: localization (priority: HIGH)
+2025-07-20 11:51:56,509 - __main__ - INFO - Registered component: playatewsidentitymasker_app (priority: MEDIUM)
+2025-07-20 11:51:56,509 - __main__ - INFO - Registered component: playatewsidentitymasker_obs_app (priority: MEDIUM)
+2025-07-20 11:51:56,509 - __main__ - INFO - Registered component: dev_scripts (priority: LOW)
+2025-07-20 11:51:56,509 - __main__ - INFO - [START] Initializing FunctionalityPreservingLazyDeepFaceLiveApp with userdata: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\test
+2025-07-20 11:51:56,509 - __main__ - INFO - Optimization mode: balanced
+2025-07-20 11:51:56,511 - __main__ - INFO - Starting functionality-preserving lazy loading initialization...
+2025-07-20 11:51:56,511 - __main__ - INFO - Loading priority components: ['xlib_appargs', 'localization']
+2025-07-20 11:51:56,511 - __main__ - INFO - Loading component: xlib_appargs
+2025-07-20 11:51:56,511 - __main__ - INFO - Loading xlib.appargs module...
+2025-07-20 11:51:56,515 - __main__ - INFO - [SUCCESS] xlib.appargs loaded successfully
+2025-07-20 11:51:56,516 - __main__ - INFO - [SUCCESS] Component xlib_appargs loaded in 0.01s
+2025-07-20 11:51:56,516 - __main__ - INFO - Loading component: localization
+2025-07-20 11:51:56,516 - __main__ - INFO - Loading localization system...
+2025-07-20 11:51:56,519 - __main__ - INFO - [SUCCESS] Localization system loaded successfully
+2025-07-20 11:51:56,519 - __main__ - INFO - [SUCCESS] Component localization loaded in 0.00s
+2025-07-20 11:51:56,520 - __main__ - INFO - [SUCCESS] Functionality-preserving lazy loading initialization completed in 0.01 seconds
+2025-07-20 11:51:56,520 - __main__ - INFO - Components loaded: 2/5 (40.0%)
+2025-07-20 11:51:56,520 - __main__ - INFO - [SUCCESS] args_parsed completed in 0.05s
+2025-07-20 11:51:56,521 - __main__ - INFO - [START] Starting PlayaTewsIdentityMasker with OBS-style streaming interface: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\test
+2025-07-20 11:51:56,523 - __main__ - INFO - Loading component: playatewsidentitymasker_obs_app
+2025-07-20 11:51:56,523 - __main__ - INFO - Loading PlayaTewsIdentityMaskerOBSStyleApp...
+2025-07-20 11:51:56,680 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 11:52:01,388 - src.core.utils.imports - ERROR - Failed to import cupy: No module named 'cupy'
+2025-07-20 11:52:01,420 - __main__ - INFO - [SUCCESS] PlayaTewsIdentityMaskerOBSStyleApp loaded successfully
+2025-07-20 11:52:01,421 - __main__ - INFO - [SUCCESS] Component playatewsidentitymasker_obs_app loaded in 4.90s
+2025-07-20 11:52:01,422 - __main__ - INFO - [SUCCESS] app_imported completed in 4.96s
+2025-07-20 11:52:01,698 - __main__ - ERROR - ❌ Application failed to start: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+2025-07-20 11:52:02,935 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:52:02,944 - __main__ - INFO - Registered component: xlib_appargs (priority: CRITICAL)
+2025-07-20 11:52:02,944 - __main__ - INFO - Registered component: localization (priority: HIGH)
+2025-07-20 11:52:02,944 - __main__ - INFO - Registered component: playatewsidentitymasker_app (priority: MEDIUM)
+2025-07-20 11:52:02,944 - __main__ - INFO - Registered component: playatewsidentitymasker_obs_app (priority: MEDIUM)
+2025-07-20 11:52:02,944 - __main__ - INFO - Registered component: dev_scripts (priority: LOW)
+2025-07-20 11:52:02,944 - __main__ - INFO - [START] Initializing FunctionalityPreservingLazyDeepFaceLiveApp with userdata: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master
+2025-07-20 11:52:02,944 - __main__ - INFO - Optimization mode: balanced
+2025-07-20 11:52:02,945 - __main__ - INFO - Starting functionality-preserving lazy loading initialization...
+2025-07-20 11:52:02,946 - __main__ - INFO - Loading priority components: ['xlib_appargs', 'localization']
+2025-07-20 11:52:02,946 - __main__ - INFO - Loading component: xlib_appargs
+2025-07-20 11:52:02,946 - __main__ - INFO - Loading xlib.appargs module...
+2025-07-20 11:52:02,949 - __main__ - INFO - [SUCCESS] xlib.appargs loaded successfully
+2025-07-20 11:52:02,949 - __main__ - INFO - [SUCCESS] Component xlib_appargs loaded in 0.00s
+2025-07-20 11:52:02,949 - __main__ - INFO - Loading component: localization
+2025-07-20 11:52:02,949 - __main__ - INFO - Loading localization system...
+2025-07-20 11:52:02,952 - __main__ - INFO - [SUCCESS] Localization system loaded successfully
+2025-07-20 11:52:02,952 - __main__ - INFO - [SUCCESS] Component localization loaded in 0.00s
+2025-07-20 11:52:02,952 - __main__ - INFO - [SUCCESS] Functionality-preserving lazy loading initialization completed in 0.01 seconds
+2025-07-20 11:52:02,952 - __main__ - INFO - Components loaded: 2/5 (40.0%)
+2025-07-20 11:52:02,953 - __main__ - INFO - [SUCCESS] args_parsed completed in 0.02s
+2025-07-20 11:52:02,953 - __main__ - INFO - [START] Starting PlayaTewsIdentityMasker with OBS-style streaming interface: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master
+2025-07-20 11:52:02,954 - __main__ - INFO - Loading component: playatewsidentitymasker_obs_app
+2025-07-20 11:52:02,954 - __main__ - INFO - Loading PlayaTewsIdentityMaskerOBSStyleApp...
+2025-07-20 11:52:03,108 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 11:52:07,365 - src.core.utils.imports - ERROR - Failed to import cupy: No module named 'cupy'
+2025-07-20 11:52:07,402 - __main__ - INFO - [SUCCESS] PlayaTewsIdentityMaskerOBSStyleApp loaded successfully
+2025-07-20 11:52:07,402 - __main__ - INFO - [SUCCESS] Component playatewsidentitymasker_obs_app loaded in 4.45s
+2025-07-20 11:52:07,403 - __main__ - INFO - [SUCCESS] app_imported completed in 4.47s
+2025-07-20 11:52:07,673 - __main__ - ERROR - ❌ Application failed to start: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+2025-07-20 11:52:08,814 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:52:08,822 - __main__ - DEBUG - Verbose logging enabled
+2025-07-20 11:52:08,823 - __main__ - INFO - Registered component: xlib_appargs (priority: CRITICAL)
+2025-07-20 11:52:08,823 - __main__ - INFO - Registered component: localization (priority: HIGH)
+2025-07-20 11:52:08,823 - __main__ - INFO - Registered component: playatewsidentitymasker_app (priority: MEDIUM)
+2025-07-20 11:52:08,823 - __main__ - INFO - Registered component: playatewsidentitymasker_obs_app (priority: MEDIUM)
+2025-07-20 11:52:08,823 - __main__ - INFO - Registered component: dev_scripts (priority: LOW)
+2025-07-20 11:52:08,823 - __main__ - INFO - [START] Initializing FunctionalityPreservingLazyDeepFaceLiveApp with userdata: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master
+2025-07-20 11:52:08,823 - __main__ - INFO - Optimization mode: balanced
+2025-07-20 11:52:08,823 - asyncio - DEBUG - Using proactor: IocpProactor
+2025-07-20 11:52:08,825 - __main__ - INFO - Starting functionality-preserving lazy loading initialization...
+2025-07-20 11:52:08,825 - __main__ - INFO - Loading priority components: ['xlib_appargs', 'localization']
+2025-07-20 11:52:08,826 - __main__ - INFO - Loading component: xlib_appargs
+2025-07-20 11:52:08,826 - __main__ - INFO - Loading xlib.appargs module...
+2025-07-20 11:52:08,832 - __main__ - INFO - [SUCCESS] xlib.appargs loaded successfully
+2025-07-20 11:52:08,832 - __main__ - INFO - [SUCCESS] Component xlib_appargs loaded in 0.01s
+2025-07-20 11:52:08,832 - __main__ - INFO - Loading component: localization
+2025-07-20 11:52:08,832 - __main__ - INFO - Loading localization system...
+2025-07-20 11:52:08,836 - __main__ - INFO - [SUCCESS] Localization system loaded successfully
+2025-07-20 11:52:08,836 - __main__ - INFO - [SUCCESS] Component localization loaded in 0.00s
+2025-07-20 11:52:08,836 - __main__ - INFO - [SUCCESS] Functionality-preserving lazy loading initialization completed in 0.01 seconds
+2025-07-20 11:52:08,836 - __main__ - INFO - Components loaded: 2/5 (40.0%)
+2025-07-20 11:52:08,837 - __main__ - INFO - [SUCCESS] args_parsed completed in 0.02s
+2025-07-20 11:52:08,837 - __main__ - INFO - [START] Starting PlayaTewsIdentityMasker with OBS-style streaming interface: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master
+2025-07-20 11:52:08,837 - asyncio - DEBUG - Using proactor: IocpProactor
+2025-07-20 11:52:08,838 - __main__ - INFO - Loading component: playatewsidentitymasker_obs_app
+2025-07-20 11:52:08,839 - __main__ - INFO - Loading PlayaTewsIdentityMaskerOBSStyleApp...
+2025-07-20 11:52:08,998 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 11:52:09,179 - h5py._conv - DEBUG - Creating converter from 7 to 5
+2025-07-20 11:52:09,179 - h5py._conv - DEBUG - Creating converter from 5 to 7
+2025-07-20 11:52:09,179 - h5py._conv - DEBUG - Creating converter from 7 to 5
+2025-07-20 11:52:09,180 - h5py._conv - DEBUG - Creating converter from 5 to 7
+2025-07-20 11:52:13,356 - src.core.utils.imports - ERROR - Failed to import cupy: No module named 'cupy'
+2025-07-20 11:52:13,387 - __main__ - INFO - [SUCCESS] PlayaTewsIdentityMaskerOBSStyleApp loaded successfully
+2025-07-20 11:52:13,387 - __main__ - INFO - [SUCCESS] Component playatewsidentitymasker_obs_app loaded in 4.55s
+2025-07-20 11:52:13,388 - __main__ - INFO - [SUCCESS] app_imported completed in 4.57s
+2025-07-20 11:52:13,657 - __main__ - ERROR - ❌ Application failed to start: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+2025-07-20 11:52:14,810 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 11:52:14,817 - __main__ - INFO - Registered component: xlib_appargs (priority: CRITICAL)
+2025-07-20 11:52:14,818 - __main__ - INFO - Registered component: localization (priority: HIGH)
+2025-07-20 11:52:14,818 - __main__ - INFO - Registered component: playatewsidentitymasker_app (priority: MEDIUM)
+2025-07-20 11:52:14,818 - __main__ - INFO - Registered component: playatewsidentitymasker_obs_app (priority: MEDIUM)
+2025-07-20 11:52:14,818 - __main__ - INFO - Registered component: dev_scripts (priority: LOW)
+2025-07-20 11:52:14,818 - __main__ - INFO - [START] Initializing FunctionalityPreservingLazyDeepFaceLiveApp with userdata: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master
+2025-07-20 11:52:14,818 - __main__ - INFO - Optimization mode: balanced
+2025-07-20 11:52:14,819 - __main__ - INFO - Starting functionality-preserving lazy loading initialization...
+2025-07-20 11:52:14,820 - __main__ - INFO - Loading priority components: ['xlib_appargs', 'localization']
+2025-07-20 11:52:14,820 - __main__ - INFO - Loading component: xlib_appargs
+2025-07-20 11:52:14,820 - __main__ - INFO - Loading xlib.appargs module...
+2025-07-20 11:52:14,824 - __main__ - INFO - [SUCCESS] xlib.appargs loaded successfully
+2025-07-20 11:52:14,825 - __main__ - INFO - [SUCCESS] Component xlib_appargs loaded in 0.00s
+2025-07-20 11:52:14,825 - __main__ - INFO - Loading component: localization
+2025-07-20 11:52:14,825 - __main__ - INFO - Loading localization system...
+2025-07-20 11:52:14,829 - __main__ - INFO - [SUCCESS] Localization system loaded successfully
+2025-07-20 11:52:14,829 - __main__ - INFO - [SUCCESS] Component localization loaded in 0.00s
+2025-07-20 11:52:14,830 - __main__ - INFO - [SUCCESS] Functionality-preserving lazy loading initialization completed in 0.01 seconds
+2025-07-20 11:52:14,830 - __main__ - INFO - Components loaded: 2/5 (40.0%)
+2025-07-20 11:52:14,831 - __main__ - INFO - [SUCCESS] args_parsed completed in 0.02s
+2025-07-20 11:52:14,831 - __main__ - INFO - [START] Starting PlayaTewsIdentityMasker with traditional UI: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master
+2025-07-20 11:52:14,831 - __main__ - INFO - [SUCCESS] args_parsed completed in 0.02s
+2025-07-20 11:52:14,831 - __main__ - INFO - [START] Starting PlayaTewsIdentityMasker with userdata: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master
+2025-07-20 11:52:14,833 - __main__ - INFO - Loading component: playatewsidentitymasker_app
+2025-07-20 11:52:14,833 - __main__ - INFO - Loading PlayaTewsIdentityMaskerApp...
+2025-07-20 11:52:15,012 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 11:52:20,031 - __main__ - ERROR - Failed to load PlayaTewsIdentityMaskerApp: cannot import name 'QStreamOutput' from 'apps.PlayaTewsIdentityMasker.ui.QStreamOutput' (C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\apps\PlayaTewsIdentityMasker\ui\QStreamOutput.py)
+2025-07-20 11:52:20,032 - __main__ - INFO - [SUCCESS] Component playatewsidentitymasker_app loaded in 5.20s
+2025-07-20 11:52:20,033 - __main__ - ERROR - ❌ Failed to import PlayaTewsIdentityMaskerApp: Failed to load PlayaTewsIdentityMaskerApp
+2025-07-20 11:52:20,039 - __main__ - ERROR - Please ensure all dependencies are installed: pip install -r requirements-unified.txt
+2025-07-20 11:52:21,433 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 14:59:21,607 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 14:59:21,617 - __main__ - INFO - Registered component: xlib_appargs (priority: CRITICAL)
+2025-07-20 14:59:21,617 - __main__ - INFO - Registered component: localization (priority: HIGH)
+2025-07-20 14:59:21,617 - __main__ - INFO - Registered component: playatewsidentitymasker_app (priority: MEDIUM)
+2025-07-20 14:59:21,617 - __main__ - INFO - Registered component: playatewsidentitymasker_obs_app (priority: MEDIUM)
+2025-07-20 14:59:21,617 - __main__ - INFO - Registered component: dev_scripts (priority: LOW)
+2025-07-20 14:59:21,617 - __main__ - INFO - [START] Initializing FunctionalityPreservingLazyDeepFaceLiveApp with userdata: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\userdata
+2025-07-20 14:59:21,619 - __main__ - INFO - Optimization mode: balanced
+2025-07-20 14:59:21,620 - __main__ - INFO - Starting functionality-preserving lazy loading initialization...
+2025-07-20 14:59:21,620 - __main__ - INFO - Loading priority components: ['xlib_appargs', 'localization']
+2025-07-20 14:59:21,621 - __main__ - INFO - Loading component: xlib_appargs
+2025-07-20 14:59:21,621 - __main__ - INFO - Loading xlib.appargs module...
+2025-07-20 14:59:21,625 - __main__ - INFO - [SUCCESS] xlib.appargs loaded successfully
+2025-07-20 14:59:21,625 - __main__ - INFO - [SUCCESS] Component xlib_appargs loaded in 0.00s
+2025-07-20 14:59:21,625 - __main__ - INFO - Loading component: localization
+2025-07-20 14:59:21,626 - __main__ - INFO - Loading localization system...
+2025-07-20 14:59:21,634 - __main__ - INFO - [SUCCESS] Localization system loaded successfully
+2025-07-20 14:59:21,634 - __main__ - INFO - [SUCCESS] Component localization loaded in 0.01s
+2025-07-20 14:59:21,635 - __main__ - INFO - [SUCCESS] Functionality-preserving lazy loading initialization completed in 0.01 seconds
+2025-07-20 14:59:21,635 - __main__ - INFO - Components loaded: 2/5 (40.0%)
+2025-07-20 14:59:21,636 - __main__ - INFO - [SUCCESS] args_parsed completed in 0.03s
+2025-07-20 14:59:21,637 - __main__ - INFO - [START] Starting PlayaTewsIdentityMasker with OBS-style streaming interface: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\userdata
+2025-07-20 14:59:21,638 - __main__ - INFO - Loading component: playatewsidentitymasker_obs_app
+2025-07-20 14:59:21,638 - __main__ - INFO - Loading PlayaTewsIdentityMaskerOBSStyleApp...
+2025-07-20 14:59:21,812 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:26,114 - src.core.utils.imports - ERROR - Failed to import cupy: No module named 'cupy'
+2025-07-20 14:59:26,144 - __main__ - INFO - [SUCCESS] PlayaTewsIdentityMaskerOBSStyleApp loaded successfully
+2025-07-20 14:59:26,144 - __main__ - INFO - [SUCCESS] Component playatewsidentitymasker_obs_app loaded in 4.51s
+2025-07-20 14:59:26,145 - __main__ - INFO - [SUCCESS] app_imported completed in 4.54s
+2025-07-20 14:59:27,536 - memory_manager - INFO - 📦 Memory pools initialized
+2025-07-20 14:59:27,542 - memory_manager - INFO - 🚀 Smart memory manager initialized (max: 2048 MB)
+2025-07-20 14:59:29,191 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:35,317 - __main__ - INFO - [SUCCESS] app_created completed in 13.71s
+2025-07-20 14:59:37,001 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:37,184 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:37,209 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:37,294 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:37,296 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:37,292 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:37,325 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:38,014 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 14:59:57,545 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 14:59:57,628 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.081s, Memory: 55.2%
+2025-07-20 15:00:27,633 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:00:27,718 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.084s, Memory: 55.2%
+2025-07-20 15:00:55,233 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:00:57,725 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:00:57,825 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.100s, Memory: 53.9%
+2025-07-20 15:02:05,768 - __main__ - INFO - [SUCCESS] main_start completed in 0.00s
+2025-07-20 15:02:05,777 - __main__ - INFO - Registered component: xlib_appargs (priority: CRITICAL)
+2025-07-20 15:02:05,778 - __main__ - INFO - Registered component: localization (priority: HIGH)
+2025-07-20 15:02:05,778 - __main__ - INFO - Registered component: playatewsidentitymasker_app (priority: MEDIUM)
+2025-07-20 15:02:05,778 - __main__ - INFO - Registered component: playatewsidentitymasker_obs_app (priority: MEDIUM)
+2025-07-20 15:02:05,780 - __main__ - INFO - Registered component: dev_scripts (priority: LOW)
+2025-07-20 15:02:05,780 - __main__ - INFO - [START] Initializing FunctionalityPreservingLazyDeepFaceLiveApp with userdata: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\userdata
+2025-07-20 15:02:05,780 - __main__ - INFO - Optimization mode: balanced
+2025-07-20 15:02:05,782 - __main__ - INFO - Starting functionality-preserving lazy loading initialization...
+2025-07-20 15:02:05,782 - __main__ - INFO - Loading priority components: ['xlib_appargs', 'localization']
+2025-07-20 15:02:05,782 - __main__ - INFO - Loading component: xlib_appargs
+2025-07-20 15:02:05,782 - __main__ - INFO - Loading xlib.appargs module...
+2025-07-20 15:02:05,786 - __main__ - INFO - [SUCCESS] xlib.appargs loaded successfully
+2025-07-20 15:02:05,786 - __main__ - INFO - [SUCCESS] Component xlib_appargs loaded in 0.00s
+2025-07-20 15:02:05,786 - __main__ - INFO - Loading component: localization
+2025-07-20 15:02:05,787 - __main__ - INFO - Loading localization system...
+2025-07-20 15:02:05,790 - __main__ - INFO - [SUCCESS] Localization system loaded successfully
+2025-07-20 15:02:05,790 - __main__ - INFO - [SUCCESS] Component localization loaded in 0.00s
+2025-07-20 15:02:05,790 - __main__ - INFO - [SUCCESS] Functionality-preserving lazy loading initialization completed in 0.01 seconds
+2025-07-20 15:02:05,791 - __main__ - INFO - Components loaded: 2/5 (40.0%)
+2025-07-20 15:02:05,792 - __main__ - INFO - [SUCCESS] args_parsed completed in 0.02s
+2025-07-20 15:02:05,794 - __main__ - INFO - [START] Starting PlayaTewsIdentityMasker with OBS-style streaming interface: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\userdata
+2025-07-20 15:02:05,797 - __main__ - INFO - Loading component: playatewsidentitymasker_obs_app
+2025-07-20 15:02:05,797 - __main__ - INFO - Loading PlayaTewsIdentityMaskerOBSStyleApp...
+2025-07-20 15:02:06,023 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:11,157 - src.core.utils.imports - ERROR - Failed to import cupy: No module named 'cupy'
+2025-07-20 15:02:11,187 - __main__ - INFO - [SUCCESS] PlayaTewsIdentityMaskerOBSStyleApp loaded successfully
+2025-07-20 15:02:11,187 - __main__ - INFO - [SUCCESS] Component playatewsidentitymasker_obs_app loaded in 5.39s
+2025-07-20 15:02:11,188 - __main__ - INFO - [SUCCESS] app_imported completed in 5.42s
+2025-07-20 15:02:12,676 - memory_manager - INFO - 📦 Memory pools initialized
+2025-07-20 15:02:12,678 - memory_manager - INFO - 🚀 Smart memory manager initialized (max: 2048 MB)
+2025-07-20 15:02:15,435 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:21,165 - __main__ - INFO - [SUCCESS] app_created completed in 15.40s
+2025-07-20 15:02:22,420 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:22,509 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:22,520 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:22,797 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:22,867 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:22,936 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:22,937 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:23,107 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:02:42,682 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:02:42,770 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.087s, Memory: 59.2%
+2025-07-20 15:02:58,895 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:03:12,777 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:03:12,908 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.127s, Memory: 61.8%
+2025-07-20 15:03:18,878 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-07-20 15:03:42,913 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:03:43,004 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.089s, Memory: 61.8%
+2025-07-20 15:04:13,010 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:04:13,095 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.085s, Memory: 61.1%
+2025-07-20 15:04:43,103 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:04:43,197 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.094s, Memory: 59.6%
+2025-07-20 15:05:13,202 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:05:13,295 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.092s, Memory: 59.5%
+2025-07-20 15:05:43,304 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:05:43,391 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.086s, Memory: 59.5%
+2025-07-20 15:06:13,396 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:06:13,491 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.095s, Memory: 59.5%
+2025-07-20 15:06:43,496 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:06:43,589 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.092s, Memory: 59.5%
+2025-07-20 15:07:13,593 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:07:13,684 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.090s, Memory: 59.6%
+2025-07-20 15:07:43,690 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:07:43,784 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.095s, Memory: 59.5%
+2025-07-20 15:08:13,789 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:08:13,876 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.087s, Memory: 59.5%
+2025-07-20 15:08:43,883 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:08:43,969 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.085s, Memory: 59.5%
+2025-07-20 15:09:13,974 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:09:14,060 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.085s, Memory: 59.4%
+2025-07-20 15:09:44,064 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:09:44,157 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.093s, Memory: 59.3%
+2025-07-20 15:10:14,162 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:10:14,252 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.088s, Memory: 59.5%
+2025-07-20 15:10:44,257 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:10:44,339 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.082s, Memory: 59.3%
+2025-07-20 15:11:14,347 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:11:14,437 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.090s, Memory: 59.4%
+2025-07-20 15:11:44,441 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:11:44,528 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.085s, Memory: 59.4%
+2025-07-20 15:12:14,531 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:12:14,622 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.089s, Memory: 59.4%
+2025-07-20 15:12:44,626 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:12:44,712 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.086s, Memory: 58.8%
+2025-07-20 15:13:14,718 - memory_manager - INFO - 🔧 Optimizing memory usage...
+2025-07-20 15:13:14,807 - memory_manager - INFO - Memory optimization complete: GC collected 0 objects in 0.089s, Memory: 58.9%

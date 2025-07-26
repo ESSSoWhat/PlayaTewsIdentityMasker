@@ -1,0 +1,442 @@
+2025-07-22 12:17:08,821 - INFO - NumExpr defaulting to 8 threads.
+2025-07-22 12:17:22,875 - INFO - NumExpr defaulting to 8 threads.
+2025-07-22 12:22:41,437 - INFO - NumExpr defaulting to 8 threads.
+2025-07-22 12:22:53,005 - INFO - NumExpr defaulting to 8 threads.
+2025-07-22 12:22:58,500 - INFO - NumExpr defaulting to 8 threads.
+2025-07-22 12:23:01,852 - INFO - Voice effect changed to: 0
+2025-07-22 12:23:01,853 - ERROR - Failed to get device list: [Errno -10000] PortAudio not initialized
+2025-07-22 12:23:09,526 - INFO - NumExpr defaulting to 8 threads.
+2025-07-22 12:23:16,007 - INFO - Voice effect changed to: 0
+2025-07-22 12:23:16,009 - ERROR - Failed to get device list: [Errno -10000] PortAudio not initialized
+2025-07-22 12:24:26,451 - INFO - NumExpr defaulting to 8 threads.
+2025-07-22 12:24:54,532 - INFO - NumExpr defaulting to 8 threads.
+2025-07-22 18:49:26,988 - INFO - NumExpr defaulting to 8 threads.
+2025-07-22 18:49:39,778 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:31,896 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:43,031 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:53,717 - INFO - Application initialized successfully
+2025-07-23 00:27:54,560 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:55,540 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:56,229 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:56,296 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:56,378 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:57,312 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:57,567 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:57,713 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:57,731 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:58,147 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:27:59,048 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:05,096 - INFO - PlayaTewsIdentityMasker OBS-Style Launcher Starting...
+2025-07-23 00:39:05,098 - INFO - Using workspace: C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master
+2025-07-23 00:39:05,098 - INFO - Initializing lazy loading system...
+2025-07-23 00:39:05,354 - INFO - Lazy load manager initialized (max: 2048 MB, 50 modules)
+2025-07-23 00:39:05,539 - INFO - Lazy loading system initialized
+2025-07-23 00:39:05,645 - INFO - 🚀 Launching PlayaTewsIdentityMasker with OBS-style streaming interface...
+2025-07-23 00:39:06,844 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:19,423 - INFO - Memory pools initialized
+2025-07-23 00:39:19,729 - INFO - Smart memory manager initialized (max: 2048 MB)
+2025-07-23 00:39:24,279 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:33,661 - INFO - Application initialized successfully
+2025-07-23 00:39:36,319 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:36,327 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:36,328 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:36,547 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:36,945 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:36,973 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:37,926 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:38,513 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:38,701 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:38,865 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:39,414 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 00:39:49,987 - INFO - Optimizing memory usage...
+2025-07-23 00:39:50,330 - INFO - Memory optimization complete: GC collected 0 objects in 0.340s, Memory: 54.8%
+2025-07-23 00:40:20,578 - INFO - Optimizing memory usage...
+2025-07-23 00:40:21,004 - INFO - Memory optimization complete: GC collected 0 objects in 0.418s, Memory: 57.7%
+2025-07-23 00:40:51,014 - INFO - Optimizing memory usage...
+2025-07-23 00:40:51,147 - INFO - Memory optimization complete: GC collected 0 objects in 0.132s, Memory: 56.9%
+2025-07-23 00:41:21,271 - INFO - Optimizing memory usage...
+2025-07-23 00:41:22,008 - INFO - Memory optimization complete: GC collected 0 objects in 0.532s, Memory: 57.5%
+2025-07-23 00:41:52,077 - INFO - Optimizing memory usage...
+2025-07-23 00:41:52,208 - INFO - Memory optimization complete: GC collected 0 objects in 0.130s, Memory: 58.5%
+2025-07-23 00:42:22,226 - INFO - Optimizing memory usage...
+2025-07-23 00:42:22,493 - INFO - Memory optimization complete: GC collected 0 objects in 0.249s, Memory: 57.4%
+2025-07-23 00:42:52,501 - INFO - Optimizing memory usage...
+2025-07-23 00:42:52,630 - INFO - Memory optimization complete: GC collected 0 objects in 0.127s, Memory: 57.3%
+2025-07-23 00:43:22,637 - INFO - Optimizing memory usage...
+2025-07-23 00:43:22,853 - INFO - Memory optimization complete: GC collected 0 objects in 0.214s, Memory: 55.2%
+2025-07-23 00:43:52,864 - INFO - Optimizing memory usage...
+2025-07-23 00:43:53,070 - INFO - Memory optimization complete: GC collected 0 objects in 0.198s, Memory: 56.2%
+2025-07-23 00:44:23,095 - INFO - Optimizing memory usage...
+2025-07-23 00:44:23,221 - INFO - Memory optimization complete: GC collected 0 objects in 0.126s, Memory: 56.4%
+2025-07-23 00:44:53,234 - INFO - Optimizing memory usage...
+2025-07-23 00:44:53,458 - INFO - Memory optimization complete: GC collected 0 objects in 0.220s, Memory: 56.4%
+2025-07-23 00:45:23,474 - INFO - Optimizing memory usage...
+2025-07-23 00:45:23,627 - INFO - Memory optimization complete: GC collected 0 objects in 0.152s, Memory: 58.6%
+2025-07-23 13:51:09,644 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 13:51:29,093 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:30,633 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:40,719 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:51,071 - INFO - Application initialized successfully
+2025-07-23 15:45:51,922 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,157 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,159 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,219 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,272 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,354 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,370 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,505 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,727 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,758 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:45:52,840 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:46:10,126 - INFO - Memory optimization complete: GC collected 0 objects in 0.337s, Memory: 46.4%
+2025-07-23 15:46:40,264 - INFO - Memory optimization complete: GC collected 0 objects in 0.123s, Memory: 46.9%
+2025-07-23 15:46:42,840 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:46:53,155 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:02,532 - INFO - Application initialized successfully
+2025-07-23 15:47:03,376 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:03,403 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:03,416 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:03,483 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:03,529 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:03,529 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:03,554 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:03,616 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:03,671 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:03,742 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:04,308 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 15:47:20,781 - INFO - Memory optimization complete: GC collected 0 objects in 0.128s, Memory: 47.4%
+2025-07-23 15:47:50,897 - INFO - Memory optimization complete: GC collected 0 objects in 0.112s, Memory: 49.5%
+2025-07-23 15:48:21,010 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 51.4%
+2025-07-23 15:48:51,141 - INFO - Memory optimization complete: GC collected 0 objects in 0.114s, Memory: 51.7%
+2025-07-23 15:49:21,254 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 49.5%
+2025-07-23 15:49:51,369 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 48.6%
+2025-07-23 15:50:21,485 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 48.2%
+2025-07-23 15:50:51,604 - INFO - Memory optimization complete: GC collected 0 objects in 0.112s, Memory: 48.7%
+2025-07-23 15:51:21,719 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 48.5%
+2025-07-23 15:51:51,835 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 48.8%
+2025-07-23 15:52:21,946 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 48.5%
+2025-07-23 15:52:52,074 - INFO - Memory optimization complete: GC collected 0 objects in 0.123s, Memory: 48.3%
+2025-07-23 15:53:22,188 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 48.3%
+2025-07-23 15:53:52,301 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 48.5%
+2025-07-23 15:54:22,415 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 48.2%
+2025-07-23 15:54:52,532 - INFO - Memory optimization complete: GC collected 0 objects in 0.110s, Memory: 48.7%
+2025-07-23 15:55:22,664 - INFO - Memory optimization complete: GC collected 0 objects in 0.125s, Memory: 48.3%
+2025-07-23 15:55:52,778 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 48.6%
+2025-07-23 15:56:22,889 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 48.5%
+2025-07-23 15:56:53,004 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 48.8%
+2025-07-23 15:57:23,116 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 48.5%
+2025-07-23 15:57:53,230 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 51.2%
+2025-07-23 15:58:23,345 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 50.9%
+2025-07-23 15:58:53,457 - INFO - Memory optimization complete: GC collected 0 objects in 0.103s, Memory: 51.3%
+2025-07-23 15:59:23,570 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 51.1%
+2025-07-23 15:59:53,693 - INFO - Memory optimization complete: GC collected 0 objects in 0.117s, Memory: 50.0%
+2025-07-23 16:00:23,807 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 49.8%
+2025-07-23 16:00:53,921 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 52.7%
+2025-07-23 16:01:24,040 - INFO - Memory optimization complete: GC collected 0 objects in 0.110s, Memory: 52.6%
+2025-07-23 16:01:54,154 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 52.8%
+2025-07-23 16:02:24,266 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 52.5%
+2025-07-23 16:02:54,386 - INFO - Memory optimization complete: GC collected 0 objects in 0.113s, Memory: 50.8%
+2025-07-23 16:03:24,498 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 50.8%
+2025-07-23 16:03:54,613 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 51.0%
+2025-07-23 16:04:24,729 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 50.7%
+2025-07-23 16:04:54,841 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 51.0%
+2025-07-23 16:05:24,953 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 50.7%
+2025-07-23 16:05:55,073 - INFO - Memory optimization complete: GC collected 0 objects in 0.114s, Memory: 50.5%
+2025-07-23 16:06:25,191 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 50.3%
+2025-07-23 16:06:55,308 - INFO - Memory optimization complete: GC collected 0 objects in 0.110s, Memory: 50.6%
+2025-07-23 16:07:25,423 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 50.8%
+2025-07-23 16:07:55,540 - INFO - Memory optimization complete: GC collected 0 objects in 0.111s, Memory: 50.8%
+2025-07-23 16:08:25,651 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 47.0%
+2025-07-23 16:08:55,765 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 47.4%
+2025-07-23 16:09:25,884 - INFO - Memory optimization complete: GC collected 0 objects in 0.112s, Memory: 47.0%
+2025-07-23 16:09:55,999 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 47.4%
+2025-07-23 16:10:26,110 - INFO - Memory optimization complete: GC collected 0 objects in 0.103s, Memory: 47.0%
+2025-07-23 16:10:56,220 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 47.4%
+2025-07-23 16:11:26,333 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 47.1%
+2025-07-23 16:11:56,445 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 47.4%
+2025-07-23 16:12:26,558 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 46.9%
+2025-07-23 16:12:56,682 - INFO - Memory optimization complete: GC collected 0 objects in 0.115s, Memory: 47.3%
+2025-07-23 16:13:26,797 - INFO - Memory optimization complete: GC collected 0 objects in 0.110s, Memory: 47.1%
+2025-07-23 16:13:56,910 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 47.4%
+2025-07-23 16:14:27,023 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 49.2%
+2025-07-23 16:14:57,138 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 49.6%
+2025-07-23 16:15:27,252 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 49.3%
+2025-07-23 16:15:57,368 - INFO - Memory optimization complete: GC collected 0 objects in 0.111s, Memory: 48.2%
+2025-07-23 16:16:27,481 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 47.9%
+2025-07-23 16:16:57,602 - INFO - Memory optimization complete: GC collected 0 objects in 0.113s, Memory: 48.3%
+2025-07-23 16:17:27,717 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 47.9%
+2025-07-23 16:17:57,831 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 48.2%
+2025-07-23 16:18:27,943 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 47.8%
+2025-07-23 16:18:58,055 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 47.6%
+2025-07-23 16:19:28,175 - INFO - Memory optimization complete: GC collected 0 objects in 0.111s, Memory: 47.4%
+2025-07-23 16:19:58,290 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 47.6%
+2025-07-23 16:20:28,404 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 49.9%
+2025-07-23 16:20:58,522 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 50.2%
+2025-07-23 16:21:28,636 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 50.0%
+2025-07-23 16:21:58,752 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 49.5%
+2025-07-23 16:22:28,866 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 47.3%
+2025-07-23 16:22:58,979 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 47.7%
+2025-07-23 16:23:29,101 - INFO - Memory optimization complete: GC collected 0 objects in 0.114s, Memory: 47.4%
+2025-07-23 16:23:59,215 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 47.7%
+2025-07-23 16:24:29,329 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 47.3%
+2025-07-23 16:24:59,443 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 47.7%
+2025-07-23 16:25:29,554 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 49.6%
+2025-07-23 16:25:59,671 - INFO - Memory optimization complete: GC collected 0 objects in 0.110s, Memory: 49.9%
+2025-07-23 16:26:29,786 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 49.6%
+2025-07-23 16:26:59,919 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 48.6%
+2025-07-23 16:27:36,440 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:43,880 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:54,147 - INFO - Application initialized successfully
+2025-07-23 16:27:55,286 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:55,339 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:55,433 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:55,591 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:55,707 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:55,761 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:55,766 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:55,928 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:55,969 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:56,046 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:27:56,087 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:28:13,152 - INFO - Memory optimization complete: GC collected 0 objects in 0.202s, Memory: 53.1%
+2025-07-23 16:28:43,266 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 53.1%
+2025-07-23 16:29:13,382 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 52.3%
+2025-07-23 16:29:43,494 - INFO - Memory optimization complete: GC collected 0 objects in 0.103s, Memory: 52.6%
+2025-07-23 16:30:13,606 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 46.7%
+2025-07-23 16:30:43,718 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 47.1%
+2025-07-23 16:31:13,850 - INFO - Memory optimization complete: GC collected 0 objects in 0.126s, Memory: 46.9%
+2025-07-23 16:31:43,961 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 49.7%
+2025-07-23 16:32:14,073 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 49.5%
+2025-07-23 16:32:44,183 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 49.8%
+2025-07-23 16:33:14,311 - INFO - Memory optimization complete: GC collected 0 objects in 0.120s, Memory: 48.1%
+2025-07-23 16:33:44,424 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 48.4%
+2025-07-23 16:34:14,535 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 48.1%
+2025-07-23 16:34:44,647 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 48.5%
+2025-07-23 16:35:14,757 - INFO - Memory optimization complete: GC collected 0 objects in 0.102s, Memory: 48.4%
+2025-07-23 16:35:44,867 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 48.7%
+2025-07-23 16:36:14,976 - INFO - Memory optimization complete: GC collected 0 objects in 0.103s, Memory: 50.8%
+2025-07-23 16:36:45,087 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 51.0%
+2025-07-23 16:37:15,200 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 50.9%
+2025-07-23 16:37:45,313 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 49.0%
+2025-07-23 16:38:15,428 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 48.9%
+2025-07-23 16:38:45,547 - INFO - Memory optimization complete: GC collected 0 objects in 0.112s, Memory: 49.1%
+2025-07-23 16:39:15,655 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 48.9%
+2025-07-23 16:39:45,776 - INFO - Memory optimization complete: GC collected 0 objects in 0.113s, Memory: 48.6%
+2025-07-23 16:40:15,887 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 48.4%
+2025-07-23 16:40:45,999 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 48.2%
+2025-07-23 16:41:16,109 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 48.0%
+2025-07-23 16:41:46,220 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 48.3%
+2025-07-23 16:42:16,334 - INFO - Memory optimization complete: GC collected 0 objects in 0.109s, Memory: 48.1%
+2025-07-23 16:42:46,453 - INFO - Memory optimization complete: GC collected 0 objects in 0.110s, Memory: 48.4%
+2025-07-23 16:43:16,564 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 48.2%
+2025-07-23 16:43:46,675 - INFO - Memory optimization complete: GC collected 0 objects in 0.103s, Memory: 48.5%
+2025-07-23 16:44:16,785 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 48.3%
+2025-07-23 16:44:46,896 - INFO - Memory optimization complete: GC collected 0 objects in 0.103s, Memory: 48.5%
+2025-07-23 16:45:17,006 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 48.4%
+2025-07-23 16:45:47,117 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 48.9%
+2025-07-23 16:46:17,236 - INFO - Memory optimization complete: GC collected 0 objects in 0.111s, Memory: 48.8%
+2025-07-23 16:46:47,357 - INFO - Memory optimization complete: GC collected 0 objects in 0.114s, Memory: 49.0%
+2025-07-23 16:47:17,466 - INFO - Memory optimization complete: GC collected 0 objects in 0.103s, Memory: 48.8%
+2025-07-23 16:47:47,577 - INFO - Memory optimization complete: GC collected 0 objects in 0.104s, Memory: 51.3%
+2025-07-23 16:48:17,690 - INFO - Memory optimization complete: GC collected 0 objects in 0.105s, Memory: 51.2%
+2025-07-23 16:48:47,803 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 51.5%
+2025-07-23 16:49:17,918 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 50.0%
+2025-07-23 16:49:48,067 - INFO - Memory optimization complete: GC collected 0 objects in 0.142s, Memory: 52.1%
+2025-07-23 16:50:18,181 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 51.9%
+2025-07-23 16:50:48,295 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 52.2%
+2025-07-23 16:51:18,406 - INFO - Memory optimization complete: GC collected 0 objects in 0.106s, Memory: 50.5%
+2025-07-23 16:52:50,708 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:52:59,343 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:09,704 - INFO - Application initialized successfully
+2025-07-23 16:53:11,010 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:11,106 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:11,178 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:11,209 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:11,210 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:11,254 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:11,593 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:11,598 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:11,671 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:11,777 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:12,044 - INFO - NumExpr defaulting to 8 threads.
+2025-07-23 16:53:28,731 - INFO - Memory optimization complete: GC collected 0 objects in 0.330s, Memory: 47.4%
+2025-07-23 16:53:58,856 - INFO - Memory optimization complete: GC collected 0 objects in 0.118s, Memory: 47.0%
+2025-07-23 16:54:28,994 - INFO - Memory optimization complete: GC collected 0 objects in 0.131s, Memory: 46.5%
+2025-07-23 16:54:59,108 - INFO - Memory optimization complete: GC collected 0 objects in 0.108s, Memory: 46.9%
+2025-07-23 16:55:29,235 - INFO - Memory optimization complete: GC collected 0 objects in 0.122s, Memory: 46.4%
+2025-07-23 16:55:59,348 - INFO - Memory optimization complete: GC collected 0 objects in 0.107s, Memory: 46.9%
+2025-07-26 21:12:25,413 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:12:35,161 - WARNING - High memory usage: 81.7%
+2025-07-26 21:12:35,315 - INFO - Memory optimization complete: GC collected 0 objects in 0.068s, Memory: 81.7%
+2025-07-26 21:12:35,608 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:12:38,449 - WARNING - High memory usage: 81.3%
+2025-07-26 21:12:38,540 - INFO - Memory optimization complete: GC collected 0 objects in 0.076s, Memory: 81.4%
+2025-07-26 21:14:25,721 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:28,483 - WARNING - High memory usage: 81.5%
+2025-07-26 21:14:28,599 - INFO - Memory optimization complete: GC collected 0 objects in 0.076s, Memory: 81.5%
+2025-07-26 21:14:29,330 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:33,613 - WARNING - High memory usage: 81.6%
+2025-07-26 21:14:33,714 - INFO - Memory optimization complete: GC collected 0 objects in 0.099s, Memory: 81.6%
+2025-07-26 21:14:38,716 - WARNING - High memory usage: 81.9%
+2025-07-26 21:14:38,785 - INFO - Memory optimization complete: GC collected 0 objects in 0.068s, Memory: 81.9%
+2025-07-26 21:14:39,614 - INFO - Application initialized successfully
+2025-07-26 21:14:39,864 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:39,867 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:39,868 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:39,869 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:39,921 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:39,968 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:39,986 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:39,988 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:40,118 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:40,120 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:40,122 - INFO - NumExpr defaulting to 12 threads.
+2025-07-26 21:14:43,790 - WARNING - High memory usage: 88.4%
+2025-07-26 21:14:43,945 - INFO - Memory optimization complete: GC collected 0 objects in 0.119s, Memory: 88.5%
+2025-07-26 21:14:48,956 - WARNING - High memory usage: 88.4%
+2025-07-26 21:14:49,038 - INFO - Memory optimization complete: GC collected 0 objects in 0.080s, Memory: 88.4%
+2025-07-26 21:14:54,040 - WARNING - High memory usage: 87.6%
+2025-07-26 21:14:54,110 - INFO - Memory optimization complete: GC collected 0 objects in 0.071s, Memory: 87.6%
+2025-07-26 21:14:59,112 - WARNING - High memory usage: 87.5%
+2025-07-26 21:14:59,185 - INFO - Memory optimization complete: GC collected 0 objects in 0.071s, Memory: 87.5%
+2025-07-26 21:14:59,250 - INFO - Memory optimization complete: GC collected 0 objects in 0.064s, Memory: 87.5%
+2025-07-26 21:15:04,251 - WARNING - High memory usage: 87.5%
+2025-07-26 21:15:04,324 - INFO - Memory optimization complete: GC collected 0 objects in 0.073s, Memory: 87.5%
+2025-07-26 21:15:09,326 - WARNING - High memory usage: 87.3%
+2025-07-26 21:15:09,399 - INFO - Memory optimization complete: GC collected 0 objects in 0.071s, Memory: 87.4%
+2025-07-26 21:15:14,399 - WARNING - High memory usage: 87.2%
+2025-07-26 21:15:14,470 - INFO - Memory optimization complete: GC collected 0 objects in 0.070s, Memory: 87.2%
+2025-07-26 21:15:19,471 - WARNING - High memory usage: 88.1%
+2025-07-26 21:15:19,547 - INFO - Memory optimization complete: GC collected 0 objects in 0.073s, Memory: 88.1%
+2025-07-26 21:15:24,549 - WARNING - High memory usage: 88.6%
+2025-07-26 21:15:24,620 - INFO - Memory optimization complete: GC collected 0 objects in 0.071s, Memory: 88.6%
+2025-07-26 21:15:29,622 - WARNING - High memory usage: 88.6%
+2025-07-26 21:15:29,691 - INFO - Memory optimization complete: GC collected 0 objects in 0.068s, Memory: 88.5%
+2025-07-26 21:15:29,771 - INFO - Memory optimization complete: GC collected 0 objects in 0.076s, Memory: 88.6%
+2025-07-26 21:15:34,772 - WARNING - High memory usage: 89.1%
+2025-07-26 21:15:34,843 - INFO - Memory optimization complete: GC collected 0 objects in 0.068s, Memory: 89.1%
+2025-07-26 21:15:39,843 - WARNING - High memory usage: 89.1%
+2025-07-26 21:15:39,920 - INFO - Memory optimization complete: GC collected 0 objects in 0.076s, Memory: 89.1%
+2025-07-26 21:15:44,921 - WARNING - High memory usage: 89.2%
+2025-07-26 21:15:44,998 - INFO - Memory optimization complete: GC collected 0 objects in 0.075s, Memory: 89.2%
+2025-07-26 21:15:49,999 - WARNING - High memory usage: 89.2%
+2025-07-26 21:15:50,068 - INFO - Memory optimization complete: GC collected 0 objects in 0.068s, Memory: 89.2%
+2025-07-26 21:15:55,069 - WARNING - High memory usage: 88.5%
+2025-07-26 21:15:55,137 - INFO - Memory optimization complete: GC collected 0 objects in 0.067s, Memory: 88.5%
+2025-07-26 21:16:00,138 - WARNING - High memory usage: 87.8%
+2025-07-26 21:16:00,207 - INFO - Memory optimization complete: GC collected 0 objects in 0.067s, Memory: 87.8%
+2025-07-26 21:16:00,276 - INFO - Memory optimization complete: GC collected 0 objects in 0.066s, Memory: 87.8%
+2025-07-26 21:16:05,276 - WARNING - High memory usage: 87.4%
+2025-07-26 21:16:05,348 - INFO - Memory optimization complete: GC collected 0 objects in 0.069s, Memory: 87.4%
+2025-07-26 21:16:10,348 - WARNING - High memory usage: 87.2%
+2025-07-26 21:16:10,421 - INFO - Memory optimization complete: GC collected 0 objects in 0.070s, Memory: 87.2%
+2025-07-26 21:16:15,422 - WARNING - High memory usage: 87.3%
+2025-07-26 21:16:15,493 - INFO - Memory optimization complete: GC collected 0 objects in 0.070s, Memory: 87.3%
+2025-07-26 21:16:20,494 - WARNING - High memory usage: 86.6%
+2025-07-26 21:16:20,566 - INFO - Memory optimization complete: GC collected 0 objects in 0.071s, Memory: 86.6%
+2025-07-26 21:16:25,568 - WARNING - High memory usage: 87.1%
+2025-07-26 21:16:25,636 - INFO - Memory optimization complete: GC collected 0 objects in 0.067s, Memory: 87.2%
+2025-07-26 21:16:30,637 - WARNING - High memory usage: 87.2%
+2025-07-26 21:16:30,708 - INFO - Memory optimization complete: GC collected 0 objects in 0.070s, Memory: 87.2%
+2025-07-26 21:16:30,814 - INFO - Memory optimization complete: GC collected 0 objects in 0.103s, Memory: 87.2%
+2025-07-26 21:16:35,815 - WARNING - High memory usage: 87.9%
+2025-07-26 21:16:35,885 - INFO - Memory optimization complete: GC collected 0 objects in 0.070s, Memory: 87.9%
+2025-07-26 21:16:40,887 - WARNING - High memory usage: 88.4%
+2025-07-26 21:16:40,959 - INFO - Memory optimization complete: GC collected 0 objects in 0.070s, Memory: 88.4%
+2025-07-26 21:16:45,960 - WARNING - High memory usage: 93.1%
+2025-07-26 21:16:46,039 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:16:46,039 - INFO - Pool cleared: AudioPool
+2025-07-26 21:16:46,039 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:16:46,039 - INFO - Memory optimization complete: GC collected 0 objects in 0.076s, Memory: 93.2%
+2025-07-26 21:16:51,042 - WARNING - High memory usage: 93.6%
+2025-07-26 21:16:51,114 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:16:51,114 - INFO - Pool cleared: AudioPool
+2025-07-26 21:16:51,114 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:16:51,114 - INFO - Memory optimization complete: GC collected 0 objects in 0.069s, Memory: 93.5%
+2025-07-26 21:16:56,116 - WARNING - High memory usage: 93.6%
+2025-07-26 21:16:56,195 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:16:56,195 - INFO - Pool cleared: AudioPool
+2025-07-26 21:16:56,195 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:16:56,195 - INFO - Memory optimization complete: GC collected 0 objects in 0.079s, Memory: 93.7%
+2025-07-26 21:17:01,197 - WARNING - High memory usage: 94.2%
+2025-07-26 21:17:01,347 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:01,347 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:01,347 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:01,347 - INFO - Memory optimization complete: GC collected 0 objects in 0.074s, Memory: 94.2%
+2025-07-26 21:17:01,418 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:01,418 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:01,418 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:01,418 - INFO - Memory optimization complete: GC collected 0 objects in 0.069s, Memory: 94.2%
+2025-07-26 21:17:06,420 - WARNING - High memory usage: 93.3%
+2025-07-26 21:17:06,556 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:06,556 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:06,556 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:06,558 - INFO - Memory optimization complete: GC collected 0 objects in 0.074s, Memory: 93.3%
+2025-07-26 21:17:11,559 - WARNING - High memory usage: 93.1%
+2025-07-26 21:17:11,625 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:11,625 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:11,625 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:11,626 - INFO - Memory optimization complete: GC collected 0 objects in 0.066s, Memory: 93.1%
+2025-07-26 21:17:16,627 - WARNING - High memory usage: 91.9%
+2025-07-26 21:17:16,700 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:16,701 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:16,701 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:16,701 - INFO - Memory optimization complete: GC collected 0 objects in 0.072s, Memory: 91.9%
+2025-07-26 21:17:21,702 - WARNING - High memory usage: 92.0%
+2025-07-26 21:17:21,791 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:21,791 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:21,791 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:21,791 - INFO - Memory optimization complete: GC collected 0 objects in 0.086s, Memory: 92.1%
+2025-07-26 21:17:26,793 - WARNING - High memory usage: 92.4%
+2025-07-26 21:17:26,862 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:26,862 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:26,862 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:26,862 - INFO - Memory optimization complete: GC collected 0 objects in 0.066s, Memory: 92.4%
+2025-07-26 21:17:31,863 - WARNING - High memory usage: 92.3%
+2025-07-26 21:17:31,942 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:31,942 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:31,942 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:31,942 - INFO - Memory optimization complete: GC collected 0 objects in 0.078s, Memory: 92.3%
+2025-07-26 21:17:32,023 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:32,023 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:32,023 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:32,025 - INFO - Memory optimization complete: GC collected 0 objects in 0.079s, Memory: 92.3%
+2025-07-26 21:17:37,025 - WARNING - High memory usage: 93.1%
+2025-07-26 21:17:37,097 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:37,097 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:37,097 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:37,097 - INFO - Memory optimization complete: GC collected 0 objects in 0.071s, Memory: 93.1%
+2025-07-26 21:17:42,099 - WARNING - High memory usage: 93.0%
+2025-07-26 21:17:42,168 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:42,168 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:42,168 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:42,168 - INFO - Memory optimization complete: GC collected 0 objects in 0.069s, Memory: 93.0%
+2025-07-26 21:17:47,170 - WARNING - High memory usage: 92.9%
+2025-07-26 21:17:47,249 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:47,249 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:47,249 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:47,249 - INFO - Memory optimization complete: GC collected 0 objects in 0.077s, Memory: 92.9%
+2025-07-26 21:17:52,250 - WARNING - High memory usage: 93.0%
+2025-07-26 21:17:52,322 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:52,322 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:52,322 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:52,322 - INFO - Memory optimization complete: GC collected 0 objects in 0.069s, Memory: 92.9%
+2025-07-26 21:17:57,323 - WARNING - High memory usage: 92.5%
+2025-07-26 21:17:57,403 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:17:57,403 - INFO - Pool cleared: AudioPool
+2025-07-26 21:17:57,403 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:17:57,404 - INFO - Memory optimization complete: GC collected 0 objects in 0.078s, Memory: 92.4%
+2025-07-26 21:18:02,404 - WARNING - High memory usage: 92.6%
+2025-07-26 21:18:02,473 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:18:02,473 - INFO - Pool cleared: AudioPool
+2025-07-26 21:18:02,473 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:18:02,473 - INFO - Memory optimization complete: GC collected 0 objects in 0.065s, Memory: 92.6%
+2025-07-26 21:18:02,548 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:18:02,548 - INFO - Pool cleared: AudioPool
+2025-07-26 21:18:02,548 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:18:02,548 - INFO - Memory optimization complete: GC collected 0 objects in 0.073s, Memory: 92.6%
+2025-07-26 21:18:07,550 - WARNING - High memory usage: 92.6%
+2025-07-26 21:18:07,612 - WARNING - Critical memory usage, clearing pools...
+2025-07-26 21:18:07,612 - INFO - Pool cleared: AudioPool
+2025-07-26 21:18:07,614 - INFO - Pool cleared: ObjectPool
+2025-07-26 21:18:07,614 - INFO - Memory optimization complete: GC collected 0 objects in 0.062s, Memory: 92.6%
