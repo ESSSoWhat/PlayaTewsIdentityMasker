@@ -40,14 +40,6 @@ class QLazyLoadPlaceholder(qtx.QXWidget):
                 border: 2px dashed #dee2e6;
                 border-radius: 8px;
                 margin: 2px;
-
-    def create_placeholder(self, component_name: str):
-        """Create a placeholder widget for lazy loading"""
-        from xlib.qt.widgets.QXLabel import QXLabel
-        placeholder = QXLabel(f"Loading {component_name}...")
-        placeholder.setStyleSheet("QLabel { color: gray; font-style: italic; }")
-        return placeholder
-
             }
             QWidget:hover {
                 background-color: #e9ecef;
@@ -91,6 +83,13 @@ class QLazyLoadPlaceholder(qtx.QXWidget):
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(5)
         self.setLayout(layout)
+
+    def create_placeholder(self, component_name: str):
+        """Create a placeholder widget for lazy loading"""
+        from xlib.qt.widgets.QXLabel import QXLabel
+        placeholder = QXLabel(f"Loading {component_name}...")
+        placeholder.setStyleSheet("QLabel { color: gray; font-style: italic; }")
+        return placeholder
     
     def setup_connections(self):
         """Setup click event for lazy loading"""
