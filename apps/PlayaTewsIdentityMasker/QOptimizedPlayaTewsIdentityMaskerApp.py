@@ -259,24 +259,24 @@ class QOptimizedLiveSwap(qtx.QXWidget):
         ))
         
         # Create lazy loading placeholders
-        self.q_file_source = self.lazy_loader.create_placeholder("file_source", "File Source")
-        self.q_camera_source = self.lazy_loader.create_placeholder("camera_source", "Camera Source")
-        self.q_face_detector = self.lazy_loader.create_placeholder("face_detector", "Face Detector")
-        self.q_face_marker = self.lazy_loader.create_placeholder("face_marker", "Face Marker")
-        self.q_face_aligner = self.lazy_loader.create_placeholder("face_aligner", "Face Aligner")
-        self.q_face_animator = self.lazy_loader.create_placeholder("face_animator", "Face Animator")
-        self.q_face_swap_insight = self.lazy_loader.create_placeholder("face_swap_insight", "Face Swap Insight")
-        self.q_face_swap_dfm = self.lazy_loader.create_placeholder("face_swap_dfm", "Face Swap DFM")
-        self.q_frame_adjuster = self.lazy_loader.create_placeholder("frame_adjuster", "Frame Adjuster")
-        self.q_face_merger = self.lazy_loader.create_placeholder("face_merger", "Face Merger")
-        self.q_stream_output = self.lazy_loader.create_placeholder("stream_output", "Stream Output")
-        self.q_voice_changer = self.lazy_loader.create_placeholder("voice_changer", "Voice Changer")
+        self.q_file_source = self.lazy_loader.get_placeholder("file_source")
+        self.q_camera_source = self.lazy_loader.get_placeholder("camera_source")
+        self.q_face_detector = self.lazy_loader.get_placeholder("face_detector")
+        self.q_face_marker = self.lazy_loader.get_placeholder("face_marker")
+        self.q_face_aligner = self.lazy_loader.get_placeholder("face_aligner")
+        self.q_face_animator = self.lazy_loader.get_placeholder("face_animator")
+        self.q_face_swap_insight = self.lazy_loader.get_placeholder("face_swap_insight")
+        self.q_face_swap_dfm = self.lazy_loader.get_placeholder("face_swap_dfm")
+        self.q_frame_adjuster = self.lazy_loader.get_placeholder("frame_adjuster")
+        self.q_face_merger = self.lazy_loader.get_placeholder("face_merger")
+        self.q_stream_output = self.lazy_loader.get_placeholder("stream_output")
+        self.q_voice_changer = self.lazy_loader.get_placeholder("voice_changer")
         
         # Create viewer placeholders
-        self.q_ds_frame_viewer = self.lazy_loader.create_placeholder("frame_viewer", "Frame Viewer")
-        self.q_ds_fa_viewer = self.lazy_loader.create_placeholder("fa_viewer", "Face Align Viewer")
-        self.q_ds_fc_viewer = self.lazy_loader.create_placeholder("fc_viewer", "Face Swap Viewer")
-        self.q_ds_merged_frame_viewer = self.lazy_loader.create_placeholder("merged_frame_viewer", "Merged Frame Viewer")
+        self.q_ds_frame_viewer = self.lazy_loader.get_placeholder("frame_viewer")
+        self.q_ds_fa_viewer = self.lazy_loader.get_placeholder("fa_viewer")
+        self.q_ds_fc_viewer = self.lazy_loader.get_placeholder("fc_viewer")
+        self.q_ds_merged_frame_viewer = self.lazy_loader.get_placeholder("merged_frame_viewer")
     
     def _setup_layout(self):
         """Setup layout with direct UI components"""
@@ -332,8 +332,9 @@ class QOptimizedLiveSwap(qtx.QXWidget):
             self.last_fps_update = current_time
             
             # Update performance display with lazy loading info
-            loaded_components = len(self.lazy_loader.get_loaded_components()) if hasattr(self, 'lazy_loader') else 0
-            total_components = len(self.lazy_loader.get_registered_components()) if hasattr(self, 'lazy_loader') else 0
+            stats = self.lazy_loader.get_stats() if hasattr(self, 'lazy_loader') else {'loaded_components': 0, 'total_components': 0}
+            loaded_components = stats.get('loaded_components', 0)
+            total_components = stats.get('total_components', 0)
             perf_text = f"FPS: {self.current_fps:.1f} | Lazy Loading: {loaded_components}/{total_components} | Optimized Mode Active"
             self.performance_label.setText(perf_text)
     
