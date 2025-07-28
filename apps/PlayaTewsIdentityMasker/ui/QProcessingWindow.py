@@ -107,7 +107,7 @@ class QProcessingWindow(qtx.QXWindow):
     def setup_ui(self):
         """Setup the main UI layout"""
         central_widget = QWidget()
-        self.add_widget(central_widget)
+        self.setCentralWidget(central_widget)
         
         main_layout = QHBoxLayout()
         

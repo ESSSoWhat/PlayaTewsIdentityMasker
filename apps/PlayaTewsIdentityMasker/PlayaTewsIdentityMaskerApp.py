@@ -1,3 +1,18 @@
+"""
+PlayaTewsIdentityMasker - Professional Face-Swapping & Streaming Application
+
+This application is built upon the excellent work of the open source community:
+
+Core Technologies:
+- DeepFaceLive by @iperov (https://github.com/iperov/DeepFaceLive.git) - Real-time face swap technology
+- DeepFaceLab by @iperov (https://github.com/iperov/DeepFaceLab) - Face model training framework
+- Voice Changer Technology - Real-time audio processing and effects
+
+For complete attribution information, see CREDITS_AND_ATTRIBUTIONS.md
+
+License: GPL-3.0 (based on DeepFaceLive)
+"""
+
 from pathlib import Path
 from typing import List
 from xlib import qt as qtx

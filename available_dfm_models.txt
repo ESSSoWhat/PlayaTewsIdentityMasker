@@ -1,0 +1,54 @@
+
+Available DFM Models for Download
+================================
+
+The following models are available for download:
+
+
+kevin_hart_model:
+  Description: Kevin Hart face swap model
+  Size: ~150MB
+  Primary URL: https://github.com/iperov/DeepFaceLive/releases/download/v1.0/kevin_hart_model.dfm
+  Backup URLs: 2 available
+
+Keanu_Reeves:
+  Description: Keanu Reeves face swap model
+  Size: ~150MB
+  Primary URL: https://github.com/iperov/DeepFaceLive/releases/download/v1.0/keanu_reeves_model.dfm
+  Backup URLs: 1 available
+
+Jackie_Chan:
+  Description: Jackie Chan face swap model
+  Size: ~150MB
+  Primary URL: https://github.com/iperov/DeepFaceLive/releases/download/v1.0/jackie_chan_model.dfm
+  Backup URLs: 1 available
+
+
+Manual Download Instructions:
+============================
+
+If automatic download fails, you can manually download models from:
+
+1. DeepFaceLive Releases:
+   https://github.com/iperov/DeepFaceLive/releases
+
+2. Community Repositories:
+   https://mega.nz/folder/Po0nGQrA#dbbliNWojjt_9_12c5qjog
+
+3. Model Sharing Platforms:
+   - https://www.deepfakes.com/forums/
+   - https://mrdeepfakes.com/
+   - https://huggingface.co/datasets/deepfakes/dfm-models
+
+4. Direct Model Sources:
+   - Search for "[model_name].dfm" files
+   - Look for files 50-200MB in size
+   - Ensure they have .dfm extension
+
+Installation:
+============
+
+1. Download the .dfm file
+2. Place it in: dfm_models/
+3. Also copy to: universal_dfm/models/prebuilt/
+4. Restart the app to detect new models

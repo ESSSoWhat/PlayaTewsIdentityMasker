@@ -936,7 +936,7 @@ class Sheet:
         def __init__(self):
             super().__init__()
             
-            self.enabled = lib_csw.Flag.Worker()
+            self.enabled = lib_csw.Flag()
             self.effect_type = lib_csw.DynamicSingleSwitch.Worker()
             self.pitch_shift = lib_csw.Number.Worker()
             self.formant_shift = lib_csw.Number.Worker()

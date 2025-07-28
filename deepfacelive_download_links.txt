@@ -1,0 +1,47 @@
+# DeepFaceLive DFM Model Download Links
+# Generated from actual DeepFaceLive releases
+
+Found 5 DFM models in DeepFaceLive releases:
+
+## Tina_Shift.dfm
+- **Size**: 685.2MB
+- **Release**:  (TINA_SHIFT)
+- **Download**: https://github.com/iperov/DeepFaceLive/releases/download/TINA_SHIFT/Tina_Shift.dfm
+
+## Meggie_Merkel.dfm
+- **Size**: 685.2MB
+- **Release**:  (MEGGIE_MERKEL)
+- **Download**: https://github.com/iperov/DeepFaceLive/releases/download/MEGGIE_MERKEL/Meggie_Merkel.dfm
+
+## Albica_Johns.dfm
+- **Size**: 685.2MB
+- **Release**:  (ALBICA_JOHNS)
+- **Download**: https://github.com/iperov/DeepFaceLive/releases/download/ALBICA_JOHNS/Albica_Johns.dfm
+
+## Natalie_Fatman.dfm
+- **Size**: 685.2MB
+- **Release**:  (NATALIE_FATMAN)
+- **Download**: https://github.com/iperov/DeepFaceLive/releases/download/NATALIE_FATMAN/Natalie_Fatman.dfm
+
+## Liu_Lice.dfm
+- **Size**: 685.2MB
+- **Release**:  (LIU_LICE)
+- **Download**: https://github.com/iperov/DeepFaceLive/releases/download/LIU_LICE/Liu_Lice.dfm
+
+
+# Manual Download Instructions:
+1. Click the download link above
+2. Save the .dfm file to your Downloads folder
+3. Run: python quick_dfm_setup.py
+4. Enter the path to your downloaded file
+5. The model will be installed automatically
+
+# Alternative Sources:
+- Mega Repository: https://mega.nz/folder/Po0nGQrA#dbbliNWojjt_9_12c5qjog
+- HuggingFace: https://huggingface.co/datasets/deepfakes/dfm-models
+- Community Discord: https://discord.gg/rxa7h9M6rH
+
+# Model Categories:
+- Celebrity models: Keanu_Reeves, Bryan_Greynolds, etc.
+- Character models: Joker, Mr_Bean, etc.
+- Quality varies by model size (50-200MB typical)

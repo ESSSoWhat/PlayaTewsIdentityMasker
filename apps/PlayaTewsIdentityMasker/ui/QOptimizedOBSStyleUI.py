@@ -968,10 +968,15 @@ class QOptimizedOBSStyleUI(QWidget):
         
         # Connect voice changer controls
         if hasattr(self, 'voice_changer_widget'):
-            self.voice_changer_widget.enabled_changed.connect(self.on_voice_changer_toggled)
-            self.voice_changer_widget.effect_changed.connect(self.on_voice_effect_changed)
-            self.voice_changer_widget.pitch_changed.connect(self.on_pitch_changed)
-            self.voice_changer_widget.echo_changed.connect(self.on_echo_changed)
+            # Check if signals exist before connecting
+            if hasattr(self.voice_changer_widget, 'enabled_changed'):
+                self.voice_changer_widget.enabled_changed.connect(self.on_voice_changer_toggled)
+            if hasattr(self.voice_changer_widget, 'effect_changed'):
+                self.voice_changer_widget.effect_changed.connect(self.on_voice_effect_changed)
+            if hasattr(self.voice_changer_widget, 'pitch_changed'):
+                self.voice_changer_widget.pitch_changed.connect(self.on_pitch_changed)
+            if hasattr(self.voice_changer_widget, 'echo_changed'):
+                self.voice_changer_widget.echo_changed.connect(self.on_echo_changed)
         
     def open_processing_window(self):
         """Open the processing window"""

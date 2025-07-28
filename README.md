@@ -6,6 +6,23 @@
 📹 **Multi-platform streaming** to Twitch, YouTube, Facebook  
 🎬 **Professional recording** and scene management  
 
+## 🙏 Credits and Attribution
+
+This application is built upon the excellent work of the open source community:
+
+### 🌟 Core Technologies
+- **[DeepFaceLive](https://github.com/iperov/DeepFaceLive.git)** by @iperov - Real-time face swap technology (GPL-3.0)
+- **[DeepFaceLab](https://github.com/iperov/DeepFaceLab)** by @iperov - Face model training framework
+- **Voice Changer Technology** - Real-time audio processing and effects
+
+### 📚 Full Credits
+See [CREDITS_AND_ATTRIBUTIONS.md](CREDITS_AND_ATTRIBUTIONS.md) for complete attribution information, including all contributors, libraries, and community resources.
+
+### 🤝 Community Support
+- **DeepFaceLive Discord**: https://discord.gg/rxa7h9M6rH
+- **QQ Group**: 124500433 (Chinese community)
+- **GitHub Issues**: https://github.com/iperov/DeepFaceLive/issues  
+
 ## 🚀 OBS-Style Interface (Primary)
 
 PlayaTewsIdentityMasker now features a professional streaming interface inspired by OBS Studio as the main interface!

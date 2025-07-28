@@ -1,0 +1,53 @@
+
+DFM Model Recovery Report
+Generated: 2025-07-28 20:17:46
+
+SUMMARY:
+- Total models in registry: 16
+- Placeholder files created: 16
+- Real models found: 0
+
+MISSING MODELS:
+- kevin_hart_model
+- Keanu_Reeves
+- Keanu_Reeves_320
+- Jackie_Chan
+- Joker
+- Dilraba_Dilmurat
+- Emily_Winston
+- Bryan_Greynolds
+- David_Kovalniy
+- Dean_Wiesel
+- Ewon_Spice
+- Irina_Arty
+- Jesse_Stat_320
+- Liu_Lice
+- Matilda_Bobbie
+- Meggie_Merkel
+
+RECOVERY STATUS:
+✅ Registry restored
+✅ Placeholder files created  
+✅ Directory structure fixed
+❌ Real model files missing
+
+NEXT STEPS:
+1. Download real DFM model files from:
+   - DeepFaceLive releases: https://github.com/iperov/DeepFaceLive/releases
+   - Community repositories
+   - Model sharing platforms
+
+2. Replace placeholder files with real .dfm files
+
+3. Run the app to verify models work
+
+4. Check the download helper script: download_dfm_models.py
+
+DIRECTORIES:
+- dfm_models/: D:\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\dfm_models
+- universal_dfm/models/prebuilt/: D:\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master\universal_dfm\models\prebuilt
+
+For help finding models, check:
+- https://github.com/iperov/DeepFaceLive/releases
+- https://mega.nz/folder/Po0nGQrA#dbbliNWojjt_9_12c5qjog
+- Community forums and repositories

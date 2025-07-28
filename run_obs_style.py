@@ -6,6 +6,17 @@ This is the main launcher for PlayaTewsIdentityMasker with the professional
 OBS-style streaming interface. This interface is now the primary and recommended 
 way to run the application, providing enhanced streaming, recording, and 
 face-swapping capabilities.
+
+This application is built upon the excellent work of the open source community:
+
+Core Technologies:
+- DeepFaceLive by @iperov (https://github.com/iperov/DeepFaceLive.git) - Real-time face swap technology
+- DeepFaceLab by @iperov (https://github.com/iperov/DeepFaceLab) - Face model training framework
+- Voice Changer Technology - Real-time audio processing and effects
+
+For complete attribution information, see CREDITS_AND_ATTRIBUTIONS.md
+
+License: GPL-3.0 (based on DeepFaceLive)
 """
 
 import sys
@@ -90,12 +101,12 @@ def main():
     
     # Ensure userdata directory exists
     userdata_path.mkdir(parents=True, exist_ok=True)
-    logger.info(f"📁 Using workspace: {userdata_path}")
+    logger.info(f"Using workspace: {userdata_path}")
     
     # Set environment variables
     if args.no_cuda:
         os.environ['NO_CUDA'] = '1'
-        logger.info("🔧 CUDA disabled - using CPU acceleration")
+        logger.info("CUDA disabled - using CPU acceleration")
     
     # Import and run the appropriate application
     try:
@@ -108,7 +119,7 @@ def main():
             from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
             app = PlayaTewsIdentityMaskerApp(userdata_path=userdata_path)
         else:
-            logger.info("🚀 Launching PlayaTewsIdentityMasker with OBS-style streaming interface...")
+            logger.info("Launching PlayaTewsIdentityMasker with OBS-style streaming interface...")
             print("=" * 60)
             print("🎬 OBS-STYLE INTERFACE - Professional Streaming Mode")
             print("📺 Features: Multi-platform streaming, recording, scene management")
@@ -118,7 +129,7 @@ def main():
             app = PlayaTewsIdentityMaskerOBSStyleApp(userdata_path=userdata_path)
         
         # Run the application
-        logger.info("✅ Application initialized successfully")
+        logger.info("Application initialized successfully")
         app.run()
         
     except ImportError as e:
@@ -129,7 +140,7 @@ def main():
         print("3. Check if all app modules are present in apps/PlayaTewsIdentityMasker/")
         sys.exit(1)
     except Exception as e:
-        logger.error(f"❌ Application Error: {e}")
+        logger.error(f"Application Error: {e}")
         if args.verbose:
             import traceback
             traceback.print_exc()
