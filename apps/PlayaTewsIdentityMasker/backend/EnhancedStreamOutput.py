@@ -569,18 +569,20 @@ class EnhancedStreamOutputWorker(BackendWorker):
             frame = self.extract_frame_from_bcd(bcd, state.source_type, state.aligned_face_id)
             if frame is not None:
                 # Update FPS counter
-                self.fps_counter.update()
-                cs.avg_fps.set_number(self.fps_counter.get_fps())
+                self.fps_counter.step()
+                cs.avg_fps.set_number(self.fps_counter.step())
 
                 # Process frame based on source type
                 processed_frame = self.process_frame(frame, state.source_type, state.aligned_face_id)
                 
                 if processed_frame is not None:
                     # Add to buffer
-                    self.buffered_frames.add(processed_frame)
+                    import time
+                    self.buffered_frames.add_buffer(time.time(), processed_frame)
                     
                     # Get delayed frame
-                    delayed_frame = self.buffered_frames.get()
+                    result = self.buffered_frames.process()
+                    delayed_frame = result.new_data
                     if delayed_frame is not None:
                         # Show in window if enabled
                         if state.is_showing_window:

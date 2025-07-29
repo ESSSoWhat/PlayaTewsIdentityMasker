@@ -107,7 +107,8 @@ class QProcessingWindow(qtx.QXWindow):
     def setup_ui(self):
         """Setup the main UI layout"""
         central_widget = QWidget()
-        self.setCentralWidget(central_widget)
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(central_widget)
         
         main_layout = QHBoxLayout()
         
@@ -876,7 +877,6 @@ class QProcessingWindow(qtx.QXWindow):
         
     def start_all_processing(self):
         """Start all processing components"""
-        self.status_bar.showMessage("Starting all processing components...")
         self.status_list.addItem("🔄 Starting all processing...")
         
         # Here you would start all the backend components
@@ -884,33 +884,31 @@ class QProcessingWindow(qtx.QXWindow):
         
     def stop_all_processing(self):
         """Stop all processing components"""
-        self.status_bar.showMessage("Stopping all processing components...")
         self.status_list.addItem("⏹️ Stopping all processing...")
         
     def reset_all_settings(self):
         """Reset all settings to defaults"""
-        self.status_bar.showMessage("Resetting all settings...")
         self.status_list.addItem("🔄 Resetting all settings...")
         
     def save_settings(self):
         """Save current settings"""
-        self.status_bar.showMessage("Settings saved")
+        self.status_list.addItem("✅ Settings saved")
         
     def load_settings(self):
         """Load saved settings"""
-        self.status_bar.showMessage("Settings loaded")
+        self.status_list.addItem("📂 Settings loaded")
         
     def toggle_dock(self):
         """Toggle dock state"""
-        self.status_bar.showMessage("Dock toggled")
+        self.status_list.addItem("🔗 Dock toggled")
         
     def optimize_performance(self):
         """Optimize performance settings"""
-        self.status_bar.showMessage("Optimizing performance...")
+        self.status_list.addItem("⚡ Optimizing performance...")
         
     def show_about(self):
         """Show about dialog"""
-        self.status_bar.showMessage("About Processing Window")
+        self.status_list.addItem("ℹ️ About Processing Window")
         
     def update_performance_metrics(self):
         """Update performance metrics display"""

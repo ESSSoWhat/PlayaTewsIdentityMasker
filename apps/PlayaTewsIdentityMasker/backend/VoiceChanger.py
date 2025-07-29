@@ -143,16 +143,10 @@ class VoiceChangerWorker(BackendWorker):
         cs.output_device.call_on_selected(self.on_cs_output_device)
         
         # Initialize UI controls
-        cs.enabled.enable()
         cs.enabled.set_flag(state.enabled if state.enabled is not None else False)
         
-        cs.effect_type.enable()
-        cs.effect_type.set_choices(VoiceEffectType, 
-                                  ['None', 'Pitch Shift', 'Formant Shift', 'Robot', 
-                                   'Helium', 'Deep', 'Echo', 'Reverb', 'Chorus', 
-                                   'Distortion', 'Autotune', 'Male Voice', 'Female Voice',
-                                   'Child Voice', 'Elderly Voice', 'British Accent', 'Southern Accent'],
-                                  none_choice_name='@misc.menu_select')
+        # Note: Client objects don't have set_choices method
+        # The choices will be set by the Host side when the UI is created
         cs.effect_type.select(state.effect_type if state.effect_type is not None else VoiceEffectType.NONE)
         
         # Initialize parameter controls
@@ -163,56 +157,37 @@ class VoiceChangerWorker(BackendWorker):
 
     def _init_parameter_controls(self, cs, state):
         """Initialize all parameter controls"""
+        # Note: Client objects don't have set_config method
+        # The configuration will be set by the Host side when the UI is created
+        
         # Pitch shift
-        cs.pitch_shift.enable()
-        cs.pitch_shift.set_config(lib_csw.Number.Config(min=-12, max=12, step=0.5, decimals=1, allow_instant_update=True))
         cs.pitch_shift.set_number(state.pitch_shift if state.pitch_shift is not None else 0.0)
         
         # Formant shift
-        cs.formant_shift.enable()
-        cs.formant_shift.set_config(lib_csw.Number.Config(min=0.5, max=2.0, step=0.1, decimals=1, allow_instant_update=True))
         cs.formant_shift.set_number(state.formant_shift if state.formant_shift is not None else 1.0)
         
         # Robot rate
-        cs.robot_rate.enable()
-        cs.robot_rate.set_config(lib_csw.Number.Config(min=0.1, max=10.0, step=0.1, decimals=1, allow_instant_update=True))
         cs.robot_rate.set_number(state.robot_rate if state.robot_rate is not None else 0.1)
         
         # Echo parameters
-        cs.echo_delay.enable()
-        cs.echo_delay.set_config(lib_csw.Number.Config(min=0.1, max=1.0, step=0.1, decimals=1, allow_instant_update=True))
         cs.echo_delay.set_number(state.echo_delay if state.echo_delay is not None else 0.3)
         
-        cs.echo_decay.enable()
-        cs.echo_decay.set_config(lib_csw.Number.Config(min=0.1, max=0.9, step=0.1, decimals=1, allow_instant_update=True))
         cs.echo_decay.set_number(state.echo_decay if state.echo_decay is not None else 0.5)
         
         # Reverb parameters
-        cs.reverb_room_size.enable()
-        cs.reverb_room_size.set_config(lib_csw.Number.Config(min=0.1, max=1.0, step=0.1, decimals=1, allow_instant_update=True))
         cs.reverb_room_size.set_number(state.reverb_room_size if state.reverb_room_size is not None else 0.8)
         
-        cs.reverb_damping.enable()
-        cs.reverb_damping.set_config(lib_csw.Number.Config(min=0.1, max=1.0, step=0.1, decimals=1, allow_instant_update=True))
         cs.reverb_damping.set_number(state.reverb_damping if state.reverb_damping is not None else 0.5)
         
         # Chorus parameters
-        cs.chorus_rate.enable()
-        cs.chorus_rate.set_config(lib_csw.Number.Config(min=0.1, max=5.0, step=0.1, decimals=1, allow_instant_update=True))
         cs.chorus_rate.set_number(state.chorus_rate if state.chorus_rate is not None else 1.5)
         
-        cs.chorus_depth.enable()
-        cs.chorus_depth.set_config(lib_csw.Number.Config(min=0.001, max=0.01, step=0.001, decimals=3, allow_instant_update=True))
         cs.chorus_depth.set_number(state.chorus_depth if state.chorus_depth is not None else 0.002)
         
         # Distortion
-        cs.distortion_amount.enable()
-        cs.distortion_amount.set_config(lib_csw.Number.Config(min=0.1, max=1.0, step=0.1, decimals=1, allow_instant_update=True))
         cs.distortion_amount.set_number(state.distortion_amount if state.distortion_amount is not None else 0.3)
         
         # Autotune
-        cs.autotune_sensitivity.enable()
-        cs.autotune_sensitivity.set_config(lib_csw.Number.Config(min=0.01, max=1.0, step=0.01, decimals=2, allow_instant_update=True))
         cs.autotune_sensitivity.set_number(state.autotune_sensitivity if state.autotune_sensitivity is not None else 0.1)
 
     def _init_device_lists(self, cs, state):
@@ -237,34 +212,24 @@ class VoiceChangerWorker(BackendWorker):
             return
         
         # Set up input device control
-        cs.input_device.enable()
+        # Note: Client objects don't have set_choices method
+        # The choices will be set by the Host side when the UI is created
         if input_devices:
-            cs.input_device.set_choices([d[0] for d in input_devices], 
-                                       [d[1] for d in input_devices],
-                                       none_choice_name='@misc.menu_select')
-            
             default_input = state.input_device if state.input_device is not None else 0
             if default_input < len(input_devices):
                 cs.input_device.select(default_input)
             else:
                 cs.input_device.select(0)
-        else:
-            cs.input_device.set_choices([], [], none_choice_name='No input devices found')
         
         # Set up output device control
-        cs.output_device.enable()
+        # Note: Client objects don't have set_choices method
+        # The choices will be set by the Host side when the UI is created
         if output_devices:
-            cs.output_device.set_choices([d[0] for d in output_devices], 
-                                        [d[1] for d in output_devices],
-                                        none_choice_name='@misc.menu_select')
-            
             default_output = state.output_device if state.output_device is not None else 0
             if default_output < len(output_devices):
                 cs.output_device.select(default_output)
             else:
                 cs.output_device.select(0)
-        else:
-            cs.output_device.set_choices([], [], none_choice_name='No output devices found')
 
     def on_stop(self):
         """Stop all audio processing"""
@@ -311,8 +276,10 @@ class VoiceChangerWorker(BackendWorker):
         try:
             # Get device indices
             state, cs = self.get_state(), self.get_control_sheet()
-            input_device = cs.input_device.get_selected()
-            output_device = cs.output_device.get_selected()
+            # Note: Client objects don't have get_selected method
+            # Use state values instead
+            input_device = state.input_device if state.input_device is not None else 0
+            output_device = state.output_device if state.output_device is not None else 0
             
             if input_device is None or output_device is None:
                 self.logger.error("No input or output device selected")
@@ -936,21 +903,21 @@ class Sheet:
         def __init__(self):
             super().__init__()
             
-            self.enabled = lib_csw.Flag()
-            self.effect_type = lib_csw.DynamicSingleSwitch.Worker()
-            self.pitch_shift = lib_csw.Number.Worker()
-            self.formant_shift = lib_csw.Number.Worker()
-            self.robot_rate = lib_csw.Number.Worker()
-            self.echo_delay = lib_csw.Number.Worker()
-            self.echo_decay = lib_csw.Number.Worker()
-            self.reverb_room_size = lib_csw.Number.Worker()
-            self.reverb_damping = lib_csw.Number.Worker()
-            self.chorus_rate = lib_csw.Number.Worker()
-            self.chorus_depth = lib_csw.Number.Worker()
-            self.distortion_amount = lib_csw.Number.Worker()
-            self.autotune_sensitivity = lib_csw.Number.Worker()
-            self.input_device = lib_csw.DynamicSingleSwitch.Worker()
-            self.output_device = lib_csw.DynamicSingleSwitch.Worker()
+            self.enabled = lib_csw.Flag.Client()
+            self.effect_type = lib_csw.DynamicSingleSwitch.Client()
+            self.pitch_shift = lib_csw.Number.Client()
+            self.formant_shift = lib_csw.Number.Client()
+            self.robot_rate = lib_csw.Number.Client()
+            self.echo_delay = lib_csw.Number.Client()
+            self.echo_decay = lib_csw.Number.Client()
+            self.reverb_room_size = lib_csw.Number.Client()
+            self.reverb_damping = lib_csw.Number.Client()
+            self.chorus_rate = lib_csw.Number.Client()
+            self.chorus_depth = lib_csw.Number.Client()
+            self.distortion_amount = lib_csw.Number.Client()
+            self.autotune_sensitivity = lib_csw.Number.Client()
+            self.input_device = lib_csw.DynamicSingleSwitch.Client()
+            self.output_device = lib_csw.DynamicSingleSwitch.Client()
 
 
 class WorkerState(BackendWorkerState):

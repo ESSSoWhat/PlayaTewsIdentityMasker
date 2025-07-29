@@ -872,8 +872,7 @@ class QOBSStyleUI(qtx.QXWindow):
         # List of components to enable
         components_to_enable = [
             'face_detector', 'face_marker', 'face_aligner', 
-            'face_animator', 'face_swap_insight', 'face_swap_dfm',
-            'frame_adjuster', 'face_merger'
+            'face_swap_dfm', 'frame_adjuster', 'face_merger'
         ]
         
         for component_name in components_to_enable:
@@ -896,8 +895,7 @@ class QOBSStyleUI(qtx.QXWindow):
         # List of components to disable
         components_to_disable = [
             'face_detector', 'face_marker', 'face_aligner', 
-            'face_animator', 'face_swap_insight', 'face_swap_dfm',
-            'frame_adjuster', 'face_merger'
+            'face_swap_dfm', 'frame_adjuster', 'face_merger'
         ]
         
         for component_name in components_to_disable:
