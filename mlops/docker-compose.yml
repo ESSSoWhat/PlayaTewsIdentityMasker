@@ -1,0 +1,291 @@
+version: '3.8'
+
+services:
+  # Redis for caching and session management
+  redis:
+    image: redis:6-alpine
+    container_name: mlops-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - mlops-network
+
+  # PostgreSQL for metadata storage
+  postgres:
+    image: postgres:13-alpine
+    container_name: mlops-postgres
+    environment:
+      POSTGRES_DB: mlops
+      POSTGRES_USER: mlops
+      POSTGRES_PASSWORD: mlops_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mlops -d mlops"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - mlops-network
+
+  # MLflow for experiment tracking
+  mlflow:
+    image: python:3.9-slim
+    container_name: mlops-mlflow
+    working_dir: /app
+    volumes:
+      - ./src:/app/src
+      - ./configs:/app/configs
+      - mlflow_data:/app/mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_TRACKING_URI=sqlite:///mlflow/mlflow.db
+    command: >
+      bash -c "pip install mlflow &&
+               mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow/mlflow.db"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - mlops-network
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mlops-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - mlops-network
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: mlops-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - mlops-network
+
+  # Model serving API
+  model-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: mlops-model-server
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      redis:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+    networks:
+      - mlops-network
+    restart: unless-stopped
+
+  # Monitoring service
+  monitoring:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: monitoring
+    container_name: mlops-monitoring
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      redis:
+        condition: service_healthy
+      model-server:
+        condition: service_started
+    networks:
+      - mlops-network
+    restart: unless-stopped
+
+  # Data pipeline service
+  data-pipeline:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: mlops-data-pipeline
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      mlflow:
+        condition: service_started
+    networks:
+      - mlops-network
+    command: ["python", "src/pipelines/data_pipeline.py"]
+    restart: "no"
+
+  # Model training service
+  model-training:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: mlops-model-training
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      mlflow:
+        condition: service_started
+      data-pipeline:
+        condition: service_completed_successfully
+    networks:
+      - mlops-network
+    command: ["python", "src/models/train.py"]
+    restart: "no"
+
+  # Testing service
+  testing:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: testing
+    container_name: mlops-testing
+    volumes:
+      - ./tests:/app/tests
+      - ./src:/app/src
+      - ./configs:/app/configs
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - TESTING=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      redis:
+        condition: service_healthy
+      model-server:
+        condition: service_started
+    networks:
+      - mlops-network
+    command: ["pytest", "tests/", "-v", "--cov=src", "--cov-report=html"]
+    restart: "no"
+
+  # Jupyter notebook for development
+  jupyter:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: mlops-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/app/notebooks
+      - ./data:/app/data
+      - ./src:/app/src
+      - ./configs:/app/configs
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      mlflow:
+        condition: service_started
+    networks:
+      - mlops-network
+    command: ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
+    restart: unless-stopped
+
+  # Feature store (Hopsworks)
+  hopsworks:
+    image: hopsworks/hopsworks:latest
+    container_name: mlops-hopsworks
+    ports:
+      - "8181:8181"
+    environment:
+      - HADOOP_USER_NAME=glassfish
+    volumes:
+      - hopsworks_data:/opt/hopsworks
+    networks:
+      - mlops-network
+    restart: unless-stopped
+
+  # Airflow for workflow orchestration
+  airflow:
+    image: apache/airflow:2.7.1
+    container_name: mlops-airflow
+    ports:
+      - "8080:8080"
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://mlops:mlops_password@postgres:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=your-fernet-key-here
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - mlops-network
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:
+  mlflow_data:
+  prometheus_data:
+  grafana_data:
+  hopsworks_data:
+
+networks:
+  mlops-network:
+    driver: bridge
