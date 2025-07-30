@@ -1,0 +1,313 @@
+# Monitoring Configuration
+# This file configures the monitoring and alerting system
+
+# Monitoring System Configuration
+monitoring:
+  enabled: true
+  interval_seconds: 300  # 5 minutes
+  max_performance_history: 1000
+  metrics_port: 8002
+  prometheus_enabled: true
+  grafana_enabled: true
+
+# Data Drift Detection
+data_drift:
+  enabled: true
+  detection_interval: 3600  # 1 hour
+  drift_threshold: 0.05
+  statistical_test: "ks_test"  # ks_test, chi_square, wasserstein
+  features_to_monitor: "all"  # all, specific list, or regex pattern
+  baseline_data_path: "data/baseline/"
+  min_sample_size: 100
+  confidence_level: 0.95
+
+# Model Performance Monitoring
+model_performance:
+  enabled: true
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1_score"
+    - "latency"
+    - "throughput"
+    - "error_rate"
+  degradation_threshold: 0.1
+  performance_window: 24  # hours
+  alert_on_degradation: true
+  auto_retrain_threshold: 0.2
+
+# Infrastructure Monitoring
+infrastructure:
+  enabled: true
+  metrics:
+    - "cpu_usage"
+    - "memory_usage"
+    - "disk_usage"
+    - "network_io"
+    - "gpu_usage"
+  thresholds:
+    cpu_usage: 80
+    memory_usage: 85
+    disk_usage: 90
+    gpu_usage: 90
+  check_interval: 60  # seconds
+
+# API Monitoring
+api_monitoring:
+  enabled: true
+  endpoints:
+    - "/predict"
+    - "/health"
+    - "/models"
+  metrics:
+    - "request_count"
+    - "response_time"
+    - "error_rate"
+    - "throughput"
+  latency_thresholds:
+    p50: 100  # milliseconds
+    p95: 500
+    p99: 1000
+
+# Alerting Configuration
+alerts:
+  enabled: true
+  default_severity: "medium"
+  escalation_policy:
+    low: ["email"]
+    medium: ["email", "slack"]
+    high: ["email", "slack", "webhook", "pagerduty"]
+  
+  # Email Alerts
+  email:
+    enabled: false
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    username: "your-email@gmail.com"
+    password: "your-app-password"
+    recipients: ["admin@example.com", "mlops@example.com"]
+    subject_prefix: "[MLOps Alert]"
+    template_path: "templates/email_alert.html"
+  
+  # Slack Alerts
+  slack:
+    enabled: false
+    webhook_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    channel: "#mlops-alerts"
+    username: "MLOps Bot"
+    icon_emoji: ":robot_face:"
+    color_mapping:
+      low: "#36a64f"
+      medium: "#ffa500"
+      high: "#ff0000"
+  
+  # Webhook Alerts
+  webhook:
+    enabled: false
+    url: "https://your-webhook-url.com/alerts"
+    method: "POST"
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bearer your-token"
+    timeout: 10
+  
+  # PagerDuty Alerts
+  pagerduty:
+    enabled: false
+    api_key: "your-pagerduty-api-key"
+    service_id: "your-service-id"
+    escalation_policy_id: "your-escalation-policy-id"
+
+# Alert Rules
+alert_rules:
+  data_drift:
+    - name: "High Data Drift"
+      condition: "drift_score > 0.8"
+      severity: "high"
+      message: "High data drift detected in feature {feature_name}"
+    
+    - name: "Multiple Features Drifted"
+      condition: "drifted_features_count > 5"
+      severity: "medium"
+      message: "Multiple features showing drift: {drifted_features}"
+  
+  model_performance:
+    - name: "Model Accuracy Degradation"
+      condition: "accuracy_degradation > 0.1"
+      severity: "high"
+      message: "Model accuracy degraded by {degradation_percent}%"
+    
+    - name: "High Latency"
+      condition: "avg_latency > 1000"
+      severity: "medium"
+      message: "High model latency: {latency}ms"
+    
+    - name: "High Error Rate"
+      condition: "error_rate > 0.05"
+      severity: "high"
+      message: "High error rate: {error_rate}%"
+  
+  infrastructure:
+    - name: "High CPU Usage"
+      condition: "cpu_usage > 80"
+      severity: "medium"
+      message: "High CPU usage: {cpu_usage}%"
+    
+    - name: "High Memory Usage"
+      condition: "memory_usage > 85"
+      severity: "medium"
+      message: "High memory usage: {memory_usage}%"
+    
+    - name: "Disk Space Low"
+      condition: "disk_usage > 90"
+      severity: "high"
+      message: "Low disk space: {free_space}GB remaining"
+  
+  api:
+    - name: "High API Error Rate"
+      condition: "error_rate > 0.05"
+      severity: "high"
+      message: "High API error rate: {error_rate}%"
+    
+    - name: "Slow API Response"
+      condition: "avg_response_time > 1000"
+      severity: "medium"
+      message: "Slow API response: {response_time}ms"
+
+# Dashboard Configuration
+dashboard:
+  enabled: true
+  refresh_interval: 30  # seconds
+  default_time_range: "1h"
+  panels:
+    - name: "System Health"
+      type: "status"
+      metrics: ["overall_health"]
+    
+    - name: "Model Performance"
+      type: "line"
+      metrics: ["accuracy", "latency", "throughput"]
+    
+    - name: "Data Drift"
+      type: "bar"
+      metrics: ["drift_scores"]
+    
+    - name: "Infrastructure"
+      type: "line"
+      metrics: ["cpu_usage", "memory_usage", "disk_usage"]
+    
+    - name: "API Metrics"
+      type: "line"
+      metrics: ["request_count", "response_time", "error_rate"]
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  file_path: "logs/monitoring.log"
+  max_file_size: "100MB"
+  backup_count: 5
+  correlation_id: true
+
+# Storage Configuration
+storage:
+  type: "local"  # local, s3, gcs, azure
+  local:
+    data_dir: "data/monitoring/"
+    logs_dir: "logs/"
+  s3:
+    bucket: "mlops-monitoring"
+    region: "us-east-1"
+    access_key: "your-access-key"
+    secret_key: "your-secret-key"
+  retention:
+    metrics: "30d"
+    logs: "90d"
+    alerts: "1y"
+
+# Integration Configuration
+integrations:
+  # Prometheus
+  prometheus:
+    enabled: true
+    url: "http://localhost:9090"
+    scrape_interval: "15s"
+    metrics_path: "/metrics"
+  
+  # Grafana
+  grafana:
+    enabled: true
+    url: "http://localhost:3000"
+    username: "admin"
+    password: "admin"
+    api_key: "your-grafana-api-key"
+  
+  # MLflow
+  mlflow:
+    enabled: true
+    tracking_uri: "http://localhost:5000"
+    experiment_name: "monitoring"
+  
+  # Redis
+  redis:
+    enabled: true
+    host: "localhost"
+    port: 6379
+    db: 1
+    password: null
+
+# Notification Templates
+notification_templates:
+  email:
+    subject: "[{severity}] {alert_type} Alert - {timestamp}"
+    body: |
+      Alert Details:
+      - Type: {alert_type}
+      - Severity: {severity}
+      - Message: {message}
+      - Timestamp: {timestamp}
+      - Details: {details}
+      
+      Please check the monitoring dashboard for more information.
+  
+  slack:
+    text: "🚨 *{alert_type} Alert*"
+    attachments: |
+      [
+        {
+          "color": "{color}",
+          "fields": [
+            {"title": "Severity", "value": "{severity}", "short": true},
+            {"title": "Message", "value": "{message}", "short": false},
+            {"title": "Timestamp", "value": "{timestamp}", "short": true}
+          ]
+        }
+      ]
+
+# Environment-specific overrides
+environments:
+  development:
+    monitoring:
+      interval_seconds: 60
+    alerts:
+      enabled: false
+    logging:
+      level: "DEBUG"
+  
+  staging:
+    alerts:
+      email:
+        enabled: true
+      slack:
+        enabled: true
+  
+  production:
+    monitoring:
+      interval_seconds: 300
+    alerts:
+      enabled: true
+      pagerduty:
+        enabled: true
+    storage:
+      type: "s3" 

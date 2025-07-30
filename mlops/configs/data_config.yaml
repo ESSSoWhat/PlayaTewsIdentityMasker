@@ -1,0 +1,358 @@
+# Data Pipeline Configuration
+# This file configures the data processing and feature engineering pipeline
+
+# Pipeline Configuration
+pipeline:
+  name: "playatews_data_pipeline"
+  version: "1.0.0"
+  description: "Data pipeline for PlayaTews Identity Masker"
+  enabled: true
+  parallel_processing: true
+  max_workers: 4
+
+# Data Sources Configuration
+data_sources:
+  # Input data sources
+  input:
+    - name: "face_images"
+      type: "file_system"
+      path: "data/raw/face_images/"
+      format: "image"
+      extensions: ["jpg", "jpeg", "png", "bmp"]
+      recursive: true
+    
+    - name: "face_annotations"
+      type: "file_system"
+      path: "data/raw/annotations/"
+      format: "json"
+      extensions: ["json"]
+    
+    - name: "metadata"
+      type: "file_system"
+      path: "data/raw/metadata/"
+      format: "csv"
+      extensions: ["csv"]
+  
+  # External data sources
+  external:
+    - name: "face_detection_model"
+      type: "model_registry"
+      source: "mlflow"
+      model_name: "face_detection"
+      version: "latest"
+    
+    - name: "face_landmarks_model"
+      type: "model_registry"
+      source: "mlflow"
+      model_name: "face_landmarks"
+      version: "latest"
+
+# Data Processing Configuration
+processing:
+  # Image preprocessing
+  image:
+    resize:
+      enabled: true
+      target_size: [256, 256]
+      interpolation: "bilinear"
+      maintain_aspect_ratio: false
+    
+    normalization:
+      enabled: true
+      method: "standard"  # standard, minmax, robust
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+    
+    augmentation:
+      enabled: true
+      techniques:
+        - name: "horizontal_flip"
+          probability: 0.5
+        - name: "rotation"
+          probability: 0.3
+          max_angle: 15
+        - name: "brightness_contrast"
+          probability: 0.4
+          brightness_range: [0.8, 1.2]
+          contrast_range: [0.8, 1.2]
+        - name: "noise"
+          probability: 0.2
+          noise_factor: 0.05
+    
+    quality_checks:
+      enabled: true
+      min_resolution: [64, 64]
+      max_file_size: "10MB"
+      valid_formats: ["jpg", "jpeg", "png", "bmp"]
+  
+  # Face detection and alignment
+  face_processing:
+    detection:
+      enabled: true
+      model: "face_detection"
+      confidence_threshold: 0.5
+      max_faces: 10
+    
+    alignment:
+      enabled: true
+      model: "face_landmarks"
+      target_size: [256, 256]
+      landmarks: [36, 45, 30, 48, 54]  # left_eye, right_eye, nose, left_mouth, right_mouth
+    
+    cropping:
+      enabled: true
+      margin: 0.1  # 10% margin around detected face
+      square_crop: true
+
+# Feature Engineering Configuration
+feature_engineering:
+  enabled: true
+  
+  # Face features
+  face_features:
+    - name: "face_embedding"
+      type: "deep_learning"
+      model: "face_recognition"
+      output_dim: 128
+      enabled: true
+    
+    - name: "face_landmarks"
+      type: "geometric"
+      num_landmarks: 68
+      enabled: true
+    
+    - name: "face_attributes"
+      type: "classification"
+      attributes: ["age", "gender", "ethnicity", "emotion"]
+      enabled: true
+  
+  # Image features
+  image_features:
+    - name: "color_histogram"
+      type: "statistical"
+      bins: 256
+      enabled: true
+    
+    - name: "texture_features"
+      type: "glcm"
+      enabled: true
+    
+    - name: "edge_density"
+      type: "computer_vision"
+      enabled: true
+  
+  # Metadata features
+  metadata_features:
+    - name: "image_metadata"
+      type: "extraction"
+      fields: ["width", "height", "format", "size"]
+      enabled: true
+    
+    - name: "temporal_features"
+      type: "datetime"
+      fields: ["hour", "day_of_week", "month"]
+      enabled: true
+
+# Data Validation Configuration
+validation:
+  enabled: true
+  
+  # Schema validation
+  schema:
+    enabled: true
+    strict: false
+    allow_unknown: true
+  
+  # Quality checks
+  quality:
+    enabled: true
+    checks:
+      - name: "missing_values"
+        threshold: 0.1
+      - name: "duplicates"
+        threshold: 0.05
+      - name: "outliers"
+        method: "iqr"
+        threshold: 1.5
+      - name: "data_types"
+        enabled: true
+  
+  # Business rules
+  business_rules:
+    - name: "face_detection_required"
+      condition: "face_count > 0"
+      severity: "error"
+    
+    - name: "image_quality"
+      condition: "image_quality_score > 0.7"
+      severity: "warning"
+    
+    - name: "annotation_completeness"
+      condition: "annotation_completeness > 0.9"
+      severity: "error"
+
+# Data Versioning Configuration
+versioning:
+  enabled: true
+  tool: "dvc"
+  
+  # DVC configuration
+  dvc:
+    remote: "storage"
+    cache_dir: ".dvc/cache"
+    state_file: ".dvc/state"
+    
+    # Data files to version
+    data_files:
+      - "data/raw/"
+      - "data/processed/"
+      - "data/features/"
+      - "models/"
+    
+    # Exclude patterns
+    exclude:
+      - "*.tmp"
+      - "*.log"
+      - "__pycache__/"
+      - ".git/"
+
+# Storage Configuration
+storage:
+  # Local storage
+  local:
+    base_path: "data/"
+    raw_data: "data/raw/"
+    processed_data: "data/processed/"
+    features: "data/features/"
+    models: "models/"
+    logs: "logs/"
+  
+  # Cloud storage (optional)
+  cloud:
+    provider: "s3"  # s3, gcs, azure
+    bucket: "mlops-data"
+    region: "us-east-1"
+    access_key: "your-access-key"
+    secret_key: "your-secret-key"
+    
+    # Data lifecycle
+    lifecycle:
+      raw_data: "30d"
+      processed_data: "90d"
+      features: "1y"
+      models: "2y"
+
+# Output Configuration
+output:
+  # Processed data
+  processed:
+    format: "parquet"  # parquet, csv, hdf5
+    compression: "snappy"
+    partition_by: ["date", "source"]
+    output_path: "data/processed/"
+  
+  # Features
+  features:
+    format: "parquet"
+    compression: "snappy"
+    output_path: "data/features/"
+    feature_store: "hopsworks"
+  
+  # Metadata
+  metadata:
+    format: "json"
+    output_path: "data/metadata/"
+    include_schema: true
+    include_statistics: true
+
+# Performance Configuration
+performance:
+  # Memory management
+  memory:
+    max_memory_usage: "8GB"
+    chunk_size: 1000
+    use_dask: true
+  
+  # Parallel processing
+  parallel:
+    enabled: true
+    max_workers: 4
+    backend: "multiprocessing"  # multiprocessing, threading, dask
+  
+  # Caching
+  caching:
+    enabled: true
+    cache_dir: ".cache/"
+    max_cache_size: "2GB"
+    ttl: 3600  # 1 hour
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  
+  # Metrics to track
+  metrics:
+    - "data_volume"
+    - "processing_time"
+    - "error_rate"
+    - "quality_score"
+    - "feature_count"
+  
+  # Alerts
+  alerts:
+    - name: "processing_failure"
+      condition: "error_rate > 0.05"
+      severity: "high"
+    
+    - name: "data_quality_degradation"
+      condition: "quality_score < 0.8"
+      severity: "medium"
+    
+    - name: "processing_slowdown"
+      condition: "processing_time > threshold"
+      severity: "warning"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  file_path: "logs/data_pipeline.log"
+  max_file_size: "100MB"
+  backup_count: 5
+  
+  # Log specific events
+  events:
+    - "pipeline_start"
+    - "pipeline_complete"
+    - "data_validation"
+    - "feature_engineering"
+    - "data_storage"
+    - "errors"
+
+# Environment-specific overrides
+environments:
+  development:
+    processing:
+      parallel_processing: false
+      max_workers: 1
+    monitoring:
+      enabled: false
+    logging:
+      level: "DEBUG"
+  
+  staging:
+    validation:
+      strict: true
+    monitoring:
+      enabled: true
+  
+  production:
+    performance:
+      max_workers: 8
+    storage:
+      cloud:
+        enabled: true
+    monitoring:
+      enabled: true
+      alerts:
+        enabled: true 

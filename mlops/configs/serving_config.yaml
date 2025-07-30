@@ -1,0 +1,198 @@
+# Model Serving Configuration
+# This file configures the FastAPI model serving application
+
+# Server Configuration
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: false
+  log_level: "info"
+
+# Model Configuration
+models:
+  models_dir: "models"
+  default_model: "latest"
+  model_cache_size: 10
+  model_load_timeout: 30
+
+# Redis Configuration
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: null
+  max_connections: 20
+  retry_on_timeout: true
+
+# Caching Configuration
+cache:
+  enabled: true
+  ttl: 3600  # 1 hour
+  max_size: 10000
+  key_prefix: "prediction:"
+
+# Rate Limiting
+rate_limiting:
+  enabled: true
+  default_limit: "100/minute"
+  burst_limit: "200/minute"
+  storage_uri: "redis://localhost:6379/1"
+
+# CORS Configuration
+cors:
+  allow_origins: ["*"]
+  allow_credentials: true
+  allow_methods: ["*"]
+  allow_headers: ["*"]
+
+# Authentication
+auth:
+  enabled: false
+  jwt_secret: "your-secret-key"
+  jwt_algorithm: "HS256"
+  jwt_expiration: 3600
+
+# A/B Testing Configuration
+ab_tests:
+  enabled: true
+  default_traffic_split: 0.5
+  experiment_storage: "redis"
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  metrics_port: 8002
+  health_check_interval: 30
+  log_predictions: true
+  log_features: false  # Set to true for debugging
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  correlation_id: true
+  sensitive_fields: ["password", "token", "secret"]
+
+# Security Configuration
+security:
+  enable_https: false
+  ssl_cert_file: null
+  ssl_key_file: null
+  allowed_hosts: ["*"]
+  max_request_size: "10MB"
+
+# Performance Configuration
+performance:
+  max_concurrent_requests: 100
+  request_timeout: 30
+  response_timeout: 30
+  keep_alive_timeout: 5
+
+# Model-specific configurations
+model_configs:
+  face_swap:
+    input_shape: [256, 256, 3]
+    output_shape: [256, 256, 3]
+    preprocessing:
+      normalize: true
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+    postprocessing:
+      denormalize: true
+      clip_values: [0, 1]
+  
+  face_detection:
+    confidence_threshold: 0.5
+    nms_threshold: 0.4
+    max_faces: 10
+
+# Feature store configuration
+feature_store:
+  enabled: false
+  hopsworks_url: "http://localhost:8181"
+  feature_group: "face_features"
+  online_features: true
+
+# MLflow Configuration
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  registry_uri: "http://localhost:5000"
+  experiment_name: "playatews_identity_masker"
+
+# Alerting Configuration
+alerts:
+  enabled: true
+  email:
+    enabled: false
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    username: "your-email@gmail.com"
+    password: "your-password"
+    recipients: ["admin@example.com"]
+  
+  slack:
+    enabled: false
+    webhook_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    channel: "#mlops-alerts"
+  
+  webhook:
+    enabled: false
+    url: "https://your-webhook-url.com/alerts"
+    timeout: 10
+
+# Deployment Configuration
+deployment:
+  strategy: "rolling"  # rolling, blue-green, canary
+  health_check_path: "/health"
+  readiness_check_path: "/health"
+  liveness_check_path: "/health"
+  startup_probe:
+    enabled: true
+    initial_delay: 10
+    period: 5
+    timeout: 3
+    failure_threshold: 3
+  liveness_probe:
+    enabled: true
+    initial_delay: 30
+    period: 10
+    timeout: 5
+    failure_threshold: 3
+  readiness_probe:
+    enabled: true
+    initial_delay: 5
+    period: 5
+    timeout: 3
+    failure_threshold: 3
+
+# Environment-specific overrides
+environments:
+  development:
+    server:
+      reload: true
+      log_level: "debug"
+    monitoring:
+      log_predictions: true
+      log_features: true
+  
+  staging:
+    auth:
+      enabled: true
+    monitoring:
+      enabled: true
+  
+  production:
+    server:
+      workers: 8
+      reload: false
+    auth:
+      enabled: true
+    security:
+      enable_https: true
+    monitoring:
+      enabled: true
+      log_predictions: false
+    cache:
+      enabled: true
+      ttl: 7200  # 2 hours 
