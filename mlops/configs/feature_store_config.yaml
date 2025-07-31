@@ -1,0 +1,467 @@
+# Feature Store Configuration for PlayaTews Identity Masker
+# This configuration file defines all settings for the feature store
+
+# Feature Store General Settings
+feature_store:
+  name: "playatews_feature_store"
+  version: "1.0"
+  environment: "production"  # development, staging, production
+  debug: false
+  
+  # Storage settings
+  storage:
+    type: "hybrid"  # local, hopsworks, hybrid
+    local_path: "feature_store"
+    backup_enabled: true
+    backup_interval_hours: 24
+    retention_days: 90
+
+# Hopsworks Integration
+hopsworks:
+  enabled: true
+  project: "playatews_ml"
+  api_key: "${HOPSWORKS_API_KEY}"  # Set via environment variable
+  host: "https://c.app.hopsworks.ai"
+  port: 443
+  timeout_seconds: 30
+  retry_attempts: 3
+  
+  # Feature groups
+  feature_groups:
+    face_features:
+      name: "face_features"
+      version: "1.0"
+      description: "Face detection and analysis features"
+      primary_keys: ["entity_id", "timestamp"]
+      partition_keys: ["date"]
+      online_enabled: true
+      offline_enabled: true
+      
+    image_features:
+      name: "image_features"
+      version: "1.0"
+      description: "Image processing features"
+      primary_keys: ["entity_id", "timestamp"]
+      partition_keys: ["date"]
+      online_enabled: true
+      offline_enabled: true
+      
+    voice_features:
+      name: "voice_features"
+      version: "1.0"
+      description: "Voice processing features"
+      primary_keys: ["entity_id", "timestamp"]
+      partition_keys: ["date"]
+      online_enabled: true
+      offline_enabled: true
+
+# Redis Cache Configuration
+cache:
+  enabled: true
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: "${REDIS_PASSWORD}"  # Set via environment variable
+  ttl_seconds: 300  # 5 minutes
+  max_memory: "1gb"
+  max_memory_policy: "allkeys-lru"
+  
+  # Cache keys
+  key_prefix: "features:"
+  key_separator: ":"
+  
+  # Cache strategies
+  strategies:
+    feature_values:
+      ttl_seconds: 300
+      max_size: 10000
+    feature_definitions:
+      ttl_seconds: 3600  # 1 hour
+      max_size: 1000
+    feature_sets:
+      ttl_seconds: 3600
+      max_size: 100
+
+# Local Storage Configuration
+local_storage:
+  path: "feature_store"
+  format: "json"  # json, pickle, parquet
+  compression: false
+  encryption_enabled: false
+  encryption_key: "${STORAGE_ENCRYPTION_KEY}"  # Set via environment variable
+  
+  # File organization
+  structure:
+    features: "features/"
+    feature_sets: "feature_sets/"
+    data: "data/"
+    metadata: "metadata/"
+    backups: "backups/"
+
+# Feature Pipeline Configuration
+pipelines:
+  # Face processing pipeline
+  face_features:
+    enabled: true
+    batch_size: 100
+    timeout_seconds: 30
+    retry_attempts: 3
+    
+    features:
+      - face_detection_confidence
+      - face_landmarks_count
+      - face_bbox_coordinates
+      - face_quality_score
+      - face_pose_angles
+      - face_expression_probabilities
+    
+    models:
+      face_detector: "models/face_detection.onnx"
+      landmark_detector: "models/landmark_detection.onnx"
+      quality_assessor: "models/face_quality.onnx"
+  
+  # Image processing pipeline
+  image_features:
+    enabled: true
+    batch_size: 50
+    timeout_seconds: 60
+    retry_attempts: 3
+    
+    features:
+      - image_size
+      - image_brightness
+      - image_contrast
+      - image_sharpness
+      - image_noise_level
+      - image_compression_artifacts
+    
+    processing:
+      resize_enabled: true
+      resize_dimensions: [224, 224]
+      normalization_enabled: true
+      augmentation_enabled: false
+  
+  # Voice processing pipeline
+  voice_features:
+    enabled: true
+    batch_size: 200
+    timeout_seconds: 45
+    retry_attempts: 3
+    
+    features:
+      - voice_detected
+      - voice_pitch
+      - voice_volume
+      - voice_speech_rate
+      - voice_emotion_probabilities
+      - voice_quality_score
+    
+    audio:
+      sample_rate: 16000
+      chunk_duration_ms: 1000
+      overlap_ms: 100
+
+# Data Validation Configuration
+validation:
+  enabled: true
+  strict_mode: false
+  
+  # Schema validation
+  schema:
+    validate_on_write: true
+    validate_on_read: false
+    allow_unknown_fields: true
+  
+  # Quality checks
+  quality:
+    enabled: true
+    checks:
+      - missing_values
+      - data_types
+      - value_ranges
+      - uniqueness
+      - consistency
+    
+    thresholds:
+      missing_values_pct: 0.1
+      data_type_errors_pct: 0.05
+      range_violations_pct: 0.02
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  
+  # Metrics collection
+  metrics:
+    enabled: true
+    interval_seconds: 60
+    prometheus_enabled: true
+    prometheus_port: 9090
+    
+    # Custom metrics
+    custom_metrics:
+      - feature_computation_time
+      - feature_quality_score
+      - cache_hit_rate
+      - storage_usage
+      - error_rate
+  
+  # Health checks
+  health_checks:
+    enabled: true
+    interval_seconds: 30
+    timeout_seconds: 10
+    
+    checks:
+      - redis_connection
+      - hopsworks_connection
+      - local_storage
+      - feature_registry
+  
+  # Alerting
+  alerting:
+    enabled: true
+    
+    channels:
+      email:
+        enabled: true
+        recipients: ["ml-team@playatews.com"]
+        smtp_server: "smtp.company.com"
+        smtp_port: 587
+        
+      slack:
+        enabled: true
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+        channel: "#ml-alerts"
+        
+      webhook:
+        enabled: false
+        url: "${WEBHOOK_URL}"
+    
+    rules:
+      - name: "high_error_rate"
+        condition: "error_rate > 0.05"
+        severity: "critical"
+        
+      - name: "low_cache_hit_rate"
+        condition: "cache_hit_rate < 0.8"
+        severity: "warning"
+        
+      - name: "storage_usage_high"
+        condition: "storage_usage > 0.9"
+        severity: "warning"
+
+# Security Configuration
+security:
+  enabled: true
+  
+  # Authentication
+  authentication:
+    enabled: true
+    type: "jwt"  # jwt, oauth, api_key
+    jwt_secret: "${JWT_SECRET}"
+    jwt_expiry_hours: 24
+    
+  # Authorization
+  authorization:
+    enabled: true
+    rbac_enabled: true
+    
+    roles:
+      admin:
+        permissions: ["read", "write", "delete", "manage"]
+        users: ["ml-admin"]
+        
+      developer:
+        permissions: ["read", "write"]
+        users: ["ml-developer"]
+        
+      viewer:
+        permissions: ["read"]
+        users: ["ml-viewer"]
+  
+  # Data encryption
+  encryption:
+    enabled: true
+    algorithm: "AES-256-GCM"
+    key_rotation_days: 90
+    
+  # Network security
+  network:
+    allowed_hosts: ["localhost", "127.0.0.1", "*.playatews.com"]
+    cors_enabled: true
+    cors_origins: ["https://app.playatews.com"]
+
+# Performance Configuration
+performance:
+  # Concurrency
+  max_concurrent_requests: 100
+  max_concurrent_computations: 10
+  
+  # Timeouts
+  request_timeout_seconds: 30
+  computation_timeout_seconds: 60
+  cache_timeout_seconds: 300
+  
+  # Memory management
+  max_memory_usage_gb: 4
+  memory_cleanup_interval_seconds: 300
+  
+  # Batch processing
+  batch_size: 100
+  batch_timeout_seconds: 60
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "json"
+  output: "file"  # console, file, both
+  
+  # File logging
+  file:
+    enabled: true
+    path: "logs/feature_store.log"
+    max_size_mb: 100
+    backup_count: 5
+    rotation: "daily"
+  
+  # Structured logging
+  structured:
+    enabled: true
+    include_timestamp: true
+    include_correlation_id: true
+    include_user_id: true
+
+# Feature Definitions (Pre-configured features)
+predefined_features:
+  # Face detection features
+  face_detection_confidence:
+    name: "face_detection_confidence"
+    feature_type: "numerical"
+    description: "Confidence score for face detection (0-1)"
+    data_source: "face_detection"
+    version: "1.0"
+    schema:
+      type: "number"
+      minimum: 0
+      maximum: 1
+    validation_rules:
+      required: true
+      min_value: 0
+      max_value: 1
+    tags: ["face", "detection", "confidence"]
+    owner: "ml_team"
+    
+  face_landmarks_count:
+    name: "face_landmarks_count"
+    feature_type: "numerical"
+    description: "Number of detected facial landmarks"
+    data_source: "face_detection"
+    version: "1.0"
+    schema:
+      type: "integer"
+      minimum: 0
+      maximum: 100
+    validation_rules:
+      required: true
+      min_value: 0
+      max_value: 100
+    tags: ["face", "landmarks", "count"]
+    owner: "ml_team"
+    
+  # Image features
+  image_brightness:
+    name: "image_brightness"
+    feature_type: "numerical"
+    description: "Average brightness of the image (0-1)"
+    data_source: "camera"
+    version: "1.0"
+    schema:
+      type: "number"
+      minimum: 0
+      maximum: 1
+    validation_rules:
+      required: true
+      min_value: 0
+      max_value: 1
+    tags: ["image", "brightness"]
+    owner: "ml_team"
+    
+  # Voice features
+  voice_pitch:
+    name: "voice_pitch"
+    feature_type: "numerical"
+    description: "Average pitch of voice in Hz"
+    data_source: "voice_changer"
+    version: "1.0"
+    schema:
+      type: "number"
+      minimum: 50
+      maximum: 500
+    validation_rules:
+      required: false
+      min_value: 50
+      max_value: 500
+    tags: ["voice", "pitch"]
+    owner: "ml_team"
+
+# Feature Sets (Pre-configured feature sets)
+predefined_feature_sets:
+  face_analysis:
+    name: "face_analysis"
+    description: "Complete set of face analysis features"
+    features:
+      - face_detection_confidence
+      - face_landmarks_count
+    version: "1.0"
+    owner: "ml_team"
+    tags: ["face", "analysis", "complete"]
+    
+  image_quality:
+    name: "image_quality"
+    description: "Image quality assessment features"
+    features:
+      - image_brightness
+    version: "1.0"
+    owner: "ml_team"
+    tags: ["image", "quality"]
+    
+  voice_analysis:
+    name: "voice_analysis"
+    description: "Voice analysis features"
+    features:
+      - voice_pitch
+    version: "1.0"
+    owner: "ml_team"
+    tags: ["voice", "analysis"]
+
+# Environment-specific overrides
+environments:
+  development:
+    debug: true
+    cache:
+      ttl_seconds: 60
+    logging:
+      level: "DEBUG"
+    monitoring:
+      metrics:
+        interval_seconds: 30
+    
+  staging:
+    debug: false
+    cache:
+      ttl_seconds: 180
+    monitoring:
+      alerting:
+        enabled: false
+    
+  production:
+    debug: false
+    cache:
+      ttl_seconds: 300
+    security:
+      authentication:
+        enabled: true
+    monitoring:
+      alerting:
+        enabled: true 

@@ -79,7 +79,11 @@ class QOptimizedVideoDisplay(QWidget):
         
         # Fullscreen button
         self.fullscreen_btn = QToolButton()
-        self.fullscreen_btn.setIcon(self.style().standardIcon(QStyleFactory.SP_TitleBarMaxButton))
+        try:
+            self.fullscreen_btn.setIcon(self.style().standardIcon(QStyleFactory.SP_TitleBarMaxButton))
+        except:
+            # Fallback for older PyQt5 versions
+            self.fullscreen_btn.setText("⛶")
         self.fullscreen_btn.setToolTip("Toggle Fullscreen (F11)")
         self.fullscreen_btn.clicked.connect(self.toggle_fullscreen)
         self.fullscreen_btn.setObjectName("fullscreen-btn")

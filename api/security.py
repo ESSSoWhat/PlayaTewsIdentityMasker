@@ -1,46 +1,43 @@
 """
 Security Module for PlayaTewsIdentityMasker API
-Handles authentication, authorization, and security utilities.
+Handles authentication, authorization, input validation, and security utilities.
 """
 
-import jwt
-import bcrypt
-import secrets
 import re
-from datetime import datetime, timedelta, timezone
-from typing import Optional, Dict, Any
-from functools import wraps
-import logging
+import hashlib
+import bcrypt
+import jwt
+from datetime import datetime, timedelta
+from typing import Optional, Dict, Any, Union
 from pathlib import Path
-import json
+import mimetypes
+import logging
 
-from fastapi import HTTPException, Depends, status
+from pydantic import BaseModel, EmailStr, validator
+from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, validator
 
-from .config import get_config
+from .config import config
 
 logger = logging.getLogger(__name__)
 
-# Security schemas
+# Security scheme
+security = HTTPBearer()
+
+# Pydantic models for request/response validation
 class UserCreate(BaseModel):
-    """User creation schema with validation."""
+    """User registration model."""
     username: str
-    email: str
+    email: EmailStr
     password: str
-    full_name: Optional[str] = None
     
     @validator('username')
     def validate_username(cls, v):
-        if not re.match(r'^[a-zA-Z0-9_]{3,20}$', v):
-            raise ValueError('Username must be 3-20 characters, alphanumeric and underscore only')
+        if len(v) < 3 or len(v) > 50:
+            raise ValueError('Username must be between 3 and 50 characters')
+        if not re.match(r'^[a-zA-Z0-9_]+$', v):
+            raise ValueError('Username can only contain letters, numbers, and underscores')
         return v
-    
-    @validator('email')
-    def validate_email(cls, v):
-        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', v):
-            raise ValueError('Invalid email format')
-        return v.lower()
     
     @validator('password')
     def validate_password(cls, v):
@@ -51,137 +48,135 @@ class UserCreate(BaseModel):
         if not re.search(r'[a-z]', v):
             raise ValueError('Password must contain at least one lowercase letter')
         if not re.search(r'\d', v):
-            raise ValueError('Password must contain at least one digit')
+            raise ValueError('Password must contain at least one number')
         return v
 
 class UserLogin(BaseModel):
-    """User login schema."""
+    """User login model."""
     username: str
     password: str
 
 class TokenResponse(BaseModel):
-    """Token response schema."""
+    """Token response model."""
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
     expires_in: int
 
+class UserResponse(BaseModel):
+    """User response model."""
+    id: int
+    username: str
+    email: str
+    created_at: datetime
+    is_active: bool
+
 class SecurityManager:
-    """Security manager for authentication and authorization."""
+    """Manages authentication, authorization, and security operations."""
     
     def __init__(self):
-        self.config = get_config()
-        self.users_file = Path("api/data/users.json")
-        self.users_file.parent.mkdir(parents=True, exist_ok=True)
-        self.users = self._load_users()
-        self.blacklisted_tokens = set()
-    
-    def _load_users(self) -> Dict[str, Dict[str, Any]]:
-        """Load users from JSON file."""
-        if self.users_file.exists():
-            try:
-                with open(self.users_file, 'r') as f:
-                    return json.load(f)
-            except Exception as e:
-                logger.error(f"Error loading users: {e}")
-        return {}
-    
-    def _save_users(self):
-        """Save users to JSON file."""
-        try:
-            with open(self.users_file, 'w') as f:
-                json.dump(self.users, f, indent=2)
-        except Exception as e:
-            logger.error(f"Error saving users: {e}")
+        self.secret_key = config.secret_key
+        self.algorithm = config.algorithm
+        self.access_token_expire_minutes = config.access_token_expire_minutes
+        self.refresh_token_expire_days = config.refresh_token_expire_days
+        
+        # In-memory user storage (replace with database in production)
+        self.users: Dict[str, Dict[str, Any]] = {}
+        self.user_id_counter = 1
     
     def hash_password(self, password: str) -> str:
-        """Hash password using bcrypt."""
+        """Hash a password using bcrypt."""
         salt = bcrypt.gensalt()
-        return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hashed.decode('utf-8')
     
-    def verify_password(self, password: str, hashed: str) -> bool:
-        """Verify password against hash."""
-        return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+    def verify_password(self, password: str, hashed_password: str) -> bool:
+        """Verify a password against its hash."""
+        return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
     
-    def create_user(self, user_data: UserCreate) -> Dict[str, Any]:
+    def create_user(self, username: str, email: str, password: str) -> Dict[str, Any]:
         """Create a new user."""
-        if user_data.username in [u['username'] for u in self.users.values()]:
+        if username in self.users:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username already exists"
+                detail="Username already registered"
             )
         
-        user_id = secrets.token_urlsafe(16)
-        hashed_password = self.hash_password(user_data.password)
+        if any(user['email'] == email for user in self.users.values()):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
+        
+        user_id = self.user_id_counter
+        self.user_id_counter += 1
         
         user = {
-            "id": user_id,
-            "username": user_data.username,
-            "email": user_data.email,
-            "full_name": user_data.full_name,
-            "password_hash": hashed_password,
-            "is_active": True,
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "last_login": None
+            'id': user_id,
+            'username': username,
+            'email': email,
+            'hashed_password': self.hash_password(password),
+            'created_at': datetime.utcnow(),
+            'is_active': True
         }
         
-        self.users[user_id] = user
-        self._save_users()
+        self.users[username] = user
         
-        return {k: v for k, v in user.items() if k != 'password_hash'}
+        logger.info(f"User created: {username}")
+        return user
     
     def authenticate_user(self, username: str, password: str) -> Optional[Dict[str, Any]]:
-        """Authenticate user credentials."""
-        for user in self.users.values():
-            if user['username'] == username and self.verify_password(password, user['password_hash']):
-                return user
-        return None
-    
-    def create_tokens(self, user_id: str) -> TokenResponse:
-        """Create access and refresh tokens."""
-        now = datetime.now(timezone.utc)
+        """Authenticate a user with username and password."""
+        user = self.users.get(username)
+        if not user:
+            return None
         
-        # Access token
-        access_token_expires = now + timedelta(minutes=self.config.access_token_expire_minutes)
+        if not self.verify_password(password, user['hashed_password']):
+            return None
+        
+        if not user['is_active']:
+            return None
+        
+        return user
+    
+    def create_tokens(self, user: Dict[str, Any]) -> Dict[str, Any]:
+        """Create access and refresh tokens for a user."""
+        access_token_expires = timedelta(minutes=self.access_token_expire_minutes)
+        refresh_token_expires = timedelta(days=self.refresh_token_expire_days)
+        
         access_token_data = {
-            "sub": user_id,
-            "type": "access",
-            "exp": access_token_expires,
-            "iat": now
+            "sub": str(user['id']),
+            "username": user['username'],
+            "exp": datetime.utcnow() + access_token_expires,
+            "type": "access"
         }
-        access_token = jwt.encode(access_token_data, self.config.secret_key, algorithm=self.config.algorithm)
         
-        # Refresh token
-        refresh_token_expires = now + timedelta(days=self.config.refresh_token_expire_days)
         refresh_token_data = {
-            "sub": user_id,
-            "type": "refresh",
-            "exp": refresh_token_expires,
-            "iat": now
+            "sub": str(user['id']),
+            "username": user['username'],
+            "exp": datetime.utcnow() + refresh_token_expires,
+            "type": "refresh"
         }
-        refresh_token = jwt.encode(refresh_token_data, self.config.secret_key, algorithm=self.config.algorithm)
         
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            expires_in=self.config.access_token_expire_minutes * 60
-        )
+        access_token = jwt.encode(access_token_data, self.secret_key, algorithm=self.algorithm)
+        refresh_token = jwt.encode(refresh_token_data, self.secret_key, algorithm=self.algorithm)
+        
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "expires_in": self.access_token_expire_minutes * 60
+        }
     
-    def verify_token(self, token: str, token_type: str = "access") -> Optional[Dict[str, Any]]:
-        """Verify JWT token."""
+    def verify_token(self, token: str, token_type: str = "access") -> Dict[str, Any]:
+        """Verify and decode a JWT token."""
         try:
-            payload = jwt.decode(token, self.config.secret_key, algorithms=[self.config.algorithm])
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
             
             if payload.get("type") != token_type:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid token type"
-                )
-            
-            if token in self.blacklisted_tokens:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Token has been revoked"
                 )
             
             return payload
@@ -195,43 +190,92 @@ class SecurityManager:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token"
             )
+    
+    def get_current_user(self, credentials: HTTPAuthorizationCredentials = Depends(security)) -> Dict[str, Any]:
+        """Get the current authenticated user."""
+        token = credentials.credentials
+        payload = self.verify_token(token, "access")
+        
+        user_id = int(payload.get("sub"))
+        username = payload.get("username")
+        
+        user = self.users.get(username)
+        if user is None or user['id'] != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found"
+            )
+        
+        if not user['is_active']:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User account is disabled"
+            )
+        
+        return user
 
 # Global security manager instance
 security_manager = SecurityManager()
 
-# Security dependencies
-security = HTTPBearer()
+# Security utility functions
+def sanitize_input(input_string: str) -> str:
+    """Sanitize user input to prevent XSS and injection attacks."""
+    if not input_string:
+        return ""
+    
+    # Remove potentially dangerous characters
+    sanitized = re.sub(r'[<>"\']', '', input_string)
+    
+    # Limit length
+    if len(sanitized) > 1000:
+        sanitized = sanitized[:1000]
+    
+    return sanitized.strip()
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Dict[str, Any]:
-    """Get current authenticated user."""
-    payload = security_manager.verify_token(credentials.credentials)
-    user_id = payload.get("sub")
+def validate_file_type(filename: str, allowed_types: list = None) -> bool:
+    """Validate file type based on extension and MIME type."""
+    if allowed_types is None:
+        allowed_types = config.allowed_file_types
     
-    if user_id not in security_manager.users:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found"
-        )
+    if not filename:
+        return False
     
-    user = security_manager.users[user_id]
-    if not user.get("is_active", True):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User account is disabled"
-        )
+    # Check file extension
+    file_ext = Path(filename).suffix.lower()
+    if file_ext not in allowed_types:
+        return False
     
+    # Check MIME type
+    mime_type, _ = mimetypes.guess_type(filename)
+    if mime_type:
+        # Basic MIME type validation
+        if file_ext in ['.jpg', '.jpeg', '.png'] and not mime_type.startswith('image/'):
+            return False
+        if file_ext in ['.mp4', '.avi', '.mov'] and not mime_type.startswith('video/'):
+            return False
+    
+    return True
+
+def generate_file_hash(file_path: Union[str, Path]) -> str:
+    """Generate SHA-256 hash of a file."""
+    hash_sha256 = hashlib.sha256()
+    
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_sha256.update(chunk)
+    
+    return hash_sha256.hexdigest()
+
+def validate_file_size(file_size: int) -> bool:
+    """Validate file size against configured limits."""
+    return file_size <= config.max_file_size
+
+# Dependency functions for FastAPI
+def get_current_user(user: Dict[str, Any] = Depends(security_manager.get_current_user)) -> Dict[str, Any]:
+    """Dependency to get current authenticated user."""
     return user
 
-# Input validation utilities
-def sanitize_input(text: str) -> str:
-    """Sanitize user input to prevent XSS."""
-    dangerous_chars = ['<', '>', '"', "'", '&']
-    for char in dangerous_chars:
-        text = text.replace(char, '')
-    return text.strip()
-
-def validate_file_type(filename: str, allowed_types: list) -> bool:
-    """Validate file type based on extension."""
-    from pathlib import Path
-    file_ext = Path(filename).suffix.lower()
-    return file_ext in allowed_types 
+def require_admin(user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
+    """Dependency to require admin privileges."""
+    # Add admin check logic here when implementing roles
+    return user 

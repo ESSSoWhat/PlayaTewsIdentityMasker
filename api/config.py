@@ -1,46 +1,44 @@
 """
-API Configuration and Security Settings
-Handles environment variables, security configurations, and API settings.
+API Configuration Module
+Handles all configuration settings for the PlayaTewsIdentityMasker API.
 """
 
 import os
-import secrets
-from typing import Dict, Any, Optional
-from pathlib import Path
-import json
-import logging
 from dataclasses import dataclass
+from typing import List, Optional
+from pathlib import Path
 
-logger = logging.getLogger(__name__)
 
 @dataclass
 class APIConfig:
-    """API Configuration class with security and performance settings."""
+    """Configuration class for API settings."""
     
     # Server Configuration
     host: str = "0.0.0.0"
     port: int = 8000
     debug: bool = False
+    reload: bool = False
     
     # Security Configuration
-    secret_key: str = ""
+    secret_key: str = "your-secret-key-change-in-production"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
     
     # CORS Configuration
-    allowed_origins: list = None
-    allowed_methods: list = None
-    allowed_headers: list = None
+    allowed_origins: List[str] = None
+    allowed_methods: List[str] = None
+    allowed_headers: List[str] = None
+    allow_credentials: bool = True
     
     # Rate Limiting
     rate_limit_requests: int = 100
     rate_limit_window: int = 60  # seconds
     
     # File Upload Configuration
-    max_file_size: int = 50 * 1024 * 1024  # 50MB
-    allowed_file_types: list = None
-    upload_directory: str = "uploads"
+    max_file_size: int = 10 * 1024 * 1024  # 10MB
+    allowed_file_types: List[str] = None
+    upload_dir: str = "uploads"
     
     # Caching Configuration
     cache_ttl: int = 300  # 5 minutes
@@ -51,7 +49,7 @@ class APIConfig:
     log_file: str = "api.log"
     
     def __post_init__(self):
-        """Initialize default values and load from environment."""
+        """Initialize default values after dataclass creation."""
         if self.allowed_origins is None:
             self.allowed_origins = ["http://localhost:3000", "http://localhost:8080"]
         
@@ -62,77 +60,83 @@ class APIConfig:
             self.allowed_headers = ["*"]
         
         if self.allowed_file_types is None:
-            self.allowed_file_types = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4", ".avi", ".mov"]
+            self.allowed_file_types = [".jpg", ".jpeg", ".png", ".mp4", ".avi", ".mov"]
         
         # Load from environment variables
         self._load_from_env()
         
-        # Generate secret key if not provided
-        if not self.secret_key:
-            self.secret_key = secrets.token_urlsafe(32)
+        # Validate configuration
+        self.validate()
     
     def _load_from_env(self):
         """Load configuration from environment variables."""
-        env_mappings = {
-            "API_HOST": "host",
-            "API_PORT": "port",
-            "API_DEBUG": "debug",
-            "API_SECRET_KEY": "secret_key",
-            "API_ALGORITHM": "algorithm",
-            "API_ACCESS_TOKEN_EXPIRE_MINUTES": "access_token_expire_minutes",
-            "API_REFRESH_TOKEN_EXPIRE_DAYS": "refresh_token_expire_days",
-            "API_RATE_LIMIT_REQUESTS": "rate_limit_requests",
-            "API_RATE_LIMIT_WINDOW": "rate_limit_window",
-            "API_MAX_FILE_SIZE": "max_file_size",
-            "API_UPLOAD_DIRECTORY": "upload_directory",
-            "API_CACHE_TTL": "cache_ttl",
-            "API_CACHE_MAX_SIZE": "cache_max_size",
-            "API_LOG_LEVEL": "log_level",
-            "API_LOG_FILE": "log_file"
-        }
+        self.host = os.getenv("API_HOST", self.host)
+        self.port = int(os.getenv("API_PORT", self.port))
+        self.debug = os.getenv("API_DEBUG", "false").lower() == "true"
+        self.reload = os.getenv("API_RELOAD", "false").lower() == "true"
         
-        for env_var, attr_name in env_mappings.items():
-            value = os.getenv(env_var)
-            if value is not None:
-                # Convert string values to appropriate types
-                if attr_name in ["port", "access_token_expire_minutes", "refresh_token_expire_days", 
-                               "rate_limit_requests", "rate_limit_window", "max_file_size", 
-                               "cache_ttl", "cache_max_size"]:
-                    try:
-                        setattr(self, attr_name, int(value))
-                    except ValueError:
-                        logger.warning(f"Invalid integer value for {env_var}: {value}")
-                elif attr_name == "debug":
-                    setattr(self, attr_name, value.lower() in ["true", "1", "yes"])
-                else:
-                    setattr(self, attr_name, value)
+        # Security
+        self.secret_key = os.getenv("API_SECRET_KEY", self.secret_key)
+        self.algorithm = os.getenv("API_ALGORITHM", self.algorithm)
+        self.access_token_expire_minutes = int(os.getenv("API_ACCESS_TOKEN_EXPIRE", self.access_token_expire_minutes))
+        self.refresh_token_expire_days = int(os.getenv("API_REFRESH_TOKEN_EXPIRE", self.refresh_token_expire_days))
+        
+        # CORS
+        if os.getenv("API_ALLOWED_ORIGINS"):
+            self.allowed_origins = os.getenv("API_ALLOWED_ORIGINS").split(",")
+        
+        # Rate Limiting
+        self.rate_limit_requests = int(os.getenv("API_RATE_LIMIT_REQUESTS", self.rate_limit_requests))
+        self.rate_limit_window = int(os.getenv("API_RATE_LIMIT_WINDOW", self.rate_limit_window))
+        
+        # File Upload
+        self.max_file_size = int(os.getenv("API_MAX_FILE_SIZE", self.max_file_size))
+        if os.getenv("API_ALLOWED_FILE_TYPES"):
+            self.allowed_file_types = os.getenv("API_ALLOWED_FILE_TYPES").split(",")
+        
+        # Caching
+        self.cache_ttl = int(os.getenv("API_CACHE_TTL", self.cache_ttl))
+        self.cache_max_size = int(os.getenv("API_CACHE_MAX_SIZE", self.cache_max_size))
+        
+        # Logging
+        self.log_level = os.getenv("API_LOG_LEVEL", self.log_level)
+        self.log_file = os.getenv("API_LOG_FILE", self.log_file)
     
-    def validate(self) -> bool:
+    def validate(self):
         """Validate configuration settings."""
-        errors = []
+        if not self.secret_key or self.secret_key == "your-secret-key-change-in-production":
+            raise ValueError("API_SECRET_KEY must be set in production")
         
         if self.port < 1 or self.port > 65535:
-            errors.append("Port must be between 1 and 65535")
-        
-        if self.access_token_expire_minutes < 1:
-            errors.append("Access token expire minutes must be at least 1")
+            raise ValueError("Port must be between 1 and 65535")
         
         if self.rate_limit_requests < 1:
-            errors.append("Rate limit requests must be at least 1")
+            raise ValueError("Rate limit requests must be positive")
         
         if self.max_file_size < 1:
-            errors.append("Max file size must be at least 1 byte")
+            raise ValueError("Max file size must be positive")
         
-        if errors:
-            for error in errors:
-                logger.error(f"Configuration validation error: {error}")
-            return False
-        
-        return True
+        # Create upload directory if it doesn't exist
+        Path(self.upload_dir).mkdir(exist_ok=True)
+    
+    def get_cors_config(self):
+        """Get CORS configuration dictionary."""
+        return {
+            "allow_origins": self.allowed_origins,
+            "allow_credentials": self.allow_credentials,
+            "allow_methods": self.allowed_methods,
+            "allow_headers": self.allowed_headers,
+        }
+    
+    def get_security_config(self):
+        """Get security configuration dictionary."""
+        return {
+            "secret_key": self.secret_key,
+            "algorithm": self.algorithm,
+            "access_token_expire_minutes": self.access_token_expire_minutes,
+            "refresh_token_expire_days": self.refresh_token_expire_days,
+        }
+
 
 # Global configuration instance
-config = APIConfig()
-
-def get_config() -> APIConfig:
-    """Get the global API configuration."""
-    return config 
+config = APIConfig() 

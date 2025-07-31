@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QPropertyAnimation, QEasingCurv
 from PyQt5.QtGui import QPalette, QColor, QFont, QIcon
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
                             QPushButton, QLabel, QComboBox, QSpinBox, QLineEdit,
-                            QCheckBox, QGroupBox, QTabWidget, QListWidget, 
+                            QCheckBox, QGroupBox, QTabWidget, QListWidget, QListWidgetItem,
                             QSlider, QFrame, QProgressBar, QSizePolicy,
                             QToolButton, QMenu, QAction, QApplication, QStyleFactory)
 
