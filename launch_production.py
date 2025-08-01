@@ -153,6 +153,10 @@ def launch_production_enhanced_ui():
 
 def create_control_panel():
     """Create left control panel"""
+    from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtGui import QFont
+    
     panel = QWidget()
     panel.setStyleSheet("""
         QWidget {
@@ -194,6 +198,10 @@ def create_control_panel():
 
 def create_video_display_panel():
     """Create center video display panel with 80%+ space allocation"""
+    from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame, QSizePolicy
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtGui import QFont
+    
     panel = QWidget()
     panel.setStyleSheet("""
         QWidget {
@@ -246,6 +254,10 @@ def create_video_display_panel():
 
 def create_settings_panel():
     """Create right settings panel"""
+    from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtGui import QFont
+    
     panel = QWidget()
     panel.setStyleSheet("""
         QWidget {
@@ -290,6 +302,9 @@ def create_settings_panel():
 
 def create_production_button(text, color):
     """Create a production-styled button"""
+    from PyQt5.QtWidgets import QPushButton
+    from PyQt5.QtCore import Qt
+    
     btn = QPushButton(text)
     btn.setMinimumHeight(40)
     btn.setCursor(Qt.PointingHandCursor)
@@ -315,6 +330,9 @@ def create_production_button(text, color):
 
 def create_performance_group():
     """Create performance monitoring group"""
+    from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel
+    from PyQt5.QtGui import QFont
+    
     group = QFrame()
     group.setStyleSheet("""
         QFrame {
@@ -357,6 +375,8 @@ def create_performance_group():
 
 def create_toolbar():
     """Create bottom toolbar"""
+    from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
+    
     toolbar = QWidget()
     toolbar.setMaximumHeight(40)
     toolbar.setStyleSheet("""
