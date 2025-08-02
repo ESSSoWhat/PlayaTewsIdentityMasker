@@ -358,14 +358,18 @@ class QUnifiedLiveSwap(QXWidget):
         return tab
     
     def create_viewers_tab(self):
-        """Create viewers tab with all preview components"""
+        """Create viewers tab with all preview components including enhanced output"""
         tab = QXWidget()
         layout = qtx.QXHBoxLayout()
         
-        # Add viewers in a grid
+        # Left side - Camera and processing viewers
+        left_viewers = QXWidget()
+        left_layout = qtx.QXVBoxLayout()
+        
+        # Add camera and processing viewers
         viewers = []
         if self.q_ds_frame_viewer:
-            viewers.append(("Frame", self.q_ds_frame_viewer))
+            viewers.append(("Camera Feed", self.q_ds_frame_viewer))
         if self.q_ds_fa_viewer:
             viewers.append(("Face Align", self.q_ds_fa_viewer))
         if self.q_ds_fc_viewer:
@@ -373,12 +377,37 @@ class QUnifiedLiveSwap(QXWidget):
         if self.q_ds_merged_frame_viewer:
             viewers.append(("Merged", self.q_ds_merged_frame_viewer))
         
-        for title, viewer in viewers:
+        # Create a grid layout for the viewers
+        viewers_grid = qtx.QXGridLayout()
+        for i, (title, viewer) in enumerate(viewers):
+            row = i // 2
+            col = i % 2
             group = QXGroupBox(title=title)
             group_layout = qtx.QXVBoxLayout()
             group_layout.addWidget(viewer)
             group.setLayout(group_layout)
-            layout.addWidget(group)
+            viewers_grid.addWidget(group, row, col)
+        
+        left_layout.addLayout(viewers_grid)
+        left_viewers.setLayout(left_layout)
+        
+        # Right side - Enhanced Stream Output
+        right_viewers = QXWidget()
+        right_layout = qtx.QXVBoxLayout()
+        
+        # Add enhanced stream output as the main preview
+        if hasattr(self, 'q_stream_output') and self.q_stream_output:
+            enhanced_group = QXGroupBox(title="Enhanced Output Preview")
+            enhanced_layout = qtx.QXVBoxLayout()
+            enhanced_layout.addWidget(self.q_stream_output)
+            enhanced_group.setLayout(enhanced_layout)
+            right_layout.addWidget(enhanced_group)
+        
+        right_viewers.setLayout(right_layout)
+        
+        # Add both sides to main layout
+        layout.addWidget(left_viewers, 1)  # 1 part width
+        layout.addWidget(right_viewers, 2)  # 2 parts width (larger for enhanced output)
         
         tab.setLayout(layout)
         return tab

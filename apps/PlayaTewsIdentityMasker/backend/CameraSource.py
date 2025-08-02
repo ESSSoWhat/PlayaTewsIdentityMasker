@@ -77,6 +77,7 @@ class CameraSourceWorker(BackendWorker):
     def get_control_sheet(self) -> 'Sheet.Worker': return super().get_control_sheet()
 
     def on_start(self, weak_heap : BackendWeakHeap, bc_out : BackendConnection):
+        print("🚀 Camera source worker starting...")
         self.weak_heap = weak_heap
         self.bc_out = bc_out
         self.bcd_uid = 0
@@ -99,7 +100,13 @@ class CameraSourceWorker(BackendWorker):
 
         cs.driver.enable()
         cs.driver.set_choices(_DriverType, _DriverType_names, none_choice_name='@misc.menu_select')
-        cs.driver.select(state.driver if state.driver is not None else _DriverType.DSHOW if platform.system() == 'Windows' else _DriverType.COMPATIBLE)
+        
+        # Ensure driver is set to DirectShow if not already set
+        if state.driver is None:
+            state.driver = _DriverType.DSHOW
+            print(f"🔧 Setting driver to DirectShow (was None)")
+        
+        cs.driver.select(state.driver)
 
         if platform.system() == 'Windows':
             from xlib.api.win32 import ole32
@@ -113,12 +120,20 @@ class CameraSourceWorker(BackendWorker):
 
         cs.device_idx.enable()
         cs.device_idx.set_choices(choices, none_choice_name='@misc.menu_select')
+        
+        # Ensure device index is set to 0 if not already set
+        if state.device_idx is None:
+            state.device_idx = 0
+            print(f"🔧 Setting device index to 0 (was None)")
+        
         cs.device_idx.select(state.device_idx)
 
         cs.resolution.enable()
         cs.resolution.set_choices(_ResolutionType, _ResolutionType_names, none_choice_name=None)
         cs.resolution.select(state.resolution if state.resolution is not None else _ResolutionType.RES_640x480)
 
+        print(f"🔍 Camera source state: device_idx={state.device_idx}, driver={state.driver}")
+        
         if state.device_idx is not None and \
            state.driver is not None:
 
@@ -126,37 +141,12 @@ class CameraSourceWorker(BackendWorker):
             cv_api = cv2.CAP_DSHOW  # Force DirectShow
             print(f"🔧 Forcing DirectShow backend for camera {state.device_idx}")
             # cv_api = {_DriverType.COMPATIBLE: cv2.CAP_ANY,
-                      _DriverType.DSHOW: cv2.CAP_DSHOW,
-                      _DriverType.MSMF: cv2.CAP_MSMF,
-                      _DriverType.GSTREAMER: cv2.CAP_GSTREAMER,
-                      }[state.driver]
+            #           _DriverType.DSHOW: cv2.CAP_DSHOW,
+            #           _DriverType.MSMF: cv2.CAP_MSMF,
+            #           _DriverType.GSTREAMER: cv2.CAP_GSTREAMER,
+            #           }[state.driver]
 
-            # Enhanced camera initialization with retry logic
-            max_retries = 3
-            vcap = None
-            
-            for attempt in range(max_retries):
-                try:
-                    print(f"🔧 Camera initialization attempt {attempt + 1}/{max_retries}")
-                    vcap = cv2.VideoCapture(state.device_idx, cv_api)
-                    
-                    if vcap.isOpened():
-                        print(f"✅ Camera {state.device_idx} opened successfully with DirectShow")
-                        break
-                    else:
-                        print(f"❌ Failed to open camera {state.device_idx}, attempt {attempt + 1}")
-                        if vcap:
-                            vcap.release()
-                        time.sleep(1)
-                except Exception as e:
-                    print(f"❌ Camera initialization error: {e}")
-                    if vcap:
-                        vcap.release()
-                    time.sleep(1)
-            
-            if vcap is None or not vcap.isOpened():
-                print(f"❌ Failed to open camera {state.device_idx} after {max_retries} attempts")
-                vcap = cv2.VideoCapture(state.device_idx, cv_api)  # Fallback to original method
+            vcap = cv2.VideoCapture(state.device_idx, cv_api)
             if vcap.isOpened():
                 self.vcap = vcap
                 w, h = _ResolutionType_wh[state.resolution]
@@ -263,16 +253,11 @@ class CameraSourceWorker(BackendWorker):
             state, cs = self.get_state(), self.get_control_sheet()
 
             self.start_profile_timing()
-            # Enhanced frame reading with validation
             ret, img = self.vcap.read()
             if ret:
                 # Validate frame
-                if img is not None and img.size > 0:
-                    print(f"📹 Camera frame read successful: {img.shape}" if self.bcd_uid % 30 == 0 else "", end="")
-                else:
-                    print(f"⚠️ Invalid frame received from camera")
+                if img is None or img.size == 0:
                     ret = False
-            if ret:
                 timestamp = datetime.now().timestamp()
                 fps = state.fps
                 if fps == 0 or ((timestamp - self.last_timestamp) > 1.0 / fps):
