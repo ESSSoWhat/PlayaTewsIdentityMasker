@@ -20,35 +20,42 @@ if "%1"=="" (
     echo   start_playatews.bat standard
     echo   start_playatews.bat obs
     echo   start_playatews.bat voice
-    goto :eof
+    goto :end
 )
 
 if "%1"=="standard" (
     echo Starting Standard PlayaTews Identity Masker...
     python main.py run PlayaTewsIdentityMasker
     goto :end
-) else if "%1"=="obs" (
+)
+
+if "%1"=="obs" (
     echo Starting OBS-Style PlayaTews Identity Masker...
     python main.py run PlayaTewsIdentityMaskerOBS
     goto :end
-) else if "%1"=="optimized" (
+)
+
+if "%1"=="optimized" (
     echo Starting Optimized PlayaTews Identity Masker...
     python main.py run PlayaTewsIdentityMaskerOptimized
     goto :end
-) else if "%1"=="enhanced" (
+)
+
+if "%1"=="enhanced" (
     echo Starting Enhanced PlayaTews Identity Masker...
     python main.py run PlayaTewsIdentityMaskerEnhanced
     goto :end
-) else if "%1"=="voice" (
+)
+
+if "%1"=="voice" (
     echo Starting Voice Changer Server...
     cd voice-changer\server
     python MMVCServerSIO.py
     goto :end
-) else (
-    echo Unknown option: %1
-    echo Run without arguments to see available options.
-    goto :eof
 )
+
+echo Unknown option: %1
+echo Run without arguments to see available options.
 
 :end
 echo.

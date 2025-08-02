@@ -11,9 +11,14 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
+# Background agent specific environment variables
+ENV AGENT_ENV=production
+ENV LOG_LEVEL=INFO
+ENV MAX_WORKERS=4
+ENV WORKER_TIMEOUT=300
+
 # Create ubuntu user and set up home directory
-RUN useradd -m -s /bin/bash ubuntu && \
-    echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN useradd -m -s /bin/bash ubuntu
 
 # Set working directory
 WORKDIR /home/ubuntu
@@ -127,7 +132,12 @@ RUN pip install \
     Pillow>=8.0.0,<11.0.0 \
     pyyaml>=6.0,<7.0 \
     requests>=2.25.0 \
-    tqdm>=4.60.0
+    tqdm>=4.60.0 \
+    # Background agent specific packages
+    python-dotenv>=0.19.0 \
+    structlog>=23.0.0 \
+    schedule>=1.2.0 \
+    watchdog>=3.0.0
 
 # Install development and testing tools
 RUN pip install \
@@ -154,7 +164,7 @@ RUN git config --global init.defaultBranch main && \
     git config --global user.email "agent@playatews.com"
 
 # Create common development directories
-RUN mkdir -p /home/ubuntu/{workspace,data,models,logs,temp}
+RUN mkdir -p /home/ubuntu/{workspace,data,models,logs,temp,config,cache,backups}
 
 # Set proper ownership
 RUN chown -R ubuntu:ubuntu /home/ubuntu
@@ -168,6 +178,10 @@ SHELL ["/bin/bash", "-c"]
 # Create a simple startup script
 RUN echo '#!/bin/bash\necho "PlayaTews Identity Masker - Background Agent Environment"\necho "Python version: $(python3.11 --version)"\necho "Working directory: $(pwd)"\necho "Virtual environment: $VIRTUAL_ENV"\nexec "$@"' > /home/ubuntu/start.sh && \
     chmod +x /home/ubuntu/start.sh
+
+# Add health check for background agent
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python3.11 -c "import sys; sys.exit(0)"
 
 # Set the startup script as default command
 CMD ["/home/ubuntu/start.sh", "/bin/bash"]

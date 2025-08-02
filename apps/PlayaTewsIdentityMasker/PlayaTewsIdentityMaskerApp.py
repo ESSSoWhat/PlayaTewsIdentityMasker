@@ -72,7 +72,27 @@ class QLiveSwap(qtx.QXWidget):
         face_merger_bc_out    = backend.BackendConnection()
 
         file_source    = self.file_source    = backend.FileSource   (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_out=multi_sources_bc_out, backend_db=backend_db)
-        camera_source  = self.camera_source  = backend.CameraSource (weak_heap=backend_weak_heap, bc_out=multi_sources_bc_out, backend_db=backend_db)
+        
+        # Enhanced camera source initialization
+        print("🔧 Initializing camera source with DirectShow backend...")
+        camera_source = self.camera_source = backend.CameraSource(weak_heap=backend_weak_heap, bc_out=multi_sources_bc_out, backend_db=backend_db)
+        
+        # Force camera to start with DirectShow
+        try:
+            camera_source.start()
+            print("✅ Camera source started successfully")
+            
+            # Wait a moment for camera to initialize
+            time.sleep(2)
+            
+            # Check if camera is working
+            if hasattr(camera_source, 'is_started') and camera_source.is_started():
+                print("✅ Camera source is running")
+            else:
+                print("⚠️ Camera source may not be running properly")
+        except Exception as e:
+            print(f"❌ Error starting camera source: {e}")
+        
         face_detector  = self.face_detector  = backend.FaceDetector (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=multi_sources_bc_out, bc_out=face_detector_bc_out, backend_db=backend_db )
         face_marker    = self.face_marker    = backend.FaceMarker   (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_detector_bc_out, bc_out=face_marker_bc_out, backend_db=backend_db)
         face_aligner   = self.face_aligner   = backend.FaceAligner  (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_marker_bc_out, bc_out=face_aligner_bc_out, backend_db=backend_db )

@@ -122,13 +122,41 @@ class CameraSourceWorker(BackendWorker):
         if state.device_idx is not None and \
            state.driver is not None:
 
-            cv_api = {_DriverType.COMPATIBLE: cv2.CAP_ANY,
+            # Force DirectShow backend for compatibility
+            cv_api = cv2.CAP_DSHOW  # Force DirectShow
+            print(f"🔧 Forcing DirectShow backend for camera {state.device_idx}")
+            # cv_api = {_DriverType.COMPATIBLE: cv2.CAP_ANY,
                       _DriverType.DSHOW: cv2.CAP_DSHOW,
                       _DriverType.MSMF: cv2.CAP_MSMF,
                       _DriverType.GSTREAMER: cv2.CAP_GSTREAMER,
                       }[state.driver]
 
-            vcap = cv2.VideoCapture(state.device_idx, cv_api)
+            # Enhanced camera initialization with retry logic
+            max_retries = 3
+            vcap = None
+            
+            for attempt in range(max_retries):
+                try:
+                    print(f"🔧 Camera initialization attempt {attempt + 1}/{max_retries}")
+                    vcap = cv2.VideoCapture(state.device_idx, cv_api)
+                    
+                    if vcap.isOpened():
+                        print(f"✅ Camera {state.device_idx} opened successfully with DirectShow")
+                        break
+                    else:
+                        print(f"❌ Failed to open camera {state.device_idx}, attempt {attempt + 1}")
+                        if vcap:
+                            vcap.release()
+                        time.sleep(1)
+                except Exception as e:
+                    print(f"❌ Camera initialization error: {e}")
+                    if vcap:
+                        vcap.release()
+                    time.sleep(1)
+            
+            if vcap is None or not vcap.isOpened():
+                print(f"❌ Failed to open camera {state.device_idx} after {max_retries} attempts")
+                vcap = cv2.VideoCapture(state.device_idx, cv_api)  # Fallback to original method
             if vcap.isOpened():
                 self.vcap = vcap
                 w, h = _ResolutionType_wh[state.resolution]
@@ -235,7 +263,15 @@ class CameraSourceWorker(BackendWorker):
             state, cs = self.get_state(), self.get_control_sheet()
 
             self.start_profile_timing()
+            # Enhanced frame reading with validation
             ret, img = self.vcap.read()
+            if ret:
+                # Validate frame
+                if img is not None and img.size > 0:
+                    print(f"📹 Camera frame read successful: {img.shape}" if self.bcd_uid % 30 == 0 else "", end="")
+                else:
+                    print(f"⚠️ Invalid frame received from camera")
+                    ret = False
             if ret:
                 timestamp = datetime.now().timestamp()
                 fps = state.fps
