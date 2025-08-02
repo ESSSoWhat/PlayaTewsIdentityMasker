@@ -1,6 +1,6 @@
 
 DFM Model Recovery Report
-Generated: 2025-07-28 20:17:46
+Generated: 2025-08-02 11:51:00
 
 SUMMARY:
 - Total models in registry: 16
