@@ -253,39 +253,23 @@ See the [complete troubleshooting guide](OBS_STYLE_INTERFACE_GUIDE.md#troublesho
 ---
 
 **Ready to start streaming?** Launch with `python launch_obs_style.py` and experience professional-grade face swapping with streaming capabilities!
-=======
+
 # PlayaTewsIdentityMasker
- cursor/update-application-and-repository-name-ad7b
-
-Real-time face swapping application for live streaming and video processing.
-
-## Features
-- Real-time face detection and swapping
-- GPU acceleration support
-- Live streaming integration
-- Multiple face model support
-- Optimized performance
-
-## Installation
-1. Clone the repository
-2. Install dependencies: `pip install -r requirements_minimal.txt`
-3. Run the application: `python main.py run PlayaTewsIdentityMasker`
-
-## Local Development Path
-Local path: `C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master`
-=======
- main
 
 A real-time face swapping application for live streaming and video processing.
 
 ## Features
 
 - Real-time face detection and swapping
-- Live streaming support
+- Live streaming support with OBS integration
 - GPU acceleration with CUDA
 - Multiple face swap models
 - Camera and file input support
 - Cross-platform compatibility (Windows, macOS, Linux)
+- Extensible interface for custom sources
+- Plugin-ready architecture
+- Professional codebase organization
+- Modern Python streaming implementation
 
 ## Installation
 
@@ -347,7 +331,7 @@ This will create:
 - Linux: `PlayaTewsIdentityMasker-x86_64.AppImage`
 - macOS: `PlayaTewsIdentityMasker.app`
 
-## Local Path
+## Local Development Path
 
 The application is configured for the local path:
 `C:\Users\son-l\Desktop\PlayaTewsIdentityMasker\PlayaTewsIdentityMasker-master`
@@ -366,4 +350,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For issues and questions, please open an issue on GitHub.
- main
