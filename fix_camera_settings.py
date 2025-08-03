@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 """
-Fix Camera Settings for PlayaTewsIdentityMasker
-Adds missing camera configuration to settings files
+Fix missing camera settings in configuration files
 """
 
 import json
-from pathlib import Path
+import os
 
 def fix_camera_settings():
-    """Fix camera settings in all configuration files"""
-    print("🔧 Fixing Camera Settings...")
-    print("=" * 50)
+    """Add camera settings to all configuration files"""
     
-    # Camera settings to add
     camera_settings = {
         "device_idx": 0,
         "driver": 1,  # DirectShow
@@ -28,16 +24,16 @@ def fix_camera_settings():
         "demo_settings/settings/global_face_swap_state.json"
     ]
     
-    for settings_file in settings_files:
-        settings_path = Path(settings_file)
+    for file_path in settings_files:
+        print(f"🔧 Fixing {file_path}...")
         
         # Create directory if it doesn't exist
-        settings_path.parent.mkdir(parents=True, exist_ok=True)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         
-        # Load existing settings or create new
-        if settings_path.exists():
+        # Load existing data or create new
+        if os.path.exists(file_path):
             try:
-                with open(settings_path, 'r', encoding='utf-8') as f:
+                with open(file_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
             except:
                 data = {}
@@ -47,23 +43,13 @@ def fix_camera_settings():
         # Add camera settings
         data['camera'] = camera_settings
         
-        # Save updated settings
+        # Write back to file
         try:
-            with open(settings_path, 'w', encoding='utf-8') as f:
+            with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
-            print(f"✅ {settings_file}: Camera settings added")
+            print(f"✅ {file_path} updated successfully")
         except Exception as e:
-            print(f"❌ {settings_file}: Error saving - {e}")
-
-def main():
-    print("🎬 PlayaTewsIdentityMasker - Camera Settings Fix")
-    print("=" * 50)
-    print()
-    
-    fix_camera_settings()
-    
-    print("\n📊 Settings Fix Complete!")
-    print("=" * 30)
+            print(f"❌ Error updating {file_path}: {e}")
 
 if __name__ == "__main__":
-    main() 
+    fix_camera_settings() 
