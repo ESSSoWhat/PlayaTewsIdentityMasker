@@ -404,11 +404,30 @@ class PlayaTewsIdentityMaskerApp(qtx.QXMainApplication):
 
         # Fonts and images are loaded on demand (no initialization needed)
 
-        # Create QLiveSwap instance directly - this is the working approach
+        # Create QLiveSwap instance first to get all UI components
         self.q_live_swap = QLiveSwap(userdata_path, self.settings_dirpath)
         
-        # Set the main window to be the QLiveSwap widget
-        self.main_window = self.q_live_swap
+        # Create main window with UI components from QLiveSwap
+        self.main_window = QDFLAppWindow(
+            userdata_path, 
+            self.settings_dirpath,
+            self.q_live_swap.q_file_source,
+            self.q_live_swap.q_camera_source,
+            self.q_live_swap.q_face_detector,
+            self.q_live_swap.q_face_marker,
+            self.q_live_swap.q_face_aligner,
+            self.q_live_swap.q_face_animator,
+            self.q_live_swap.q_face_swap_insight,
+            self.q_live_swap.q_face_swap_dfm,
+            self.q_live_swap.q_frame_adjuster,
+            self.q_live_swap.q_face_merger,
+            self.q_live_swap.q_stream_output,
+            self.q_live_swap.q_voice_changer,
+            self.q_live_swap.q_ds_frame_viewer,
+            self.q_live_swap.q_ds_fa_viewer,
+            self.q_live_swap.q_ds_fc_viewer,
+            self.q_live_swap.q_ds_merged_frame_viewer
+        )
 
         # Show splash screen
         self.show_splash_screen()
