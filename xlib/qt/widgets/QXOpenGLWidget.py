@@ -9,12 +9,12 @@ class QXOpenGLWidget(QOpenGLWidget, _part_QXWidget):
     def __init__(self, **kwargs):
         super().__init__()
         _part_QXWidget.__init__(self, **kwargs)
-        self._default_pal = QPalette( self.palette() )
+        self._default_pal = QPalette(self.palette())
 
-    def focusInEvent(self, ev : QFocusEvent):
+    def focusInEvent(self, ev: QFocusEvent):
         super().focusInEvent(ev)
         _part_QXWidget.focusInEvent(self, ev)
 
-    def resizeEvent(self, ev : QResizeEvent):
+    def resizeEvent(self, ev: QResizeEvent):
         super().resizeEvent(ev)
         _part_QXWidget.resizeEvent(self, ev)

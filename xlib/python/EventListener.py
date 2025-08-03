@@ -2,7 +2,8 @@ from collections.abc import Iterable
 
 
 class EventListener:
-    __slots__ = ['_funcs']
+    __slots__ = ["_funcs"]
+
     def __init__(self):
         self._funcs = []
 

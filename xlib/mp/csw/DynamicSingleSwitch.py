@@ -2,7 +2,6 @@ from collections.abc import Iterable
 from typing import List, Union
 
 from ...python import EventListener
-
 from .CSWBase import ControlClient, ControlHost
 
 
@@ -11,8 +10,8 @@ class _DynamicSingleSwitchBase:
         self._on_selected_evl = EventListener()
         self._on_choices_evl = EventListener()
 
-        self._call_on_msg('selected_idx', self._on_msg_selected)
-        self._call_on_msg('choices', self._on_msg_choices)
+        self._call_on_msg("selected_idx", self._on_msg_selected)
+        self._call_on_msg("choices", self._on_msg_choices)
 
         self._selected_idx = None
 
@@ -25,19 +24,23 @@ class _DynamicSingleSwitchBase:
         self._set_selected_idx(selected_idx)
 
     def _send_selected_idx(self):
-        self._send_msg('selected_idx', self.get_selected_idx() )
+        self._send_msg("selected_idx", self.get_selected_idx())
 
     def _set_selected_idx(self, selected_idx):
         if self._selected_idx != selected_idx:
             self._selected_idx = selected_idx
-            self._on_selected_evl.call(selected_idx, self.get_selected_choice() )
+            self._on_selected_evl.call(selected_idx, self.get_selected_choice())
             return True
         return False
 
     def _send_choices(self):
-        self._send_msg('choices', self._choices, self._choices_names, self._none_choice_name)
+        self._send_msg(
+            "choices", self._choices, self._choices_names, self._none_choice_name
+        )
 
-    def _set_choices(self, choices, choices_names : List[str], none_choice_name : Union[str,None]):
+    def _set_choices(
+        self, choices, choices_names: List[str], none_choice_name: Union[str, None]
+    ):
         self._choices = choices
         self._choices_len = len(choices)
         self._choices_names = choices_names
@@ -71,12 +74,18 @@ class _DynamicSingleSwitchBase:
         """
         self._on_selected_evl.add(func)
 
-    def in_choices(self, choice) -> bool: return choice in self._choices
+    def in_choices(self, choice) -> bool:
+        return choice in self._choices
 
-    def get_choices(self): return self._choices
-    def get_choices_names(self) -> List[str]: return self._choices_names
+    def get_choices(self):
+        return self._choices
 
-    def get_selected_idx(self) -> Union[int, None]: return self._selected_idx
+    def get_choices_names(self) -> List[str]:
+        return self._choices_names
+
+    def get_selected_idx(self) -> Union[int, None]:
+        return self._selected_idx
+
     def get_selected_choice(self):
         if self._selected_idx is None:
             return None
@@ -92,7 +101,7 @@ class _DynamicSingleSwitchBase:
         func does not raise any exceptions
         """
         if idx_or_choice is not None:
-            idx_or_choice = self._choice_to_index (idx_or_choice)
+            idx_or_choice = self._choice_to_index(idx_or_choice)
             if idx_or_choice is None:
                 return False
 
@@ -116,6 +125,7 @@ class DynamicSingleSwitch:
 
 
     """
+
     class Host(ControlHost, _DynamicSingleSwitchBase):
         def __init__(self):
             ControlHost.__init__(self)
@@ -141,22 +151,22 @@ class DynamicSingleSwitch:
 
             # Validate choices
             if choices is None:
-                raise ValueError('Choices cannot be None.')
+                raise ValueError("Choices cannot be None.")
             if not isinstance(choices, Iterable):
-                raise ValueError('Choices must be Iterable')
+                raise ValueError("Choices must be Iterable")
 
             if choices_names is None:
                 choices_names = tuple(str(c) for c in choices)
-            elif isinstance(choices_names, (list,tuple)):
+            elif isinstance(choices_names, (list, tuple)):
                 if len(choices_names) != len(choices):
-                    raise ValueError('mismatch len of choices and choices names')
+                    raise ValueError("mismatch len of choices and choices names")
             elif isinstance(choices_names, dict):
-                choices_names = [ choices_names[x] for x in choices ]
+                choices_names = [choices_names[x] for x in choices]
             else:
-                raise ValueError('unsupported type of choices_names')
+                raise ValueError("unsupported type of choices_names")
 
-            if not all( isinstance(x, str) for x in choices_names ):
-                raise ValueError('all values in choices_names must be a str')
+            if not all(isinstance(x, str) for x in choices_names):
+                raise ValueError("all values in choices_names must be a str")
 
             choices = tuple(choices)
 
@@ -170,5 +180,3 @@ class DynamicSingleSwitch:
 
         def _on_reset(self):
             self._set_selected_idx(None)
-
-

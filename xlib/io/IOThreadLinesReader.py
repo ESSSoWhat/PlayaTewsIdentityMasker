@@ -1,15 +1,16 @@
 import threading
 import time
+from collections import deque
 from io import IOBase
 from typing import List
-from collections import deque
+
 
 class IOThreadLinesReader:
     """
     continuously reads lines from IO in background thread.
     """
 
-    def __init__(self, io : IOBase, max_lines=None):
+    def __init__(self, io: IOBase, max_lines=None):
         self._io = io
         self._lock = threading.Lock()
         self._lines = deque(maxlen=max_lines)
@@ -24,21 +25,19 @@ class IOThreadLinesReader:
         while not io.closed and io.readable():
             line = io.readline()
             lock.acquire()
-            lines.append(line.decode('utf-8').rstrip())
+            lines.append(line.decode("utf-8").rstrip())
             lock.release()
             if len(line) == 0:
                 break
             time.sleep(0.01)
 
     def get_lines(self, wait_new=True, till_eof=False) -> List[str]:
-        """
-        """
+        """ """
         lock = self._lock
         lines = self._lines
 
         result = []
         while True:
-
             if len(lines) != 0:
                 lock.acquire()
                 result += lines
@@ -53,4 +52,3 @@ class IOThreadLinesReader:
             if not till_eof and not wait_new:
                 return None
             time.sleep(0.001)
-

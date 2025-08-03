@@ -7,7 +7,9 @@ from ..SCacheton import SCacheton
 from ..Tensor import Tensor
 
 
-def matmul(a_t : Tensor, b_t : Tensor, output_t: Tensor=None, is_add_to_output=False) -> Tensor:
+def matmul(
+    a_t: Tensor, b_t: Tensor, output_t: Tensor = None, is_add_to_output=False
+) -> Tensor:
     """
     matmul operator in row-major format
 
@@ -27,8 +29,9 @@ def matmul(a_t : Tensor, b_t : Tensor, output_t: Tensor=None, is_add_to_output=F
     return matmulc(b_t, a_t, output_t=output_t, is_add_to_output=is_add_to_output)
 
 
-
-def matmulc(a_t : Tensor, b_t : Tensor, output_t : Tensor = None, is_add_to_output=False) -> Tensor:
+def matmulc(
+    a_t: Tensor, b_t: Tensor, output_t: Tensor = None, is_add_to_output=False
+) -> Tensor:
     """
     matmul operator in col-major format
 
@@ -47,14 +50,26 @@ def matmulc(a_t : Tensor, b_t : Tensor, output_t : Tensor = None, is_add_to_outp
     """
     device = HArgs.check_get_same_device([a_t, b_t])
 
-    op = SCacheton.get(_MatmulOp, a_t.shape, a_t.dtype, b_t.shape, b_t.dtype, False if output_t is None else is_add_to_output)
+    op = SCacheton.get(
+        _MatmulOp,
+        a_t.shape,
+        a_t.dtype,
+        b_t.shape,
+        b_t.dtype,
+        False if output_t is None else is_add_to_output,
+    )
 
     if output_t is None:
-        output_t = Tensor (op.o_shape, op.o_dtype, device=device )
+        output_t = Tensor(op.o_shape, op.o_dtype, device=device)
     elif output_t.shape.size != op.o_shape.size:
-        raise ValueError(f'output_t must have size {op.o_shape.size}')
+        raise ValueError(f"output_t must have size {op.o_shape.size}")
 
-    device.run_kernel(op.forward_krn, output_t.get_buffer(), a_t.get_buffer(), b_t.get_buffer(), )
+    device.run_kernel(
+        op.forward_krn,
+        output_t.get_buffer(),
+        a_t.get_buffer(),
+        b_t.get_buffer(),
+    )
 
     return output_t
 
@@ -65,31 +80,33 @@ class _MatmulOp:
         b_dtype = np.dtype(b_dtype).type
 
         if a_dtype != np.float32 or b_dtype != np.float32:
-            raise ValueError('matmul works only with float32 tensors.')
+            raise ValueError("matmul works only with float32 tensors.")
 
         if a_shape.ndim != b_shape.ndim:
-            raise ValueError(f'ndims are not equal. {a_shape.ndim} != {b_shape.ndim}')
+            raise ValueError(f"ndims are not equal. {a_shape.ndim} != {b_shape.ndim}")
 
         ndim = a_shape.ndim
         if ndim < 2:
-            raise ValueError('Tensors ndim must be at least 2.')
+            raise ValueError("Tensors ndim must be at least 2.")
 
         K, M = a_shape[-2], a_shape[-1]
         N, B_COLS = b_shape[-2], b_shape[-1]
 
         if K != B_COLS:
-            raise ValueError('A_ROWS != B_COLS')
+            raise ValueError("A_ROWS != B_COLS")
 
         BATCH = a_shape[0:-2].size
         B_BATCH = b_shape[0:-2].size
 
         if BATCH != B_BATCH:
-            raise ValueError(f'BATCH size {BATCH} != {B_BATCH} in shapes {a_shape} {b_shape}')
+            raise ValueError(
+                f"BATCH size {BATCH} != {B_BATCH} in shapes {a_shape} {b_shape}"
+            )
 
         if ndim == 2:
-            self.o_shape = AShape( (N, M) )
+            self.o_shape = AShape((N, M))
         else:
-            self.o_shape = AShape( a_shape[:-2]+(N, M) )
+            self.o_shape = AShape(a_shape[:-2] + (N, M))
         self.o_dtype = np.float32
 
         self.M = M
@@ -97,15 +114,17 @@ class _MatmulOp:
         self.K = K
 
         # Determining optimal tile widths
-        for MW in [8,4,2,1]:
+        for MW in [8, 4, 2, 1]:
             if M % MW == 0:
                 break
-        for KW in [8,4,2,1]:
+        for KW in [8, 4, 2, 1]:
             if N % KW == 0 and K % KW == 0:
                 break
         NW = KW
 
-        self.forward_krn = Kernel(global_shape=(M//MW, N//NW, BATCH), kernel_text=f"""
+        self.forward_krn = Kernel(
+            global_shape=(M // MW, N // NW, BATCH),
+            kernel_text=f"""
 #define K {K}
 #define N {N}
 #define MW {MW}     // M tile Width
@@ -154,5 +173,5 @@ __kernel void GeMM(__global floatMW* O, const __global floatMW* restrict A, cons
     for (uint n=0; n<NW; ++n)
         O[ batch*N*MT + (nc*NW + n)*MT + mt] {'+=' if is_add_to_output else '='}
                                *( (floatMW*) CT[n]);
-}}""")
-
+}}""",
+        )

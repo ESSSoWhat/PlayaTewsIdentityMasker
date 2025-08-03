@@ -15,10 +15,10 @@ class QXProgressBar(QProgressBar, _part_QXWidget):
         if max is not None:
             self.setMaximum(max)
 
-    def focusInEvent(self, ev : QFocusEvent):
+    def focusInEvent(self, ev: QFocusEvent):
         super().focusInEvent(ev)
         _part_QXWidget.focusInEvent(self, ev)
 
-    def resizeEvent(self, ev : QResizeEvent):
+    def resizeEvent(self, ev: QResizeEvent):
         super().resizeEvent(ev)
         _part_QXWidget.resizeEvent(self, ev)

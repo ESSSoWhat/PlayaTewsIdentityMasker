@@ -1,1 +1,1 @@
-from .ole32 import CoInitializeEx, COINIT, CLSCTX, CoCreateInstance, CoUninitialize
+from .ole32 import CLSCTX, COINIT, CoCreateInstance, CoInitializeEx, CoUninitialize

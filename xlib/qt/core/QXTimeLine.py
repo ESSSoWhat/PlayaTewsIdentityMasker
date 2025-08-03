@@ -3,6 +3,8 @@ from typing import Tuple
 from PyQt5.QtCore import *
 
 _linear_easing_curve = QEasingCurve(QEasingCurve.Type.Linear)
+
+
 class QXTimeLine(QTimeLine):
     """
     QXTimeLine with default linear curve
@@ -10,15 +12,18 @@ class QXTimeLine(QTimeLine):
 
       frame_range(None)  (int,int)   start,end
     """
-    def __init__(self, duration,
-                       frame_range : Tuple[int,int] = None,
-                       loop_count=1,
-                       update_interval : int = None,
-                       easing_curve=None,
-                       frameChanged=None,
-                       stateChanged=None,
-                       start=False):
 
+    def __init__(
+        self,
+        duration,
+        frame_range: Tuple[int, int] = None,
+        loop_count=1,
+        update_interval: int = None,
+        easing_curve=None,
+        frameChanged=None,
+        stateChanged=None,
+        start=False,
+    ):
         super().__init__(duration)
 
         if frame_range is not None:

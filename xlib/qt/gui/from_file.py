@@ -10,9 +10,10 @@ def QPixmap_from_file(filepath, color=None):
     if color is not None:
         qp = QPainter(img)
         qp.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceIn)
-        qp.fillRect( img.rect(), QColor(color) )
+        qp.fillRect(img.rect(), QColor(color))
         qp.end()
     return img
+
 
 def QXPixmap_from_file(filepath, color=None):
     img = QXPixmap(str(filepath))
@@ -20,13 +21,14 @@ def QXPixmap_from_file(filepath, color=None):
     if color is not None:
         qp = QPainter(img)
         qp.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceIn)
-        qp.fillRect( img.rect(), QColor(color) )
+        qp.fillRect(img.rect(), QColor(color))
         qp.end()
     return img
+
 
 def QXImage_from_file(filepath, color=None):
     return QXImage(QPixmap_from_file(filepath, color).toImage())
 
 
-def QIcon_from_file(filepath, color='black'):
-    return QIcon(QPixmap_from_file(filepath,color=color))
+def QIcon_from_file(filepath, color="black"):
+    return QIcon(QPixmap_from_file(filepath, color=color))

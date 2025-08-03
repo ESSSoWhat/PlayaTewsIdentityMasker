@@ -1,1 +1,1 @@
-from .oaidl import IPropertyBag, IErrorLog
+from .oaidl import IErrorLog, IPropertyBag

@@ -18,14 +18,14 @@ class DelayedBuffers:
                                         |  |  |  |  |  |  |  |  |
                                         ^----show data evenly---^
     """
+
     class ProcessResult:
-        __slots__ = ['new_data']
+        __slots__ = ["new_data"]
 
         def __init__(self):
             self.new_data = None
 
     def __init__(self):
-
         self._buffers = deque()
         self._target_delay = 0
 
@@ -38,28 +38,28 @@ class DelayedBuffers:
         buffers = self._buffers
         if len(buffers) >= 2:
             x = tuple(buffer[0] for buffer in buffers)
-            self._avg_delay = min(1.0, (max(x)-min(x)) / (len(x)-1) )
+            self._avg_delay = min(1.0, (max(x) - min(x)) / (len(x) - 1))
 
-    def get_avg_delay(self): return self._avg_delay
+    def get_avg_delay(self):
+        return self._avg_delay
 
-    def add_buffer(self, timestamp : float, data):
+    def add_buffer(self, timestamp: float, data):
         buffers = self._buffers
         buffers_len = len(buffers)
-        
+
         for i in range(buffers_len):
             if timestamp < buffers[i][0]:
-                buffers.insert( i, (timestamp, data))
+                buffers.insert(i, (timestamp, data))
                 self._update_avg_frame_delay()
                 return
-        
-        buffers.append( (timestamp, data) )
+
+        buffers.append((timestamp, data))
         self._update_avg_frame_delay()
 
-    def set_target_delay(self, target_delay_sec : float):
+    def set_target_delay(self, target_delay_sec: float):
         self._target_delay = target_delay_sec
 
-
-    def process(self) -> 'DelayedBuffers.ProcessResult':
+    def process(self) -> "DelayedBuffers.ProcessResult":
         """
         processes inner logic
 
@@ -69,7 +69,6 @@ class DelayedBuffers:
         buffers = self._buffers
         now = datetime.now().timestamp()
 
-        
         if now - self._last_ts >= self._avg_delay:
             self._last_ts += self._avg_delay
 
@@ -90,13 +89,13 @@ class DelayedBuffers:
                         buffers_to_remove.append(buffer)
                     else:
                         break
-                
+
                 if len(buffers_to_remove) >= 2:
                     buffers_to_remove.pop(-1)
                     for buffer in buffers_to_remove:
                         buffers.remove(buffer)
                     self._update_avg_frame_delay()
-                
+
                 if len(buffers) != 0:
                     _, new_data = buffers[0]
                     if not self._last_data is new_data:

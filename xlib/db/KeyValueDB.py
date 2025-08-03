@@ -8,7 +8,7 @@ from ..io import FormattedFileIO
 class KeyValueDB:
     _KeyValueDB_VERSION = 1
 
-    def __init__(self, filepath = None):
+    def __init__(self, filepath=None):
         """
         Simple key/value database.
 
@@ -23,10 +23,10 @@ class KeyValueDB:
         try:
             d = {}
             if self._filepath is not None:
-                with FormattedFileIO(self._filepath, 'r+') as f:
-                    ver, = f.read_fmt('I')
+                with FormattedFileIO(self._filepath, "r+") as f:
+                    (ver,) = f.read_fmt("I")
                     if ver == KeyValueDB._KeyValueDB_VERSION:
-                        keys_len, = f.read_fmt('I')
+                        (keys_len,) = f.read_fmt("I")
                         for i in range(keys_len):
                             obj = f.read_pickled()
                             if obj is not None:
@@ -35,7 +35,7 @@ class KeyValueDB:
         except:
             d = {}
         self._data = d
-        
+
     def clear(self):
         self._data = {}
 
@@ -58,18 +58,18 @@ class KeyValueDB:
     def _save_data(self):
         if self._filepath is not None:
             try:
-                with FormattedFileIO(self._filepath, 'w+') as f:
-                    f.write_fmt('I', KeyValueDB._KeyValueDB_VERSION)
+                with FormattedFileIO(self._filepath, "w+") as f:
+                    f.write_fmt("I", KeyValueDB._KeyValueDB_VERSION)
 
                     d = self._data
                     keys = list(d.keys())
-                    f.write_fmt('I', len(keys))
+                    f.write_fmt("I", len(keys))
                     for key in keys:
-                        f.write_pickled( (key, d[key]) )
+                        f.write_pickled((key, d[key]))
 
                     f.truncate()
             except:
-                print(f'Unable to save the data. {traceback.format_exc()}')
+                print(f"Unable to save the data. {traceback.format_exc()}")
 
     def finish_pending_jobs(self):
         """finish any pending jobs now"""
@@ -79,7 +79,9 @@ class KeyValueDB:
 
     def process_messages(self):
         save_timestamp = self._save_timestamp
-        if save_timestamp is not None and \
-           (datetime.now().timestamp() - save_timestamp) >= 0:
+        if (
+            save_timestamp is not None
+            and (datetime.now().timestamp() - save_timestamp) >= 0
+        ):
             self._save_timestamp = None
             self._save_data()

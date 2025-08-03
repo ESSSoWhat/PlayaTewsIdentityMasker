@@ -12,10 +12,10 @@
 #     currently works only with one-key shortcut
 #     """
 
-#     def __init__(self, icon, 
-#                     tooltip=None, 
-#                     shortcut=None,                    
-#                     click_func=None,                  
+#     def __init__(self, icon,
+#                     tooltip=None,
+#                     shortcut=None,
+#                     click_func=None,
 #                     first_repeat_delay=300,
 #                     repeat_delay=20,
 #                     ):
@@ -23,29 +23,28 @@
 #         super().__init__(icon, "")
 
 #         self.setIcon(icon)
-        
+
 #         if shortcut is not None:
 #             tooltip = f"{tooltip} ( S_HOT_KEY: {shortcut} )"
-        
+
 #         self.setToolTip(tooltip)
-            
-        
-        
+
+
 #         self.seq = QKeySequence(shortcut) if shortcut is not None else None
-        
+
 #         QXMainWindow.inst.add_keyPressEvent_listener ( self.on_keyPressEvent )
 #         QXMainWindow.inst.add_keyReleaseEvent_listener ( self.on_keyReleaseEvent )
-        
+
 #         self.click_func = click_func
 #         self.first_repeat_delay = first_repeat_delay
 #         self.repeat_delay = repeat_delay
 #         self.repeat_timer = None
-        
+
 #         self.op_device = None
-        
+
 #         self.pressed.connect( lambda : self.action(is_pressed=True)  )
 #         self.released.connect( lambda : self.action(is_pressed=False)  )
-        
+
 #     def action(self, is_pressed=None, op_device=None):
 #         if self.click_func is None:
 #             return
@@ -65,12 +64,12 @@
 #             self.click_func()
 #             if self.repeat_timer is not None:
 #                 self.repeat_timer.setInterval(self.repeat_delay)
-        
-#     def on_keyPressEvent(self, ev):              
+
+#     def on_keyPressEvent(self, ev):
 #         key = ev.nativeVirtualKey()
 #         if ev.isAutoRepeat():
 #             return
-            
+
 #         if self.seq is not None:
 #             if key == self.seq[0]:
 #                 self.action(is_pressed=True)
@@ -82,14 +81,14 @@
 #         if self.seq is not None:
 #             if key == self.seq[0]:
 #                 self.action(is_pressed=False)
-                
-                
+
+
 ############################
 ############################
 ############################
 ############################
-############################         
-                
+############################
+
 # class QXTabWidget(QTabWidget):
 #     def __init__(self, tabs=None, tab_shape=None, size_policy=None, maximum_width=None, hided=False, enabled=True):
 #         super().__init__()
@@ -98,28 +97,26 @@
 #                 self.addTab(tab, icon, name)
 #         if tab_shape is not None:
 #             self.setTabShape(tab_shape)
-        
+
 #         if maximum_width is not None:
 #             self.setMaximumWidth(maximum_width)
-            
+
 #         if size_policy is not None:
 #             self.setSizePolicy(*size_policy)
 #         if hided:
 #             self.hide()
 #         self.setEnabled(enabled)
-        
-        
 
 
 # class QXComboObjectBox(QXComboBox):
 #     """
-#     as QComboBox but str'able Iterable of objects 
-#     and more functionality    
+#     as QComboBox but str'able Iterable of objects
+#     and more functionality
 #     """
 
 #     def __init__(self, choices : Iterable, none_choice=None, font=None, size_policy=None, maximum_width=None, hided=False, enabled=True, on_choosed=None):
 #         super().__init__(font=font, size_policy=size_policy, maximum_width=maximum_width, hided=hided, enabled=enabled)
-        
+
 #         self.choices = tuple(choices)
 #         if len(self.choices) == 0:
 #             raise ValueError('Number of choices are 0')
@@ -133,10 +130,10 @@
 
 #         self.setCurrentIndex(0)
 #         self.currentIndexChanged.connect(self.on_toggled)
-    
+
 #     def get_choices(self):
 #         return self.choices
-        
+
 #     def get_selected_choice(self):
 #         idx = self.currentIndex()
 #         if self.none_choice is not None:
@@ -176,7 +173,6 @@
 #     def on_toggled(self, idx):
 #         if self.on_choosed is not None:
 #             self.on_choosed( self.get_selected_choice() )
-            
 
 
 # class QXCollapsibleSection(QWidget):
@@ -191,7 +187,7 @@
 #         #btn.setIconSize( QSize(8,8))
 #         btn.setCheckable(True)
 #         btn.setChecked(False)
-        
+
 #         if allow_open_close:
 #             btn.toggled.connect(self.on_btn_toggled)
 
@@ -208,7 +204,7 @@
 #         main_l.addWidget(QXHorizontalLine() , 0, 1)
 
 #         main_l.addWidget(frame, 1, 0, 1, 2)
-        
+
 
 #         self.setLayout(main_l)
 
@@ -219,7 +215,7 @@
 
 #     def is_opened(self):
 #         return self.frame.isVisible()
-        
+
 #     def open(self):
 #         self.btn.setArrowType(Qt.ArrowType.DownArrow)
 #         self.frame.show()

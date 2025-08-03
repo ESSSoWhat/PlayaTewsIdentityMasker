@@ -17,10 +17,10 @@ class ThreadFileDownloader:
     Use .get_error() to check the error
     """
 
-    def __init__(self, url, savepath : Union[str, Path] = None):
+    def __init__(self, url, savepath: Union[str, Path] = None):
         if savepath is not None:
             savepath = Path(savepath)
-            self._partpath = savepath.parent / ( savepath.name + '.part' )
+            self._partpath = savepath.parent / (savepath.name + ".part")
         else:
             self._partpath = None
         self._savepath = savepath
@@ -32,7 +32,6 @@ class ThreadFileDownloader:
         self._bytes = None
 
         threading.Thread(target=self._thread, daemon=True).start()
-
 
     def get_progress(self) -> float:
         """
@@ -61,7 +60,7 @@ class ThreadFileDownloader:
         url_req = None
         try:
             url_req = urllib.request.urlopen(self._url)
-            file_size = self._file_size = int( url_req.getheader('content-length') )
+            file_size = self._file_size = int(url_req.getheader("content-length"))
             self._file_size_dl = 0
             savepath = self._savepath
             partpath = self._partpath
@@ -70,7 +69,7 @@ class ThreadFileDownloader:
                 if partpath.exists():
                     partpath.unlink()
                 # Use context manager for proper file handling
-                with open(partpath, 'wb') as f:
+                with open(partpath, "wb") as f:
                     while url_req is not None:
                         buffer = url_req.read(8192)
                         if not buffer:
@@ -84,7 +83,7 @@ class ThreadFileDownloader:
                             break
 
                         self._file_size_dl = new_file_size_dl
-                    
+
                     # Complete the download
                     if self._file_size_dl >= file_size:
                         if savepath.exists():
@@ -106,7 +105,7 @@ class ThreadFileDownloader:
                             break
 
                         self._file_size_dl = new_file_size_dl
-                    
+
                     # Get the bytes if download completed
                     if self._file_size_dl >= file_size:
                         self._bytes = f.getvalue()

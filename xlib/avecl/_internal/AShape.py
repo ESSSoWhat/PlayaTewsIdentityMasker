@@ -1,11 +1,11 @@
 from collections.abc import Iterable
-from typing import Tuple, List
+from typing import List, Tuple
 
 from .AAxes import AAxes
 
 
 class AShape(Iterable):
-    __slots__ = ['shape','size','ndim']
+    __slots__ = ["shape", "size", "ndim"]
 
     def __init__(self, shape):
         """
@@ -26,7 +26,7 @@ class AShape(Iterable):
             self.size = shape.size
             self.ndim = shape.ndim
         else:
-            if isinstance(shape, (int,float) ):
+            if isinstance(shape, (int, float)):
                 shape = (int(shape),)
 
             if isinstance(shape, Iterable):
@@ -34,12 +34,12 @@ class AShape(Iterable):
                 valid_shape = []
                 for x in shape:
                     if x is None:
-                        raise ValueError(f'Incorrent value {x} in shape {shape}')
+                        raise ValueError(f"Incorrent value {x} in shape {shape}")
                     x = int(x)
                     if x < 1:
-                        raise ValueError(f'Incorrent value {x} in shape {shape}')
+                        raise ValueError(f"Incorrent value {x} in shape {shape}")
                     valid_shape.append(x)
-                    size *= x # Faster than np.prod()
+                    size *= x  # Faster than np.prod()
 
                 self.shape = tuple(valid_shape)
                 self.ndim = len(self.shape)
@@ -49,15 +49,15 @@ class AShape(Iterable):
                     self.shape = (1,)
                 self.size = size
             else:
-                raise ValueError('Invalid type to create AShape')
+                raise ValueError("Invalid type to create AShape")
 
-    def copy(self) -> 'AShape':
+    def copy(self) -> "AShape":
         return AShape(self)
 
     def as_list(self) -> List[int]:
         return list(self.shape)
 
-    def check_axis(self, axis : int) -> int:
+    def check_axis(self, axis: int) -> int:
         """
         Check axis and returns normalized axis value
 
@@ -67,7 +67,7 @@ class AShape(Iterable):
             axis += self.ndim
 
         if axis < 0 or axis >= self.ndim:
-            raise ValueError(f'axis {axis} out of bound of ndim {self.ndim}')
+            raise ValueError(f"axis {axis} out of bound of ndim {self.ndim}")
         return axis
 
     def axes_arange(self) -> AAxes:
@@ -78,7 +78,7 @@ class AShape(Iterable):
         """
         return AAxes(range(self.ndim))
 
-    def replaced_axes(self, axes, dims) -> 'AShape':
+    def replaced_axes(self, axes, dims) -> "AShape":
         """
         returns new AShape where axes replaced with new dims
         """
@@ -88,13 +88,12 @@ class AShape(Iterable):
             if axis < 0:
                 axis = ndim + axis
             if axis < 0 or axis >= ndim:
-                raise ValueError(f'invalid axis value {axis}')
+                raise ValueError(f"invalid axis value {axis}")
 
             new_shape[axis] = dim
         return AShape(new_shape)
 
-
-    def split(self, axis) -> Tuple['AShape', 'AShape']:
+    def split(self, axis) -> Tuple["AShape", "AShape"]:
         """
         split AShape at specified axis
 
@@ -103,11 +102,11 @@ class AShape(Iterable):
         if axis < 0:
             axis = self.ndim + axis
         if axis < 0 or axis >= self.ndim:
-            raise ValueError(f'invalid axis value {axis}')
+            raise ValueError(f"invalid axis value {axis}")
 
         return self[:axis], self[axis:]
 
-    def transpose_by_axes(self, axes) -> 'AShape':
+    def transpose_by_axes(self, axes) -> "AShape":
         """
         Same as AShape[axes]
 
@@ -116,18 +115,25 @@ class AShape(Iterable):
          axes       AAxes
                     Iterable(list,tuple,set,generator)
         """
-        return AShape(self.shape[axis] for axis in AAxes(axes) )
+        return AShape(self.shape[axis] for axis in AAxes(axes))
 
-    def __hash__(self): return self.shape.__hash__()
+    def __hash__(self):
+        return self.shape.__hash__()
+
     def __eq__(self, other):
         if isinstance(other, AShape):
             return self.shape == other.shape
         elif isinstance(other, Iterable):
             return self.shape == tuple(other)
         return False
-    def __iter__(self): return self.shape.__iter__()
-    def __len__(self): return len(self.shape)
-    def __getitem__(self,key):
+
+    def __iter__(self):
+        return self.shape.__iter__()
+
+    def __len__(self):
+        return len(self.shape)
+
+    def __getitem__(self, key):
         if isinstance(key, Iterable):
             if isinstance(key, AAxes):
                 if key.is_none_axes():
@@ -140,17 +146,21 @@ class AShape(Iterable):
 
     def __radd__(self, o):
         if isinstance(o, Iterable):
-            return AShape( tuple(o) + self.shape)
+            return AShape(tuple(o) + self.shape)
         else:
-            raise ValueError(f'unable to use type {o.__class__} in AShape append')
+            raise ValueError(f"unable to use type {o.__class__} in AShape append")
+
     def __add__(self, o):
         if isinstance(o, Iterable):
-            return AShape( self.shape + tuple(o) )
+            return AShape(self.shape + tuple(o))
         else:
-            raise ValueError(f'unable to use type {o.__class__} in AShape append')
+            raise ValueError(f"unable to use type {o.__class__} in AShape append")
+
+    def __str__(self):
+        return str(self.shape)
+
+    def __repr__(self):
+        return "AShape" + self.__str__()
 
 
-    def __str__(self):  return str(self.shape)
-    def __repr__(self): return 'AShape' + self.__str__()
-
-__all__ = ['AShape']
+__all__ = ["AShape"]

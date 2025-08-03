@@ -1,4 +1,5 @@
-from enum import IntEnum, IntEnum
+from enum import IntEnum
+
 
 class EInterpolation(IntEnum):
     NEAREST = 0

@@ -1,5 +1,6 @@
 import multiprocessing
-from  multiprocessing.connection import Connection
+from multiprocessing.connection import Connection
+
 
 class PMPI:
     """
@@ -7,7 +8,8 @@ class PMPI:
 
     send and recv messages between processes via pipe
     """
-    def __init__(self, pipe : Connection = None):
+
+    def __init__(self, pipe: Connection = None):
         self.pipe = pipe
         self.funcs = {}
 
@@ -31,7 +33,7 @@ class PMPI:
         send message with name and args/kwargs
         """
         if self.pipe is not None:
-            self.pipe.send( (name, args, kwargs) )
+            self.pipe.send((name, args, kwargs))
 
     def process_messages(self, timeout=0):
         """
@@ -42,7 +44,7 @@ class PMPI:
         pipe = self.pipe
 
         try:
-            if pipe is not None and pipe.poll(timeout): # poll with timeout only once
+            if pipe is not None and pipe.poll(timeout):  # poll with timeout only once
                 while True:
                     name, args, kwargs = pipe.recv()
                     funcs = self.funcs.get(name, None)

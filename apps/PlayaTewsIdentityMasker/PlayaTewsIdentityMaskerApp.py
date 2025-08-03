@@ -16,7 +16,6 @@ License: GPL-3.0 (based on DeepFaceLive)
 import time
 from pathlib import Path
 from typing import List
-from xlib import qt as qtx
 
 from localization import L, Localization
 from resources.fonts import QXFontDB
@@ -32,13 +31,13 @@ from .ui.QFaceAnimator import QFaceAnimator
 from .ui.QFaceDetector import QFaceDetector
 from .ui.QFaceMarker import QFaceMarker
 from .ui.QFaceMerger import QFaceMerger
-from .ui.QFaceSwapInsight import QFaceSwapInsight
 from .ui.QFaceSwapDFM import QFaceSwapDFM
+from .ui.QFaceSwapInsight import QFaceSwapInsight
 from .ui.QFileSource import QFileSource
 from .ui.QFrameAdjuster import QFrameAdjuster
 from .ui.QStreamOutput import QStreamOutput
-from .ui.QVoiceChanger import QVoiceChanger
 from .ui.QUnifiedLiveSwap import QUnifiedLiveSwap, UIMode
+from .ui.QVoiceChanger import QVoiceChanger
 from .ui.widgets.QBCFaceAlignViewer import QBCFaceAlignViewer
 from .ui.widgets.QBCFaceSwapViewer import QBCFaceSwapViewer
 from .ui.widgets.QBCFrameViewer import QBCFrameViewer
@@ -46,96 +45,197 @@ from .ui.widgets.QBCMergedFrameViewer import QBCMergedFrameViewer
 
 
 class QLiveSwap(qtx.QXWidget):
-    def __init__(self, userdata_path : Path,
-                       settings_dirpath : Path):
+    def __init__(self, userdata_path: Path, settings_dirpath: Path):
         super().__init__()
 
-        dfm_models_path = userdata_path / 'dfm_models'
+        dfm_models_path = userdata_path / "dfm_models"
         dfm_models_path.mkdir(parents=True, exist_ok=True)
 
-        animatables_path = userdata_path / 'animatables'
+        animatables_path = userdata_path / "animatables"
         animatables_path.mkdir(parents=True, exist_ok=True)
 
-        output_sequence_path = userdata_path / 'output_sequence'
+        output_sequence_path = userdata_path / "output_sequence"
         output_sequence_path.mkdir(parents=True, exist_ok=True)
 
         # Construct backend config with increased memory allocation for optimization
-        backend_db          = self.backend_db          = backend.BackendDB( settings_dirpath / 'states.dat' )
-        backend_weak_heap   = self.backend_weak_heap   = backend.BackendWeakHeap(size_mb=4096)  # Increased to 4GB for memory optimization
+        backend_db = self.backend_db = backend.BackendDB(
+            settings_dirpath / "states.dat"
+        )
+        backend_weak_heap = self.backend_weak_heap = backend.BackendWeakHeap(
+            size_mb=4096
+        )  # Increased to 4GB for memory optimization
         reemit_frame_signal = self.reemit_frame_signal = backend.BackendSignal()
 
-        multi_sources_bc_out  = backend.BackendConnection(multi_producer=True)
-        face_detector_bc_out  = backend.BackendConnection()
-        face_marker_bc_out    = backend.BackendConnection()
-        face_aligner_bc_out   = backend.BackendConnection()
-        face_swapper_bc_out   = backend.BackendConnection()
+        multi_sources_bc_out = backend.BackendConnection(multi_producer=True)
+        face_detector_bc_out = backend.BackendConnection()
+        face_marker_bc_out = backend.BackendConnection()
+        face_aligner_bc_out = backend.BackendConnection()
+        face_swapper_bc_out = backend.BackendConnection()
         frame_adjuster_bc_out = backend.BackendConnection()
-        face_merger_bc_out    = backend.BackendConnection()
+        face_merger_bc_out = backend.BackendConnection()
 
-        file_source    = self.file_source    = backend.FileSource   (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_out=multi_sources_bc_out, backend_db=backend_db)
+        file_source = self.file_source = backend.FileSource(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_out=multi_sources_bc_out,
+            backend_db=backend_db,
+        )
         # Enhanced camera source initialization
         print("🔧 Initializing camera source with DirectShow backend...")
-        camera_source = self.camera_source = backend.CameraSource(weak_heap=backend_weak_heap, bc_out=multi_sources_bc_out, backend_db=backend_db)
-        
+        camera_source = self.camera_source = backend.CameraSource(
+            weak_heap=backend_weak_heap,
+            bc_out=multi_sources_bc_out,
+            backend_db=backend_db,
+        )
+
         # Force camera to start with DirectShow
         try:
             camera_source.start()
             print("✅ Camera source started successfully")
-            
+
             # Wait a moment for camera to initialize
             time.sleep(2)
-            
+
             # Check if camera is working
-            if hasattr(camera_source, 'is_started') and camera_source.is_started():
+            if hasattr(camera_source, "is_started") and camera_source.is_started():
                 print("✅ Camera source is running")
             else:
                 print("⚠️ Camera source may not be running properly")
         except Exception as e:
             print(f"❌ Error starting camera source: {e}")
-        face_detector  = self.face_detector  = backend.FaceDetector (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=multi_sources_bc_out, bc_out=face_detector_bc_out, backend_db=backend_db )
-        face_marker    = self.face_marker    = backend.FaceMarker   (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_detector_bc_out, bc_out=face_marker_bc_out, backend_db=backend_db)
-        face_aligner   = self.face_aligner   = backend.FaceAligner  (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_marker_bc_out, bc_out=face_aligner_bc_out, backend_db=backend_db )
-        face_animator  = self.face_animator  = backend.FaceAnimator (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_aligner_bc_out, bc_out=face_merger_bc_out, animatables_path=animatables_path, backend_db=backend_db )
-        face_swap_insight  = self.face_swap_insight  = backend.FaceSwapInsight (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_aligner_bc_out, bc_out=face_swapper_bc_out, faces_path=animatables_path, backend_db=backend_db )
-        
+        face_detector = self.face_detector = backend.FaceDetector(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_in=multi_sources_bc_out,
+            bc_out=face_detector_bc_out,
+            backend_db=backend_db,
+        )
+        face_marker = self.face_marker = backend.FaceMarker(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_in=face_detector_bc_out,
+            bc_out=face_marker_bc_out,
+            backend_db=backend_db,
+        )
+        face_aligner = self.face_aligner = backend.FaceAligner(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_in=face_marker_bc_out,
+            bc_out=face_aligner_bc_out,
+            backend_db=backend_db,
+        )
+        face_animator = self.face_animator = backend.FaceAnimator(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_in=face_aligner_bc_out,
+            bc_out=face_merger_bc_out,
+            animatables_path=animatables_path,
+            backend_db=backend_db,
+        )
+        face_swap_insight = self.face_swap_insight = backend.FaceSwapInsight(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_in=face_aligner_bc_out,
+            bc_out=face_swapper_bc_out,
+            faces_path=animatables_path,
+            backend_db=backend_db,
+        )
+
         # Use Memory-Optimized Face Swap DFM for better performance
         try:
             from .backend.MemoryOptimizedFaceSwap import MemoryOptimizedFaceSwap
-            face_swap_dfm   = self.face_swap_dfm   = MemoryOptimizedFaceSwap  (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_aligner_bc_out, bc_out=face_swapper_bc_out, dfm_models_path=dfm_models_path, backend_db=backend_db )
+
+            face_swap_dfm = self.face_swap_dfm = MemoryOptimizedFaceSwap(
+                weak_heap=backend_weak_heap,
+                reemit_frame_signal=reemit_frame_signal,
+                bc_in=face_aligner_bc_out,
+                bc_out=face_swapper_bc_out,
+                dfm_models_path=dfm_models_path,
+                backend_db=backend_db,
+            )
             print("🧠 Memory-optimized face swap backend loaded successfully")
         except Exception as e:
             print(f"⚠️ Could not load memory-optimized backend: {e}")
             print("   Falling back to standard face swap backend")
-            face_swap_dfm   = self.face_swap_dfm   = backend.FaceSwapDFM  (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_aligner_bc_out, bc_out=face_swapper_bc_out, dfm_models_path=dfm_models_path, backend_db=backend_db )
-        
-        frame_adjuster = self.frame_adjuster = backend.FrameAdjuster(weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_swapper_bc_out, bc_out=frame_adjuster_bc_out, backend_db=backend_db )
-        face_merger    = self.face_merger    = backend.FaceMerger   (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=frame_adjuster_bc_out, bc_out=face_merger_bc_out, backend_db=backend_db )
-        
+            face_swap_dfm = self.face_swap_dfm = backend.FaceSwapDFM(
+                weak_heap=backend_weak_heap,
+                reemit_frame_signal=reemit_frame_signal,
+                bc_in=face_aligner_bc_out,
+                bc_out=face_swapper_bc_out,
+                dfm_models_path=dfm_models_path,
+                backend_db=backend_db,
+            )
+
+        frame_adjuster = self.frame_adjuster = backend.FrameAdjuster(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_in=face_swapper_bc_out,
+            bc_out=frame_adjuster_bc_out,
+            backend_db=backend_db,
+        )
+        face_merger = self.face_merger = backend.FaceMerger(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_in=frame_adjuster_bc_out,
+            bc_out=face_merger_bc_out,
+            backend_db=backend_db,
+        )
+
         # Use enhanced streaming output for OBS-style functionality
         from .backend.EnhancedStreamOutput import EnhancedStreamOutput
-        stream_output  = self.stream_output  = EnhancedStreamOutput (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_merger_bc_out, save_default_path=userdata_path, backend_db=backend_db)
+
+        stream_output = self.stream_output = EnhancedStreamOutput(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_in=face_merger_bc_out,
+            save_default_path=userdata_path,
+            backend_db=backend_db,
+        )
 
         # Add voice changer backend
         from .backend.VoiceChanger import VoiceChanger
-        voice_changer = self.voice_changer = VoiceChanger(weak_heap=backend_weak_heap, backend_db=backend_db)
 
-        self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output, voice_changer]
+        voice_changer = self.voice_changer = VoiceChanger(
+            weak_heap=backend_weak_heap, backend_db=backend_db
+        )
 
-        self.q_file_source    = QFileSource(self.file_source)
-        self.q_camera_source  = QCameraSource(self.camera_source)
-        self.q_face_detector  = QFaceDetector(self.face_detector)
-        self.q_face_marker    = QFaceMarker(self.face_marker)
-        self.q_face_aligner   = QFaceAligner(self.face_aligner)
-        self.q_face_animator  = QFaceAnimator(self.face_animator, animatables_path=animatables_path)
-        self.q_face_swap_insight = QFaceSwapInsight(self.face_swap_insight, faces_path=animatables_path)
-        self.q_face_swap_dfm  = QFaceSwapDFM(self.face_swap_dfm, dfm_models_path=dfm_models_path)
+        self.all_backends: List[backend.BackendHost] = [
+            file_source,
+            camera_source,
+            face_detector,
+            face_marker,
+            face_aligner,
+            face_animator,
+            face_swap_insight,
+            face_swap_dfm,
+            frame_adjuster,
+            face_merger,
+            stream_output,
+            voice_changer,
+        ]
+
+        self.q_file_source = QFileSource(self.file_source)
+        self.q_camera_source = QCameraSource(self.camera_source)
+        self.q_face_detector = QFaceDetector(self.face_detector)
+        self.q_face_marker = QFaceMarker(self.face_marker)
+        self.q_face_aligner = QFaceAligner(self.face_aligner)
+        self.q_face_animator = QFaceAnimator(
+            self.face_animator, animatables_path=animatables_path
+        )
+        self.q_face_swap_insight = QFaceSwapInsight(
+            self.face_swap_insight, faces_path=animatables_path
+        )
+        self.q_face_swap_dfm = QFaceSwapDFM(
+            self.face_swap_dfm, dfm_models_path=dfm_models_path
+        )
         self.q_frame_adjuster = QFrameAdjuster(self.frame_adjuster)
-        self.q_face_merger    = QFaceMerger(self.face_merger)
-        
+        self.q_face_merger = QFaceMerger(self.face_merger)
+
         # Use enhanced streaming output UI
         from .ui.QEnhancedStreamOutput import QEnhancedStreamOutput
-        self.q_stream_output  = QEnhancedStreamOutput(self.stream_output)
-        
+
+        self.q_stream_output = QEnhancedStreamOutput(self.stream_output)
+
         # Add voice changer UI (optional - skip if there are issues)
         try:
             self.q_voice_changer = QVoiceChanger(self.voice_changer.get_control_sheet())
@@ -146,9 +246,15 @@ class QLiveSwap(qtx.QXWidget):
             self.q_voice_changer = None
 
         self.q_ds_frame_viewer = QBCFrameViewer(backend_weak_heap, multi_sources_bc_out)
-        self.q_ds_fa_viewer    = QBCFaceAlignViewer(backend_weak_heap, face_aligner_bc_out, preview_width=256)
-        self.q_ds_fc_viewer    = QBCFaceSwapViewer(backend_weak_heap, face_merger_bc_out, preview_width=256)
-        self.q_ds_merged_frame_viewer = QBCMergedFrameViewer(backend_weak_heap, face_merger_bc_out)
+        self.q_ds_fa_viewer = QBCFaceAlignViewer(
+            backend_weak_heap, face_aligner_bc_out, preview_width=256
+        )
+        self.q_ds_fc_viewer = QBCFaceSwapViewer(
+            backend_weak_heap, face_merger_bc_out, preview_width=256
+        )
+        self.q_ds_merged_frame_viewer = QBCMergedFrameViewer(
+            backend_weak_heap, face_merger_bc_out
+        )
 
         # Configure memory optimization settings if using memory-optimized backend
         self._configure_memory_optimization()
@@ -171,7 +277,7 @@ class QLiveSwap(qtx.QXWidget):
             self.q_ds_frame_viewer,
             self.q_ds_fa_viewer,
             self.q_ds_fc_viewer,
-            self.q_ds_merged_frame_viewer
+            self.q_ds_merged_frame_viewer,
         )
 
         # Create main layout
@@ -183,37 +289,41 @@ class QLiveSwap(qtx.QXWidget):
         """Configure memory optimization settings for the face swap DFM"""
         try:
             # Check if we're using the memory-optimized backend
-            if hasattr(self.face_swap_dfm, 'get_control_sheet'):
+            if hasattr(self.face_swap_dfm, "get_control_sheet"):
                 cs = self.face_swap_dfm.get_control_sheet()
-                
+
                 # Check if memory optimization controls are available
-                if hasattr(cs, 'ram_cache_size'):
+                if hasattr(cs, "ram_cache_size"):
                     # Set memory optimization settings
                     # RAM Cache Size: 2GB (2048 MB) - can be increased to 4GB for your 64GB system
                     cs.ram_cache_size.set_number(2048)
-                    
+
                     # Enable preprocessing cache
-                    if hasattr(cs, 'enable_preprocessing_cache'):
+                    if hasattr(cs, "enable_preprocessing_cache"):
                         cs.enable_preprocessing_cache.set_flag(True)
-                    
+
                     # Enable postprocessing cache
-                    if hasattr(cs, 'enable_postprocessing_cache'):
+                    if hasattr(cs, "enable_postprocessing_cache"):
                         cs.enable_postprocessing_cache.set_flag(True)
-                    
+
                     # Enable parallel processing
-                    if hasattr(cs, 'parallel_processing'):
+                    if hasattr(cs, "parallel_processing"):
                         cs.parallel_processing.set_flag(True)
-                    
+
                     print("🧠 Memory Optimization Configured:")
                     print("  • RAM Cache Size: 2GB")
                     print("  • Preprocessing Cache: Enabled")
                     print("  • Postprocessing Cache: Enabled")
                     print("  • Parallel Processing: Enabled")
                 else:
-                    print("ℹ️  Standard face swap backend - memory optimization not available")
+                    print(
+                        "ℹ️  Standard face swap backend - memory optimization not available"
+                    )
             else:
-                print("ℹ️  Standard face swap backend - memory optimization not available")
-                
+                print(
+                    "ℹ️  Standard face swap backend - memory optimization not available"
+                )
+
         except Exception as e:
             print(f"⚠️ Warning: Could not configure memory optimization: {e}")
 
@@ -238,16 +348,32 @@ class QLiveSwap(qtx.QXWidget):
 
 
 class QDFLAppWindow(qtx.QXWindow):
-    def __init__(self, userdata_path, settings_dirpath, 
-                 q_file_source, q_camera_source, q_face_detector, q_face_marker,
-                 q_face_aligner, q_face_animator, q_face_swap_insight, q_face_swap_dfm,
-                 q_frame_adjuster, q_face_merger, q_stream_output, q_voice_changer,
-                 q_ds_frame_viewer, q_ds_fa_viewer, q_ds_fc_viewer, q_ds_merged_frame_viewer):
+    def __init__(
+        self,
+        userdata_path,
+        settings_dirpath,
+        q_file_source,
+        q_camera_source,
+        q_face_detector,
+        q_face_marker,
+        q_face_aligner,
+        q_face_animator,
+        q_face_swap_insight,
+        q_face_swap_dfm,
+        q_frame_adjuster,
+        q_face_merger,
+        q_stream_output,
+        q_voice_changer,
+        q_ds_frame_viewer,
+        q_ds_fa_viewer,
+        q_ds_fc_viewer,
+        q_ds_merged_frame_viewer,
+    ):
         super().__init__()
-        
+
         self.userdata_path = userdata_path
         self.settings_dirpath = settings_dirpath
-        
+
         # Store UI components
         self.q_file_source = q_file_source
         self.q_camera_source = q_camera_source
@@ -284,9 +410,9 @@ class QDFLAppWindow(qtx.QXWindow):
             self.q_ds_frame_viewer,
             self.q_ds_fa_viewer,
             self.q_ds_fc_viewer,
-            self.q_ds_merged_frame_viewer
+            self.q_ds_merged_frame_viewer,
         )
-        
+
         # Add the main widget to this window using setLayout
         self.setLayout(qtx.QXVBoxLayout([self.q_unified_live_swap]))
 
@@ -304,7 +430,9 @@ class QDFLAppWindow(qtx.QXWindow):
             pass
 
         # Create timer for processing messages
-        self.timer_5ms = qtx.QXTimer(interval=5, timeout=self.q_unified_live_swap._on_timer_5ms)
+        self.timer_5ms = qtx.QXTimer(
+            interval=5, timeout=self.q_unified_live_swap._on_timer_5ms
+        )
         self.timer_5ms.start()
 
         # Initialize the application
@@ -325,6 +453,7 @@ class QDFLAppWindow(qtx.QXWindow):
         try:
             import subprocess
             import sys
+
             subprocess.Popen([sys.executable, "monitor_memory_performance.py"])
             print("🧠 Memory monitoring started in new window")
         except Exception as e:
@@ -335,6 +464,7 @@ class QDFLAppWindow(qtx.QXWindow):
         try:
             import subprocess
             import sys
+
             subprocess.run([sys.executable, "test_memory_optimization.py"])
             print("📄 Memory optimization report generated")
         except Exception as e:
@@ -352,7 +482,10 @@ class QDFLAppWindow(qtx.QXWindow):
         """Show memory optimization guide"""
         try:
             import webbrowser
-            webbrowser.open("https://github.com/PlayaTews/PlayaTewsIdentityMasker/wiki/Memory-Optimization")
+
+            webbrowser.open(
+                "https://github.com/PlayaTews/PlayaTewsIdentityMasker/wiki/Memory-Optimization"
+            )
             print("📖 Memory optimization guide opened in browser")
         except Exception as e:
             print(f"❌ Could not open memory guide: {e}")
@@ -361,15 +494,19 @@ class QDFLAppWindow(qtx.QXWindow):
         """Show performance optimization tips"""
         try:
             import webbrowser
-            webbrowser.open("https://github.com/PlayaTews/PlayaTewsIdentityMasker/wiki/Performance-Tips")
+
+            webbrowser.open(
+                "https://github.com/PlayaTews/PlayaTewsIdentityMasker/wiki/Performance-Tips"
+            )
             print("💡 Performance tips opened in browser")
         except Exception as e:
             print(f"❌ Could not open performance tips: {e}")
 
-    def _on_cb_process_priority_choice(self, prio : lib_os.ProcessPriority, _):
+    def _on_cb_process_priority_choice(self, prio: lib_os.ProcessPriority, _):
         """Handle process priority changes"""
         try:
             import psutil
+
             current_process = psutil.Process()
             if prio == lib_os.ProcessPriority.HIGH:
                 current_process.nice(psutil.HIGH_PRIORITY_CLASS)
@@ -383,7 +520,7 @@ class QDFLAppWindow(qtx.QXWindow):
 
     def finalize(self):
         """Finalize the application"""
-        if hasattr(self, 'timer_5ms'):
+        if hasattr(self, "timer_5ms"):
             self.timer_5ms.stop()
 
     def _on_closeEvent(self):
@@ -396,20 +533,20 @@ class PlayaTewsIdentityMaskerApp(qtx.QXMainApplication):
     def __init__(self, userdata_path):
         super().__init__()
         self.userdata_path = userdata_path
-        self.settings_dirpath = userdata_path / 'settings'
+        self.settings_dirpath = userdata_path / "settings"
         self.settings_dirpath.mkdir(parents=True, exist_ok=True)
 
         # Initialize localization
-        Localization.set_language('en-US')
+        Localization.set_language("en-US")
 
         # Fonts and images are loaded on demand (no initialization needed)
 
         # Create QLiveSwap instance first to get all UI components
         self.q_live_swap = QLiveSwap(userdata_path, self.settings_dirpath)
-        
+
         # Create main window with UI components from QLiveSwap
         self.main_window = QDFLAppWindow(
-            userdata_path, 
+            userdata_path,
             self.settings_dirpath,
             self.q_live_swap.q_file_source,
             self.q_live_swap.q_camera_source,
@@ -426,90 +563,8 @@ class PlayaTewsIdentityMaskerApp(qtx.QXMainApplication):
             self.q_live_swap.q_ds_frame_viewer,
             self.q_live_swap.q_ds_fa_viewer,
             self.q_live_swap.q_ds_fc_viewer,
-            self.q_live_swap.q_ds_merged_frame_viewer
+            self.q_live_swap.q_ds_merged_frame_viewer,
         )
 
-        # Show splash screen
-        self.show_splash_screen()
-
-    def show_splash_screen(self):
-        """Show memory optimization splash screen"""
-        try:
-            splash = qtx.QXWidget()
-            splash.setFixedSize(400, 300)
-            splash.setStyleSheet("""
-                QWidget {
-                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                        stop:0 #2d2d2d, stop:1 #1a1a1a);
-                    color: #ffffff;
-                    font-family: 'Segoe UI', Arial, sans-serif;
-                }
-            """)
-            
-            layout = qtx.QXVBoxLayout()
-            
-            # Title
-            title = QXLabel(text="🧠 Memory Optimized")
-            title.setStyleSheet("font-size: 24px; font-weight: bold; color: #00ff88; margin: 20px;")
-            title.setAlignment(qtx.Qt.AlignCenter)
-            layout.addWidget(title)
-            
-            # Subtitle
-            subtitle = QXLabel(text="PlayaTewsIdentityMasker")
-            subtitle.setStyleSheet("font-size: 16px; color: #cccccc; margin: 10px;")
-            subtitle.setAlignment(qtx.Qt.AlignCenter)
-            layout.addWidget(subtitle)
-            
-            # Memory optimization info
-            info = QXLabel(text="""
-🚀 Memory Optimization Features:
-• 2GB RAM Cache System
-• Preprocessing Cache (30-50% CPU reduction)
-• Postprocessing Cache (20-40% CPU reduction)
-• Parallel Processing
-• Smart Memory Management
-• Real-time Performance Monitoring
-            """)
-            info.setStyleSheet("font-size: 12px; color: #aaaaaa; margin: 20px; line-height: 1.4;")
-            info.setAlignment(qtx.Qt.AlignLeft)
-            layout.addWidget(info)
-            
-            # Loading indicator
-            loading = QXLabel(text="Initializing Memory Optimization...")
-            loading.setStyleSheet("font-size: 14px; color: #00ff88; margin: 20px;")
-            loading.setAlignment(qtx.Qt.AlignCenter)
-            layout.addWidget(loading)
-            
-            splash.setLayout(layout)
-            splash.show()
-            
-            # Auto-close after 3 seconds
-            qtx.QXTimer.singleShot(3000, splash.close)
-            qtx.QXTimer.singleShot(3000, self.main_window.show)
-            
-        except Exception as e:
-            print(f"Could not show splash screen: {e}")
-            self.main_window.show()
-
-    def on_reinitialize(self):
-        """Reinitialize the application"""
-        try:
-            self.main_window.finalize()
-            self.main_window = QDFLAppWindow(self.userdata_path, self.settings_dirpath)
-            self.main_window.show()
-            print("✅ Application reinitialized with memory optimization")
-        except Exception as e:
-            print(f"❌ Failed to reinitialize: {e}")
-
-    def initialize(self):
-        """Initialize the application"""
-        self.main_window.show()
-
-    def finalize(self):
-        """Finalize the application"""
-        if hasattr(self, 'main_window'):
-            self.main_window.finalize()
-
-    def _on_splash_wnd_expired(self):
-        """Handle splash window expiration"""
-        self.main_window.show()
+        # Don't automatically show splash screen or window
+        # Let the launcher handle window display

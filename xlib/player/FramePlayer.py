@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Tuple
 
 import numpy as np
+
 from ..image import ImageProcessor
 from ..python import Disposable
 
@@ -12,26 +13,34 @@ class FramePlayer(Disposable):
     """
 
     class Frame:
-        __slots__ = ['image','timestamp','fps','frame_num','frame_count','name','error']
+        __slots__ = [
+            "image",
+            "timestamp",
+            "fps",
+            "frame_num",
+            "frame_count",
+            "name",
+            "error",
+        ]
 
-        image       : np.ndarray
-        timestamp   : float
-        fps         : float
-        frame_num   : int
-        frame_count : int
-        name        : str
+        image: np.ndarray
+        timestamp: float
+        fps: float
+        frame_num: int
+        frame_count: int
+        name: str
 
         def __init__(self):
-            self.image       = None
-            self.timestamp   = None
-            self.fps         = None
-            self.frame_num   = None
+            self.image = None
+            self.timestamp = None
+            self.fps = None
+            self.frame_num = None
             self.frame_count = None
             self.name = None
 
     def __init__(self, default_fps, frame_count):
         if frame_count == 0:
-            raise Exception('Frames count are 0.')
+            raise Exception("Frames count are 0.")
 
         self._default_fps = default_fps
         self._frame_count = frame_count
@@ -52,37 +61,50 @@ class FramePlayer(Disposable):
         self._cached_frames = {}
         self._cached_frames_idxs = []
 
-    def is_playing(self): return self._is_playing
-    def get_frame_count(self): return self._frame_count
-    def get_frame_idx(self): return self._frame_idx
+    def is_playing(self):
+        return self._is_playing
 
-    def get_is_autorewind(self): return self._is_autorewind
+    def get_frame_count(self):
+        return self._frame_count
+
+    def get_frame_idx(self):
+        return self._frame_idx
+
+    def get_is_autorewind(self):
+        return self._is_autorewind
+
     def set_is_autorewind(self, is_autorewind):
         if not isinstance(is_autorewind, bool):
-            raise ValueError('is_autorewind must be an instance of bool')
+            raise ValueError("is_autorewind must be an instance of bool")
         self._is_autorewind = is_autorewind
         return self._is_autorewind
 
-    def get_is_realtime(self): return self._is_realtime
+    def get_is_realtime(self):
+        return self._is_realtime
+
     def set_is_realtime(self, is_realtime):
         if not isinstance(is_realtime, bool):
-            raise ValueError('is_realtime must be an instance of bool')
+            raise ValueError("is_realtime must be an instance of bool")
         self._is_realtime = is_realtime
         return self._is_realtime
 
-    def get_fps(self): return self._fps
+    def get_fps(self):
+        return self._fps
+
     def set_fps(self, fps):
         """
         set new FPS.
         Returns adjusted FPS.
         """
-        if not isinstance(fps, (int, float) ):
-            raise ValueError('fps must be an instance of int/float')
+        if not isinstance(fps, (int, float)):
+            raise ValueError("fps must be an instance of int/float")
         self._fps = float(np.clip(fps, 0, 240))
         self._on_fps_changed()
         return self._fps
 
-    def get_target_width(self):  return self._target_width
+    def get_target_width(self):
+        return self._target_width
+
     def set_target_width(self, target_width):
         """
         0 - auto
@@ -90,8 +112,8 @@ class FramePlayer(Disposable):
 
         returns adjusted target_width
         """
-        if not isinstance(target_width, (int,float) ):
-            raise ValueError('target_width must be an instance of int/float')
+        if not isinstance(target_width, (int, float)):
+            raise ValueError("target_width must be an instance of int/float")
 
         target_width = int(target_width)
         target_width = (target_width // 4) * 4
@@ -102,10 +124,13 @@ class FramePlayer(Disposable):
 
     def _on_play_start(self):
         """@overridable"""
+
     def _on_play_stop(self):
         """@overridable"""
+
     def _on_fps_changed(self):
         """@overridable"""
+
     def _on_target_width_changed(self):
         """@overridable"""
 
@@ -126,7 +151,6 @@ class FramePlayer(Disposable):
         """
         self._req_frame_seek_idx = (idx, mode)
 
-
     def req_play_start(self):
         """
         Request to start playing.
@@ -140,15 +164,15 @@ class FramePlayer(Disposable):
         self._req_is_playing = False
 
     class ProcessResult:
-        __slots__ = ['new_is_playing','new_frame_idx','new_frame','new_error']
+        __slots__ = ["new_is_playing", "new_frame_idx", "new_frame", "new_error"]
 
         def __init__(self):
             self.new_is_playing = None
             self.new_frame_idx = None
             self.new_frame = None
-            self.new_error : str = None
+            self.new_error: str = None
 
-    def process(self) -> 'FramePlayer.ProcessResult':
+    def process(self) -> "FramePlayer.ProcessResult":
         """
         processes inner logic
 
@@ -168,10 +192,14 @@ class FramePlayer(Disposable):
 
         if self._is_playing:
             if self._is_realtime:
-                diff_frames = int( (datetime.now().timestamp() - self._frame_timestamp) / (1.0/fps) )
+                diff_frames = int(
+                    (datetime.now().timestamp() - self._frame_timestamp) / (1.0 / fps)
+                )
                 if diff_frames != 0:
                     new_frame_idx = self._frame_idx + diff_frames
-                    new_frame_timestamp = self._frame_timestamp + diff_frames * (1.0/fps)
+                    new_frame_timestamp = self._frame_timestamp + diff_frames * (
+                        1.0 / fps
+                    )
             else:
                 new_frame_idx = self._frame_idx + 1
                 new_frame_timestamp = datetime.now().timestamp()
@@ -184,7 +212,7 @@ class FramePlayer(Disposable):
             elif seek_mode == 1:
                 new_frame_idx = self._frame_idx + seek_idx
             elif seek_mode == 2:
-                new_frame_idx = self._frame_count - seek_idx -1
+                new_frame_idx = self._frame_count - seek_idx - 1
 
             new_frame_timestamp = datetime.now().timestamp()
 
@@ -202,7 +230,7 @@ class FramePlayer(Disposable):
                     if new_frame_idx < 0:
                         new_frame_idx = 0
                     else:
-                        new_frame_idx = self._frame_count-1
+                        new_frame_idx = self._frame_count - 1
                     update_frame = False
                     new_is_playing = False
 
@@ -255,7 +283,7 @@ class FramePlayer(Disposable):
                 ip = ImageProcessor(frame_image)
                 if self._target_width != 0:
                     ip.fit_in(TW=self._target_width)
-                frame_image = ip.ch(3).get_image('HWC')
+                frame_image = ip.ch(3).get_image("HWC")
 
                 p_frame.image = frame_image
                 p_frame.name = name_or_err

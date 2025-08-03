@@ -6,11 +6,15 @@ from ._part_QXWidget import _part_QXWidget
 
 
 class QXToolButton(QToolButton, _part_QXWidget):
-    def __init__(self, text=None,
-                       checkable=False,
-                       checked=None,
-                       toggled=None, released=None,
-                       **kwargs):
+    def __init__(
+        self,
+        text=None,
+        checkable=False,
+        checked=None,
+        toggled=None,
+        released=None,
+        **kwargs,
+    ):
         super().__init__()
         _part_QXWidget.__init__(self, **kwargs)
         _part_QXWidget.connect_signal(released, self.released)
@@ -23,10 +27,10 @@ class QXToolButton(QToolButton, _part_QXWidget):
         if checked is not None:
             self.setChecked(checked)
 
-    def focusInEvent(self, ev : QFocusEvent):
+    def focusInEvent(self, ev: QFocusEvent):
         super().focusInEvent(ev)
         _part_QXWidget.focusInEvent(self, ev)
 
-    def resizeEvent(self, ev : QResizeEvent):
+    def resizeEvent(self, ev: QResizeEvent):
         super().resizeEvent(ev)
         _part_QXWidget.resizeEvent(self, ev)

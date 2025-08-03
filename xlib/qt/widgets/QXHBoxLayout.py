@@ -15,12 +15,14 @@ class QXHBoxLayout(QHBoxLayout):
             for widget in widgets:
                 alignment = None
                 if isinstance(widget, int):
-                    thickness=widget
+                    thickness = widget
                     widget = QWidget()
                     widget.setFixedWidth(thickness)
-                    widget.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+                    widget.setSizePolicy(
+                        QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum
+                    )
 
-                if isinstance(widget, (tuple,list)):
+                if isinstance(widget, (tuple, list)):
                     widget, alignment = widget
 
                 if isinstance(widget, QLayout):

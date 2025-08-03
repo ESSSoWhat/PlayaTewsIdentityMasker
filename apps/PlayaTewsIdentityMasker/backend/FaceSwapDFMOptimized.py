@@ -1,41 +1,76 @@
-import time
 import threading
+import time
 from pathlib import Path
 from typing import Dict, Optional, Tuple
+
+import cv2
 import numpy as np
+
 from modelhub import DFLive
 from xlib import os as lib_os
 from xlib.image.ImageProcessor import ImageProcessor
 from xlib.mp import csw as lib_csw
 from xlib.python import all_is_not_None
-import cv2
 
-from .BackendBase import (BackendConnection, BackendDB, BackendHost,
-                          BackendSignal, BackendWeakHeap, BackendWorker,
-                          BackendWorkerState)
+from .BackendBase import (
+    BackendConnection,
+    BackendDB,
+    BackendHost,
+    BackendSignal,
+    BackendWeakHeap,
+    BackendWorker,
+    BackendWorkerState,
+)
 
 
 class FaceSwapDFMOptimized(BackendHost):
-    def __init__(self, weak_heap : BackendWeakHeap, reemit_frame_signal : BackendSignal, bc_in : BackendConnection, bc_out : BackendConnection, dfm_models_path : Path, backend_db : BackendDB = None,
-                  id : int = 0):
+    def __init__(
+        self,
+        weak_heap: BackendWeakHeap,
+        reemit_frame_signal: BackendSignal,
+        bc_in: BackendConnection,
+        bc_out: BackendConnection,
+        dfm_models_path: Path,
+        backend_db: BackendDB = None,
+        id: int = 0,
+    ):
         self._id = id
-        super().__init__(backend_db=backend_db,
-                         sheet_cls=Sheet,
-                         worker_cls=FaceSwapDFMOptimizedWorker,
-                         worker_state_cls=WorkerState,
-                         worker_start_args=[weak_heap, reemit_frame_signal, bc_in, bc_out, dfm_models_path])
+        super().__init__(
+            backend_db=backend_db,
+            sheet_cls=Sheet,
+            worker_cls=FaceSwapDFMOptimizedWorker,
+            worker_state_cls=WorkerState,
+            worker_start_args=[
+                weak_heap,
+                reemit_frame_signal,
+                bc_in,
+                bc_out,
+                dfm_models_path,
+            ],
+        )
 
-    def get_control_sheet(self) -> 'Sheet.Host': return super().get_control_sheet()
+    def get_control_sheet(self) -> "Sheet.Host":
+        return super().get_control_sheet()
 
     def _get_name(self):
-        return super()._get_name()# + f'{self._id}'
+        return super()._get_name()  # + f'{self._id}'
 
 
 class FaceSwapDFMOptimizedWorker(BackendWorker):
-    def get_state(self) -> 'WorkerState': return super().get_state()
-    def get_control_sheet(self) -> 'Sheet.Worker': return super().get_control_sheet()
+    def get_state(self) -> "WorkerState":
+        return super().get_state()
 
-    def on_start(self, weak_heap : BackendWeakHeap, reemit_frame_signal : BackendSignal, bc_in : BackendConnection, bc_out : BackendConnection, dfm_models_path : Path):
+    def get_control_sheet(self) -> "Sheet.Worker":
+        return super().get_control_sheet()
+
+    def on_start(
+        self,
+        weak_heap: BackendWeakHeap,
+        reemit_frame_signal: BackendSignal,
+        bc_in: BackendConnection,
+        bc_out: BackendConnection,
+        dfm_models_path: Path,
+    ):
         self.weak_heap = weak_heap
         self.reemit_frame_signal = reemit_frame_signal
         self.bc_in = bc_in
@@ -45,33 +80,35 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         self.pending_bcd = None
         self.dfm_model_initializer = None
         self.dfm_model = None
-        
+
         # Performance optimization variables
         self.frame_skip_counter = 0
-        self.frame_skip_rate = 0  # 0 = process every frame, 1 = skip every other frame, etc.
+        self.frame_skip_rate = (
+            0  # 0 = process every frame, 1 = skip every other frame, etc.
+        )
         self.last_processed_frame_time = 0
         self.target_fps = 30
         self.frame_time_threshold = 1.0 / self.target_fps
-        
+
         # Caching for performance
         self.cached_face_align_image = None
         self.cached_celeb_face = None
         self.cache_valid = False
         self.cache_timestamp = 0
         self.cache_duration = 0.1  # Cache for 100ms
-        
+
         # Threading for parallel processing
         self.processing_thread = None
         self.processing_queue = []
         self.processing_lock = threading.Lock()
         self.stop_processing = False
-        
+
         # Performance monitoring
         self.fps_counter = 0
         self.fps_start_time = time.time()
         self.current_fps = 0
         self.processing_times = []
-        
+
         lib_os.set_timer_resolution(1)
 
         state, cs = self.get_state(), self.get_control_sheet()
@@ -95,14 +132,19 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         cs.enable_caching.call_on_flag(self.on_cs_enable_caching)
 
         cs.device.enable()
-        cs.device.set_choices( DFLive.get_available_devices(), none_choice_name='@misc.menu_select')
+        cs.device.set_choices(
+            DFLive.get_available_devices(), none_choice_name="@misc.menu_select"
+        )
         cs.device.select(state.device)
 
     def on_cs_device(self, idx, device):
         state, cs = self.get_state(), self.get_control_sheet()
         if device is not None and state.device == device:
             cs.model.enable()
-            cs.model.set_choices( DFLive.get_available_models_info(self.dfm_models_path), none_choice_name='@misc.menu_select')
+            cs.model.set_choices(
+                DFLive.get_available_models_info(self.dfm_models_path),
+                none_choice_name="@misc.menu_select",
+            )
             cs.model.select(state.model)
         else:
             state.device = device
@@ -113,8 +155,12 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         state, cs = self.get_state(), self.get_control_sheet()
 
         if state.model == model:
-            state.model_state = state.models_state[model.get_name()] = state.models_state.get(model.get_name(), ModelState())
-            self.dfm_model_initializer = DFLive.DFMModel_from_info(state.model, state.device)
+            state.model_state = state.models_state[model.get_name()] = (
+                state.models_state.get(model.get_name(), ModelState())
+            )
+            self.dfm_model_initializer = DFLive.DFMModel_from_info(
+                state.model, state.device
+            )
             self.set_busy(True)
             # Clear cache when model changes
             self.clear_cache()
@@ -131,8 +177,16 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
 
             if not swap_all_faces:
                 cs.face_id.enable()
-                cs.face_id.set_config(lib_csw.Number.Config(min=0, max=999, step=1, decimals=0, allow_instant_update=True))
-                cs.face_id.set_number(state.model_state.face_id if state.model_state.face_id is not None else 0)
+                cs.face_id.set_config(
+                    lib_csw.Number.Config(
+                        min=0, max=999, step=1, decimals=0, allow_instant_update=True
+                    )
+                )
+                cs.face_id.set_number(
+                    state.model_state.face_id
+                    if state.model_state.face_id is not None
+                    else 0
+                )
             else:
                 cs.face_id.disable()
 
@@ -156,7 +210,9 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         model_state = state.model_state
         if model_state is not None:
             cfg = cs.presharpen_amount.get_config()
-            presharpen_amount = model_state.presharpen_amount = float(np.clip(presharpen_amount, cfg.min, cfg.max))
+            presharpen_amount = model_state.presharpen_amount = float(
+                np.clip(presharpen_amount, cfg.min, cfg.max)
+            )
             cs.presharpen_amount.set_number(presharpen_amount)
             self.save_state()
             self.reemit_frame_signal.send()
@@ -167,7 +223,9 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         model_state = state.model_state
         if model_state is not None:
             cfg = cs.morph_factor.get_config()
-            morph_factor = model_state.morph_factor = float(np.clip(morph_factor, cfg.min, cfg.max))
+            morph_factor = model_state.morph_factor = float(
+                np.clip(morph_factor, cfg.min, cfg.max)
+            )
             cs.morph_factor.set_number(morph_factor)
             self.save_state()
             self.reemit_frame_signal.send()
@@ -178,7 +236,9 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         model_state = state.model_state
         if model_state is not None:
             cfg = cs.pre_gamma_red.get_config()
-            pre_gamma_red = model_state.pre_gamma_red = float(np.clip(pre_gamma_red, cfg.min, cfg.max))
+            pre_gamma_red = model_state.pre_gamma_red = float(
+                np.clip(pre_gamma_red, cfg.min, cfg.max)
+            )
             cs.pre_gamma_red.set_number(pre_gamma_red)
             self.save_state()
             self.reemit_frame_signal.send()
@@ -189,7 +249,9 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         model_state = state.model_state
         if model_state is not None:
             cfg = cs.pre_gamma_green.get_config()
-            pre_gamma_green = model_state.pre_gamma_green = float(np.clip(pre_gamma_green, cfg.min, cfg.max))
+            pre_gamma_green = model_state.pre_gamma_green = float(
+                np.clip(pre_gamma_green, cfg.min, cfg.max)
+            )
             cs.pre_gamma_green.set_number(pre_gamma_green)
             self.save_state()
             self.reemit_frame_signal.send()
@@ -200,7 +262,9 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         model_state = state.model_state
         if model_state is not None:
             cfg = cs.pre_gamma_blue.get_config()
-            pre_gamma_blue = model_state.pre_gamma_blue = float(np.clip(pre_gamma_blue, cfg.min, cfg.max))
+            pre_gamma_blue = model_state.pre_gamma_blue = float(
+                np.clip(pre_gamma_blue, cfg.min, cfg.max)
+            )
             cs.pre_gamma_blue.set_number(pre_gamma_blue)
             self.save_state()
             self.reemit_frame_signal.send()
@@ -211,7 +275,9 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         model_state = state.model_state
         if model_state is not None:
             cfg = cs.post_gamma_red.get_config()
-            post_gamma_red = model_state.post_gamma_red = float(np.clip(post_gamma_red, cfg.min, cfg.max))
+            post_gamma_red = model_state.post_gamma_red = float(
+                np.clip(post_gamma_red, cfg.min, cfg.max)
+            )
             cs.post_gamma_red.set_number(post_gamma_red)
             self.save_state()
             self.reemit_frame_signal.send()
@@ -222,7 +288,9 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         model_state = state.model_state
         if model_state is not None:
             cfg = cs.post_gamma_blue.get_config()
-            post_gamma_blue = model_state.post_gamma_blue = float(np.clip(post_gamma_blue, cfg.min, cfg.max))
+            post_gamma_blue = model_state.post_gamma_blue = float(
+                np.clip(post_gamma_blue, cfg.min, cfg.max)
+            )
             cs.post_gamma_blue.set_number(post_gamma_blue)
             self.save_state()
             self.reemit_frame_signal.send()
@@ -233,7 +301,9 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         model_state = state.model_state
         if model_state is not None:
             cfg = cs.post_gamma_green.get_config()
-            post_gamma_green = model_state.post_gamma_green = float(np.clip(post_gamma_green, cfg.min, cfg.max))
+            post_gamma_green = model_state.post_gamma_green = float(
+                np.clip(post_gamma_green, cfg.min, cfg.max)
+            )
             cs.post_gamma_green.set_number(post_gamma_green)
             self.save_state()
             self.reemit_frame_signal.send()
@@ -278,23 +348,25 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
     def should_skip_frame(self) -> bool:
         """Determine if current frame should be skipped for performance"""
         current_time = time.time()
-        
+
         # Frame skip logic
         if self.frame_skip_rate > 0:
             self.frame_skip_counter += 1
             if self.frame_skip_counter % (self.frame_skip_rate + 1) == 0:
                 return True
-        
+
         # FPS limiting logic
         if current_time - self.last_processed_frame_time < self.frame_time_threshold:
             return True
-            
+
         return False
 
-    def optimize_face_align_image(self, face_align_image: np.ndarray, model_state) -> np.ndarray:
+    def optimize_face_align_image(
+        self, face_align_image: np.ndarray, model_state
+    ) -> np.ndarray:
         """Optimize face align image processing"""
         fai_ip = ImageProcessor(face_align_image)
-        
+
         # Apply presharpen if needed
         if model_state.presharpen_amount != 0:
             fai_ip.gaussian_sharpen(sigma=1.0, power=model_state.presharpen_amount)
@@ -303,50 +375,68 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         pre_gamma_red = model_state.pre_gamma_red
         pre_gamma_green = model_state.pre_gamma_green
         pre_gamma_blue = model_state.pre_gamma_blue
-        
+
         if pre_gamma_red != 1.0 or pre_gamma_green != 1.0 or pre_gamma_blue != 1.0:
             fai_ip.gamma(pre_gamma_red, pre_gamma_green, pre_gamma_blue)
-            
-        return fai_ip.get_image('HWC')
 
-    def process_face_swap(self, face_align_image: np.ndarray, model_state, dfm_model) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        return fai_ip.get_image("HWC")
+
+    def process_face_swap(
+        self, face_align_image: np.ndarray, model_state, dfm_model
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Process face swap with caching and optimization"""
         current_time = time.time()
-        
+
         # Check cache first
-        if (self.cache_valid and 
-            self.cached_face_align_image is not None and 
-            current_time - self.cache_timestamp < self.cache_duration and
-            np.array_equal(face_align_image, self.cached_face_align_image)):
-            return self.cached_celeb_face, self.cached_celeb_face_mask, self.cached_face_align_mask
-        
+        if (
+            self.cache_valid
+            and self.cached_face_align_image is not None
+            and current_time - self.cache_timestamp < self.cache_duration
+            and np.array_equal(face_align_image, self.cached_face_align_image)
+        ):
+            return (
+                self.cached_celeb_face,
+                self.cached_celeb_face_mask,
+                self.cached_face_align_mask,
+            )
+
         # Process the face swap
         start_time = time.time()
-        
+
         # Optimize input image
         optimized_image = self.optimize_face_align_image(face_align_image, model_state)
-        
+
         # Perform face swap
         celeb_face, celeb_face_mask_img, face_align_mask_img = dfm_model.convert(
             optimized_image, morph_factor=model_state.morph_factor
         )
-        celeb_face, celeb_face_mask_img, face_align_mask_img = celeb_face[0], celeb_face_mask_img[0], face_align_mask_img[0]
+        celeb_face, celeb_face_mask_img, face_align_mask_img = (
+            celeb_face[0],
+            celeb_face_mask_img[0],
+            face_align_mask_img[0],
+        )
 
         # Two-pass processing if enabled
         if model_state.two_pass:
-            celeb_face, celeb_face_mask_img, _ = dfm_model.convert(celeb_face, morph_factor=model_state.morph_factor)
+            celeb_face, celeb_face_mask_img, _ = dfm_model.convert(
+                celeb_face, morph_factor=model_state.morph_factor
+            )
             celeb_face, celeb_face_mask_img = celeb_face[0], celeb_face_mask_img[0]
 
         # Apply post-gamma correction
         post_gamma_red = model_state.post_gamma_red
         post_gamma_blue = model_state.post_gamma_blue
         post_gamma_green = model_state.post_gamma_green
-        
+
         if post_gamma_red != 1.0 or post_gamma_blue != 1.0 or post_gamma_green != 1.0:
-            celeb_face = ImageProcessor(celeb_face).gamma(post_gamma_red, post_gamma_blue, post_gamma_green).get_image('HWC')
+            celeb_face = (
+                ImageProcessor(celeb_face)
+                .gamma(post_gamma_red, post_gamma_blue, post_gamma_green)
+                .get_image("HWC")
+            )
 
         # Cache results
-        if hasattr(self, 'get_state') and self.get_state().enable_caching:
+        if hasattr(self, "get_state") and self.get_state().enable_caching:
             self.cached_face_align_image = face_align_image.copy()
             self.cached_celeb_face = celeb_face.copy()
             self.cached_celeb_face_mask = celeb_face_mask_img.copy()
@@ -366,7 +456,7 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
         """Update FPS counter"""
         self.fps_counter += 1
         current_time = time.time()
-        
+
         if current_time - self.fps_start_time >= 1.0:
             self.current_fps = self.fps_counter
             self.fps_counter = 0
@@ -386,7 +476,9 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
             if events.new_status_downloading:
                 self.set_busy(False)
                 cs.model_dl_progress.enable()
-                cs.model_dl_progress.set_config( lib_csw.Progress.Config(title='@FaceSwapDFM.downloading_model') )
+                cs.model_dl_progress.set_config(
+                    lib_csw.Progress.Config(title="@FaceSwapDFM.downloading_model")
+                )
                 cs.model_dl_progress.set_progress(0)
 
             elif events.new_status_initialized:
@@ -396,51 +488,113 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
                 model_width, model_height = self.dfm_model.get_input_res()
 
                 cs.model_info_label.enable()
-                cs.model_info_label.set_config( lib_csw.InfoLabel.Config(info_icon=True,
-                                                    info_lines=[f'@FaceSwapDFM.model_information',
-                                                                '',
-                                                                f'@FaceSwapDFM.filename',
-                                                                f'{self.dfm_model.get_model_path().name}',
-                                                                '',
-                                                                f'@FaceSwapDFM.resolution',
-                                                                f'{model_width}x{model_height}',
-                                                                '',
-                                                                f'Performance Mode: Optimized']) )
+                cs.model_info_label.set_config(
+                    lib_csw.InfoLabel.Config(
+                        info_icon=True,
+                        info_lines=[
+                            f"@FaceSwapDFM.model_information",
+                            "",
+                            f"@FaceSwapDFM.filename",
+                            f"{self.dfm_model.get_model_path().name}",
+                            "",
+                            f"@FaceSwapDFM.resolution",
+                            f"{model_width}x{model_height}",
+                            "",
+                            f"Performance Mode: Optimized",
+                        ],
+                    )
+                )
 
                 # Enable all controls
                 cs.swap_all_faces.enable()
-                cs.swap_all_faces.set_flag( state.model_state.swap_all_faces if state.model_state.swap_all_faces is not None else False)
+                cs.swap_all_faces.set_flag(
+                    state.model_state.swap_all_faces
+                    if state.model_state.swap_all_faces is not None
+                    else False
+                )
 
                 if self.dfm_model.has_morph_value():
                     cs.morph_factor.enable()
-                    cs.morph_factor.set_config(lib_csw.Number.Config(min=0, max=1, step=0.01, decimals=2, allow_instant_update=True))
-                    cs.morph_factor.set_number(state.model_state.morph_factor if state.model_state.morph_factor is not None else 0.75)
+                    cs.morph_factor.set_config(
+                        lib_csw.Number.Config(
+                            min=0,
+                            max=1,
+                            step=0.01,
+                            decimals=2,
+                            allow_instant_update=True,
+                        )
+                    )
+                    cs.morph_factor.set_number(
+                        state.model_state.morph_factor
+                        if state.model_state.morph_factor is not None
+                        else 0.75
+                    )
 
                 cs.presharpen_amount.enable()
-                cs.presharpen_amount.set_config(lib_csw.Number.Config(min=0, max=10, step=0.1, decimals=1, allow_instant_update=True))
-                cs.presharpen_amount.set_number(state.model_state.presharpen_amount if state.model_state.presharpen_amount is not None else 0)
+                cs.presharpen_amount.set_config(
+                    lib_csw.Number.Config(
+                        min=0, max=10, step=0.1, decimals=1, allow_instant_update=True
+                    )
+                )
+                cs.presharpen_amount.set_number(
+                    state.model_state.presharpen_amount
+                    if state.model_state.presharpen_amount is not None
+                    else 0
+                )
 
                 # Gamma controls
-                for gamma_control in [cs.pre_gamma_red, cs.pre_gamma_green, cs.pre_gamma_blue, 
-                                     cs.post_gamma_red, cs.post_gamma_green, cs.post_gamma_blue]:
+                for gamma_control in [
+                    cs.pre_gamma_red,
+                    cs.pre_gamma_green,
+                    cs.pre_gamma_blue,
+                    cs.post_gamma_red,
+                    cs.post_gamma_green,
+                    cs.post_gamma_blue,
+                ]:
                     gamma_control.enable()
-                    gamma_control.set_config(lib_csw.Number.Config(min=0.01, max=4, step=0.01, decimals=2, allow_instant_update=True))
+                    gamma_control.set_config(
+                        lib_csw.Number.Config(
+                            min=0.01,
+                            max=4,
+                            step=0.01,
+                            decimals=2,
+                            allow_instant_update=True,
+                        )
+                    )
                     gamma_control.set_number(1.0)
 
                 cs.two_pass.enable()
-                cs.two_pass.set_flag(state.model_state.two_pass if state.model_state.two_pass is not None else False)
+                cs.two_pass.set_flag(
+                    state.model_state.two_pass
+                    if state.model_state.two_pass is not None
+                    else False
+                )
 
                 # Performance controls
                 cs.target_fps.enable()
-                cs.target_fps.set_config(lib_csw.Number.Config(min=15, max=60, step=1, decimals=0, allow_instant_update=True))
-                cs.target_fps.set_number(state.target_fps if state.target_fps is not None else 30)
+                cs.target_fps.set_config(
+                    lib_csw.Number.Config(
+                        min=15, max=60, step=1, decimals=0, allow_instant_update=True
+                    )
+                )
+                cs.target_fps.set_number(
+                    state.target_fps if state.target_fps is not None else 30
+                )
 
                 cs.frame_skip_rate.enable()
-                cs.frame_skip_rate.set_config(lib_csw.Number.Config(min=0, max=3, step=1, decimals=0, allow_instant_update=True))
-                cs.frame_skip_rate.set_number(state.frame_skip_rate if state.frame_skip_rate is not None else 0)
+                cs.frame_skip_rate.set_config(
+                    lib_csw.Number.Config(
+                        min=0, max=3, step=1, decimals=0, allow_instant_update=True
+                    )
+                )
+                cs.frame_skip_rate.set_number(
+                    state.frame_skip_rate if state.frame_skip_rate is not None else 0
+                )
 
                 cs.enable_caching.enable()
-                cs.enable_caching.set_flag(state.enable_caching if state.enable_caching is not None else True)
+                cs.enable_caching.set_flag(
+                    state.enable_caching if state.enable_caching is not None else True
+                )
 
                 self.set_busy(False)
                 self.reemit_frame_signal.send()
@@ -463,7 +617,7 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
 
                 model_state = state.model_state
                 dfm_model = self.dfm_model
-                
+
                 if all_is_not_None(dfm_model, model_state):
                     # Check if we should skip this frame
                     if self.should_skip_frame():
@@ -472,24 +626,41 @@ class FaceSwapDFMOptimizedWorker(BackendWorker):
                     else:
                         # Process the frame
                         for i, fsi in enumerate(bcd.get_face_swap_info_list()):
-                            if not model_state.swap_all_faces and model_state.face_id != i:
+                            if (
+                                not model_state.swap_all_faces
+                                and model_state.face_id != i
+                            ):
                                 continue
 
                             face_align_image = bcd.get_image(fsi.face_align_image_name)
                             if face_align_image is not None:
                                 # Process face swap with optimization
-                                celeb_face, celeb_face_mask_img, face_align_mask_img = self.process_face_swap(
+                                (
+                                    celeb_face,
+                                    celeb_face_mask_img,
+                                    face_align_mask_img,
+                                ) = self.process_face_swap(
                                     face_align_image, model_state, dfm_model
                                 )
 
                                 # Set output images
-                                fsi.face_align_mask_name = f'{fsi.face_align_image_name}_mask'
-                                fsi.face_swap_image_name = f'{fsi.face_align_image_name}_swapped'
-                                fsi.face_swap_mask_name  = f'{fsi.face_swap_image_name}_mask'
+                                fsi.face_align_mask_name = (
+                                    f"{fsi.face_align_image_name}_mask"
+                                )
+                                fsi.face_swap_image_name = (
+                                    f"{fsi.face_align_image_name}_swapped"
+                                )
+                                fsi.face_swap_mask_name = (
+                                    f"{fsi.face_swap_image_name}_mask"
+                                )
 
-                                bcd.set_image(fsi.face_align_mask_name, face_align_mask_img)
+                                bcd.set_image(
+                                    fsi.face_align_mask_name, face_align_mask_img
+                                )
                                 bcd.set_image(fsi.face_swap_image_name, celeb_face)
-                                bcd.set_image(fsi.face_swap_mask_name, celeb_face_mask_img)
+                                bcd.set_image(
+                                    fsi.face_swap_mask_name, celeb_face_mask_img
+                                )
 
                         # Update FPS counter
                         self.update_fps_counter()
@@ -564,27 +735,27 @@ class Sheet:
 
 
 class ModelState(BackendWorkerState):
-    swap_all_faces : bool = None
-    face_id : int = None
-    morph_factor : float = None
-    presharpen_amount : float = None
-    pre_gamma_red : float = None
-    pre_gamma_blue : float = None
+    swap_all_faces: bool = None
+    face_id: int = None
+    morph_factor: float = None
+    presharpen_amount: float = None
+    pre_gamma_red: float = None
+    pre_gamma_blue: float = None
     pre_gamma_green: float = None
-    post_gamma_red : float = None
-    post_gamma_blue : float = None
-    post_gamma_green : float = None
-    two_pass : bool = None
+    post_gamma_red: float = None
+    post_gamma_blue: float = None
+    post_gamma_green: float = None
+    two_pass: bool = None
 
 
 class WorkerState(BackendWorkerState):
     def __init__(self):
         super().__init__()
-        self.models_state : Dict[str, ModelState] = {}
-        self.model_state : ModelState = None
+        self.models_state: Dict[str, ModelState] = {}
+        self.model_state: ModelState = None
         self.model = None
         self.device = None
         # Performance optimization state
-        self.target_fps : int = None
-        self.frame_skip_rate : int = None
-        self.enable_caching : bool = None 
+        self.target_fps: int = None
+        self.frame_skip_rate: int = None
+        self.enable_caching: bool = None

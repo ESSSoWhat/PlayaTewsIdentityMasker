@@ -1,276 +1,305 @@
 #!/usr/bin/env python3
 """
-Simple Camera Fix for PlayaTewsIdentityMasker
-Directly fixes the camera source initialization issue
+Simple Camera Fix
+Directly fix camera settings to ensure camera source activates
 """
 
-import cv2
-import time
-import numpy as np
-from pathlib import Path
 import sys
 import os
+import json
+from pathlib import Path
 
-def test_and_fix_camera():
-    """Test camera and create a simple fix"""
-    print("🔧 Testing and Fixing Camera...")
+# Add the project root to the path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+def create_camera_settings_fix():
+    """Create camera settings files to ensure camera works"""
+    
+    print("🔧 Creating Camera Settings Fix")
     print("=" * 50)
     
-    # Test camera directly first
-    print("📹 Testing camera directly...")
-    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-    if not cap.isOpened():
-        print("❌ Camera not accessible")
-        return False
+    # Create camera settings
+    camera_settings = {
+        "camera": {
+            "device_idx": 0,
+            "driver": 1,  # DirectShow
+            "resolution": 1,  # 640x480
+            "fps": 30,
+            "rotation": 0,  # 0 degrees
+            "flip_horizontal": False
+        }
+    }
     
-    print("✅ Camera accessible")
+    # Create settings directory
+    settings_dir = Path("settings")
+    settings_dir.mkdir(exist_ok=True)
     
-    # Test frame reading
-    ret, frame = cap.read()
-    if ret:
-        print(f"✅ Frame read successful: {frame.shape}")
-    else:
-        print("❌ Frame read failed")
-        cap.release()
-        return False
+    # Save to camera_override.json
+    camera_override_file = settings_dir / "camera_override.json"
+    with open(camera_override_file, 'w', encoding='utf-8') as f:
+        json.dump(camera_settings, f, indent=2)
+    print(f"✅ Saved camera settings to {camera_override_file}")
     
-    cap.release()
-    
-    # Create a simple camera test app
-    create_simple_camera_test()
-    
-    return True
-
-def create_simple_camera_test():
-    """Create a simple camera test application"""
-    print("\n🔧 Creating Simple Camera Test...")
-    print("=" * 50)
-    
-    test_code = '''#!/usr/bin/env python3
-"""
-Simple Camera Test for PlayaTewsIdentityMasker
-Tests camera functionality and shows preview
-"""
-
-import cv2
-import sys
-import time
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton
-from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtGui import QPixmap, QImage
-import numpy as np
-
-class SimpleCameraTest(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Simple Camera Test - PlayaTewsIdentityMasker")
-        self.setGeometry(100, 100, 800, 600)
-        
-        # Create central widget
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        layout = QVBoxLayout(central_widget)
-        
-        # Create preview label
-        self.preview_label = QLabel("Initializing camera...")
-        self.preview_label.setMinimumSize(640, 480)
-        self.preview_label.setStyleSheet("QLabel { border: 2px solid #ccc; background-color: #f0f0f0; }")
-        self.preview_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.preview_label)
-        
-        # Create status label
-        self.status_label = QLabel("Status: Initializing...")
-        self.status_label.setStyleSheet("QLabel { font-weight: bold; color: #333; }")
-        layout.addWidget(self.status_label)
-        
-        # Create control buttons
-        button_layout = QVBoxLayout()
-        
-        self.start_btn = QPushButton("Start Camera")
-        self.start_btn.clicked.connect(self.start_camera)
-        button_layout.addWidget(self.start_btn)
-        
-        self.stop_btn = QPushButton("Stop Camera")
-        self.stop_btn.clicked.connect(self.stop_camera)
-        self.stop_btn.setEnabled(False)
-        button_layout.addWidget(self.stop_btn)
-        
-        layout.addLayout(button_layout)
-        
-        # Initialize camera
-        self.cap = None
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_frame)
-        
-        # Auto-start camera
-        self.start_camera()
-        
-        print("✅ Simple camera test created")
-    
-    def start_camera(self):
-        """Start the camera"""
-        try:
-            self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-            if not self.cap.isOpened():
-                self.status_label.setText("Status: Failed to open camera")
-                self.preview_label.setText("Failed to open camera")
-                return
-            
-            # Set camera properties
-            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-            self.cap.set(cv2.CAP_PROP_FPS, 30)
-            
-            # Start timer
-            self.timer.start(33)  # ~30 FPS
-            
-            self.status_label.setText("Status: Camera running")
-            self.start_btn.setEnabled(False)
-            self.stop_btn.setEnabled(True)
-            
-            print("✅ Camera started successfully")
-            
-        except Exception as e:
-            self.status_label.setText(f"Status: Error - {str(e)}")
-            print(f"❌ Error starting camera: {e}")
-    
-    def stop_camera(self):
-        """Stop the camera"""
-        self.timer.stop()
-        if self.cap and self.cap.isOpened():
-            self.cap.release()
-        self.cap = None
-        
-        self.preview_label.setText("Camera stopped")
-        self.status_label.setText("Status: Camera stopped")
-        self.start_btn.setEnabled(True)
-        self.stop_btn.setEnabled(False)
-        
-        print("✅ Camera stopped")
-    
-    def update_frame(self):
-        """Update the frame display"""
-        if self.cap is None or not self.cap.isOpened():
-            return
-        
-        ret, frame = self.cap.read()
-        if ret:
-            # Convert BGR to RGB
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            
-            # Get frame dimensions
-            height, width, channel = rgb_frame.shape
-            bytes_per_line = 3 * width
-            
-            # Create QImage
-            q_image = QImage(rgb_frame.data, width, height, bytes_per_line, QImage.Format_RGB888)
-            
-            # Create pixmap and scale to fit
-            pixmap = QPixmap.fromImage(q_image)
-            scaled_pixmap = pixmap.scaled(self.preview_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            
-            # Display in label
-            self.preview_label.setPixmap(scaled_pixmap)
-            
-            # Update status
-            self.status_label.setText(f"Status: Running - {width}x{height} @ 30 FPS")
+    # Save to global_face_swap_state.json
+    global_settings_file = settings_dir / "global_face_swap_state.json"
+    try:
+        if global_settings_file.exists():
+            with open(global_settings_file, 'r', encoding='utf-8') as f:
+                global_settings = json.load(f)
         else:
-            self.status_label.setText("Status: Failed to read frame")
+            global_settings = {}
+        
+        global_settings.update(camera_settings)
+        
+        with open(global_settings_file, 'w', encoding='utf-8') as f:
+            json.dump(global_settings, f, indent=2)
+        print(f"✅ Updated camera settings in {global_settings_file}")
+    except Exception as e:
+        print(f"⚠️ Could not update global settings: {e}")
     
-    def closeEvent(self, event):
-        """Handle window close event"""
-        self.stop_camera()
-        event.accept()
+    # Save to demo settings
+    demo_settings_dir = Path("demo_settings/settings")
+    demo_settings_dir.mkdir(parents=True, exist_ok=True)
+    demo_settings_file = demo_settings_dir / "global_face_swap_state.json"
+    
+    try:
+        if demo_settings_file.exists():
+            with open(demo_settings_file, 'r', encoding='utf-8') as f:
+                demo_settings = json.load(f)
+        else:
+            demo_settings = {}
+        
+        demo_settings.update(camera_settings)
+        
+        with open(demo_settings_file, 'w', encoding='utf-8') as f:
+            json.dump(demo_settings, f, indent=2)
+        print(f"✅ Updated camera settings in {demo_settings_file}")
+    except Exception as e:
+        print(f"⚠️ Could not update demo settings: {e}")
+    
+    # Also create a camera source state file
+    camera_source_state = {
+        "device_idx": 0,
+        "driver": 1,
+        "resolution": 1,
+        "fps": 30,
+        "rotation": 0,
+        "flip_horizontal": False,
+        "settings_by_idx": {}
+    }
+    
+    camera_state_file = settings_dir / "camera_source_state.json"
+    with open(camera_state_file, 'w', encoding='utf-8') as f:
+        json.dump(camera_source_state, f, indent=2)
+    print(f"✅ Saved camera source state to {camera_state_file}")
 
-def main():
-    app = QApplication(sys.argv)
-    window = SimpleCameraTest()
-    window.show()
-    sys.exit(app.exec_())
+def test_camera_directly():
+    """Test camera directly to verify it works"""
+    
+    print("\n🔍 Testing camera directly...")
+    
+    try:
+        import cv2
+        
+        # Try to open camera 0 with DirectShow
+        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        
+        if cap.isOpened():
+            print("✅ Camera opened successfully")
+            
+            # Set properties
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            cap.set(cv2.CAP_PROP_FPS, 30)
+            
+            # Try to read a frame
+            ret, frame = cap.read()
+            if ret and frame is not None:
+                print(f"✅ Frame captured: {frame.shape}")
+                print("🎬 Camera is working correctly!")
+                
+                # Try to display frame
+                try:
+                    cv2.imshow('Camera Fix Test', frame)
+                    print("✅ Frame displayed (press any key to close)")
+                    cv2.waitKey(2000)  # Wait 2 seconds
+                    cv2.destroyAllWindows()
+                except Exception as e:
+                    print(f"⚠️ Could not display frame: {e}")
+            else:
+                print("❌ Could not capture frame")
+        else:
+            print("❌ Could not open camera")
+        
+        cap.release()
+        
+    except Exception as e:
+        print(f"❌ Error testing camera directly: {e}")
+
+def create_camera_activation_launcher():
+    """Create a launcher that ensures camera source activates"""
+    
+    print("\n🔧 Creating camera activation launcher...")
+    
+    launcher_content = '''#!/usr/bin/env python3
+"""
+Camera Activation Launcher
+Ensures camera source activates properly
+"""
+
+import sys
+import os
+import time
+from pathlib import Path
+from PyQt5.QtWidgets import QApplication
+
+# Add the project root to the path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+def launch_with_camera_fix():
+    """Launch the app with camera activation fix"""
+    
+    print("🚀 Camera Activation Launcher")
+    print("=" * 50)
+    
+    # Step 1: Create QApplication
+    app = QApplication.instance()
+    if app is None:
+        print("🔧 Creating QApplication instance...")
+        app = QApplication(sys.argv)
+        print("✅ QApplication instance created")
+    else:
+        print("✅ QApplication instance already exists")
+    
+    try:
+        # Step 2: Import and initialize main app
+        print("\\n🔧 Step 2: Initializing PlayaTewsIdentityMasker...")
+        from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
+        
+        # Set up userdata path as Path object
+        userdata_path = Path(os.path.dirname(os.path.abspath(__file__))) / "userdata"
+        print(f"📁 Using userdata path: {userdata_path}")
+        
+        # Create the main app
+        main_app = PlayaTewsIdentityMaskerApp(userdata_path=userdata_path)
+        print("✅ Main app created successfully")
+        
+        # Step 3: Force camera source activation
+        print("\\n🔧 Step 3: Forcing camera source activation...")
+        if hasattr(main_app, 'q_live_swap') and hasattr(main_app.q_live_swap, 'camera_source'):
+            camera_source = main_app.q_live_swap.camera_source
+            
+            # Ensure camera source is started
+            if not camera_source.is_started():
+                print("🔧 Starting camera source...")
+                camera_source.start()
+                time.sleep(2)
+            
+            if camera_source.is_started():
+                print("✅ Camera source is running")
+            else:
+                print("⚠️ Camera source may not be running properly")
+        
+        # Step 4: Show the main window
+        if hasattr(main_app, 'main_window'):
+            main_app.main_window.show()
+            print("✅ Main window displayed")
+        
+        # Step 5: Wait for initialization
+        print("\\n⏳ Step 5: Waiting for camera and UI initialization...")
+        time.sleep(5)
+        
+        # Step 6: Final status
+        print("\\n" + "=" * 50)
+        print("🎬 CAMERA ACTIVATION LAUNCH COMPLETE!")
+        print("=" * 50)
+        print("📺 The PlayaTewsIdentityMasker app should now be visible.")
+        print("🎬 Camera source should be activated and working.")
+        print()
+        print("🔍 To see the camera feed:")
+        print("   1. Look for the PlayaTewsIdentityMasker window")
+        print("   2. Click on the 'Viewers' tab")
+        print("   3. Check the 'Camera Feed' viewer on the left side")
+        print("   4. The camera feed should now be visible!")
+        print()
+        print("🎯 If camera feed is still not visible:")
+        print("   - Try clicking on different tabs and back to 'Viewers'")
+        print("   - Check camera permissions in Windows")
+        print("   - Restart the application if needed")
+        
+        # Start the event loop
+        return app.exec_()
+        
+    except Exception as e:
+        print(f"❌ Error launching app: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(launch_with_camera_fix())
 '''
     
-    with open("simple_camera_test.py", 'w', encoding='utf-8') as f:
-        f.write(test_code)
+    launcher_file = Path("camera_activation_launcher.py")
+    with open(launcher_file, 'w', encoding='utf-8') as f:
+        f.write(launcher_content)
+    print(f"✅ Created camera activation launcher: {launcher_file}")
     
-    print("✅ Created: simple_camera_test.py")
-    print("   Run this to test camera functionality")
-
-def create_camera_fix_launcher():
-    """Create a camera fix launcher"""
-    print("\n🔧 Creating Camera Fix Launcher...")
-    print("=" * 50)
-    
-    launcher_code = '''@echo off
+    # Create batch file
+    batch_content = '''@echo off
 echo ========================================
-echo PlayaTews Identity Masker - Camera Fix
+echo PlayaTews Identity Masker - CAMERA ACTIVATION LAUNCHER
 echo ========================================
 echo.
-
-echo 🔧 Testing camera functionality...
-python simple_camera_test.py
-
-echo.
-echo ✅ Camera test completed!
-echo 💡 If camera works in test, the issue is in the main app
-echo 🚀 If camera doesn't work, check virtual camera app
+echo This launcher ensures the camera source activates properly
+echo and the camera feed appears in the preview area.
 echo.
 
+echo 🔧 Terminating any existing Python processes...
+taskkill /F /IM python.exe >nul 2>&1
+timeout /t 2 >nul
+
+echo.
+echo 🚀 Starting PlayaTewsIdentityMasker with camera activation fix...
+echo.
+
+python camera_activation_launcher.py
+
+echo.
+echo Application has finished running.
 pause
 '''
     
-    with open("test_camera_fix.bat", 'w') as f:
-        f.write(launcher_code)
-    
-    print("✅ Created: test_camera_fix.bat")
-    print("   Run this to test camera functionality")
-
-def main():
-    print("🎬 PlayaTewsIdentityMasker - Simple Camera Fix")
-    print("=" * 60)
-    print()
-    print("🔍 Issue: Camera feed not appearing in preview area")
-    print("🎯 Solution: Test camera functionality and create simple test")
-    print()
-    
-    try:
-        # Test and fix camera
-        success = test_and_fix_camera()
-        
-        if success:
-            # Create camera fix launcher
-            create_camera_fix_launcher()
-            
-            print("\n🎉 Simple Camera Fix Complete!")
-            print("=" * 40)
-            print()
-            print("📋 What was created:")
-            print("   ✅ simple_camera_test.py - Simple camera test app")
-            print("   ✅ test_camera_fix.bat - Camera test launcher")
-            print()
-            print("🚀 Next steps:")
-            print("   1. Run: test_camera_fix.bat")
-            print("   2. If camera works in test, issue is in main app")
-            print("   3. If camera doesn't work, check virtual camera app")
-            print()
-            print("💡 This will help identify:")
-            print("   - If camera works at all")
-            print("   - If the issue is in the main app")
-            print("   - If the issue is with the virtual camera")
-            
-        else:
-            print("❌ Camera test failed")
-            print("   Check virtual camera app and permissions")
-            
-    except Exception as e:
-        print(f"❌ Error creating camera fix: {e}")
-        return False
-    
-    return True
+    batch_file = Path("start_camera_activation.bat")
+    with open(batch_file, 'w', encoding='utf-8') as f:
+        f.write(batch_content)
+    print(f"✅ Created camera activation batch file: {batch_file}")
 
 if __name__ == "__main__":
-    success = main()
-    if not success:
-        sys.exit(1) 
+    print("🔧 Simple Camera Fix")
+    print("=" * 50)
+    
+    # Create camera settings fix
+    create_camera_settings_fix()
+    
+    # Test camera directly
+    test_camera_directly()
+    
+    # Create camera activation launcher
+    create_camera_activation_launcher()
+    
+    print("\n" + "=" * 50)
+    print("🎬 Simple Camera Fix Complete!")
+    print("=" * 50)
+    print("✅ Camera settings have been updated")
+    print("✅ Camera activation launcher created")
+    print()
+    print("🔧 Next steps:")
+    print("   1. Run: .\\start_camera_activation.bat")
+    print("   2. The camera source button should now activate")
+    print("   3. Camera feed should appear in the preview area")
+    print()
+    print("🎯 If the camera source still doesn't activate:")
+    print("   - Check that camera permissions are granted in Windows")
+    print("   - Try closing other applications that might be using the camera")
+    print("   - Restart the computer if needed") 

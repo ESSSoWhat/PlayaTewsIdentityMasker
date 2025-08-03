@@ -7,7 +7,7 @@ from ..SCacheton import SCacheton
 from ..Tensor import Tensor
 
 
-def cvt_color (input_t : Tensor, in_mode : str, out_mode : str, ch_axis=1, dtype=None):
+def cvt_color(input_t: Tensor, in_mode: str, out_mode: str, ch_axis=1, dtype=None):
     """
     converts color
 
@@ -22,7 +22,9 @@ def cvt_color (input_t : Tensor, in_mode : str, out_mode : str, ch_axis=1, dtype
 
      dtype          output_dtype    float16/32/64
     """
-    op = SCacheton.get(_CvtColor32Op, input_t.shape, input_t.dtype, in_mode, dtype, out_mode, ch_axis)
+    op = SCacheton.get(
+        _CvtColor32Op, input_t.shape, input_t.dtype, in_mode, dtype, out_mode, ch_axis
+    )
 
     device = input_t.get_device()
 
@@ -33,31 +35,43 @@ def cvt_color (input_t : Tensor, in_mode : str, out_mode : str, ch_axis=1, dtype
     else:
         output_t = Tensor(op.o_shape, op.o_dtype, device=device)
 
-        device.run_kernel(op.forward_krn, output_t.get_buffer(), input_t.get_buffer(), op.krn_S0, op.krn_S1,
-                        global_shape=op.global_shape )
+        device.run_kernel(
+            op.forward_krn,
+            output_t.get_buffer(),
+            input_t.get_buffer(),
+            op.krn_S0,
+            op.krn_S1,
+            global_shape=op.global_shape,
+        )
 
     return output_t
 
-_allowed_modes = ['RGB', 'BGR', 'XYZ', 'LAB']
+
+_allowed_modes = ["RGB", "BGR", "XYZ", "LAB"]
 _allowed_dtypes = [np.float16, np.float32]
 
-class _CvtColor32Op():
-    def __init__(self, i_shape : AShape, i_dtype, in_mode, o_dtype, out_mode, ch_axis):
+
+class _CvtColor32Op:
+    def __init__(self, i_shape: AShape, i_dtype, in_mode, o_dtype, out_mode, ch_axis):
         self.o_dtype = o_dtype = o_dtype if o_dtype is not None else i_dtype
 
         if in_mode not in _allowed_modes:
-            raise ValueError(f'in_mode {in_mode} not in allowed modes: {_allowed_modes}')
+            raise ValueError(
+                f"in_mode {in_mode} not in allowed modes: {_allowed_modes}"
+            )
         if out_mode not in _allowed_modes:
-            raise ValueError(f'out_mode {out_mode} not in allowed modes: {_allowed_modes}')
+            raise ValueError(
+                f"out_mode {out_mode} not in allowed modes: {_allowed_modes}"
+            )
         if i_dtype not in _allowed_dtypes:
-            raise Exception(f'input dtype not in {_allowed_dtypes}')
+            raise Exception(f"input dtype not in {_allowed_dtypes}")
         if o_dtype not in _allowed_dtypes:
-            raise Exception(f'output dtype not in {_allowed_dtypes}')
+            raise Exception(f"output dtype not in {_allowed_dtypes}")
 
-        in_ch  = 3 if in_mode in ['RGB', 'BGR', 'XYZ', 'LAB'] else None
-        out_ch = 3 if in_mode in ['RGB', 'BGR', 'XYZ', 'LAB'] else None
+        in_ch = 3 if in_mode in ["RGB", "BGR", "XYZ", "LAB"] else None
+        out_ch = 3 if in_mode in ["RGB", "BGR", "XYZ", "LAB"] else None
         if i_shape[ch_axis] != in_ch:
-            raise ValueError(f'input ch_axis must have size {in_ch} for {in_mode} mode')
+            raise ValueError(f"input ch_axis must have size {in_ch} for {in_mode} mode")
 
         self.o_shape = i_shape.replaced_axes([ch_axis], [out_ch])
 
@@ -67,54 +81,57 @@ class _CvtColor32Op():
         self.krn_S0 = np.int64(s0_shape.size)
         self.krn_S1 = np.int64(s1_shape.size)
 
-        self.global_shape = (s0_shape.size*s1_shape.size,)
+        self.global_shape = (s0_shape.size * s1_shape.size,)
 
         self.output_same_as_input = in_mode == out_mode
 
         if not self.output_same_as_input:
-
             key = (_CvtColor32Op, in_mode, out_mode, i_dtype, o_dtype)
             krn = SCacheton.get_var(key)
             if krn is None:
                 body = None
 
-                if in_mode in ['RGB','XYZ','LAB']:
-                    in_args = ['I0','I1','I2']
-                elif in_mode == 'BGR':
-                    in_args = ['I2','I1','I0']
+                if in_mode in ["RGB", "XYZ", "LAB"]:
+                    in_args = ["I0", "I1", "I2"]
+                elif in_mode == "BGR":
+                    in_args = ["I2", "I1", "I0"]
 
-                if out_mode in ['RGB','XYZ','LAB']:
-                    out_args = ['O0','O1','O2']
-                elif out_mode == 'BGR':
-                    out_args = ['O2','O1','O0']
+                if out_mode in ["RGB", "XYZ", "LAB"]:
+                    out_args = ["O0", "O1", "O2"]
+                elif out_mode == "BGR":
+                    out_args = ["O2", "O1", "O0"]
 
-                get_body_func = _modes_to_body_func.get( (in_mode, out_mode), None )
+                get_body_func = _modes_to_body_func.get((in_mode, out_mode), None)
                 if get_body_func is None:
-                    raise ValueError(f'{in_mode} -> {out_mode} is not supported.')
+                    raise ValueError(f"{in_mode} -> {out_mode} is not supported.")
 
-                body = get_body_func( *(in_args+out_args) )
+                body = get_body_func(*(in_args + out_args))
 
-                krn = Kernel(kernel_text=_CvtColor32Op.fused_kernel(in_ch, i_dtype, out_ch, o_dtype, body=body))
+                krn = Kernel(
+                    kernel_text=_CvtColor32Op.fused_kernel(
+                        in_ch, i_dtype, out_ch, o_dtype, body=body
+                    )
+                )
                 SCacheton.set_var(key, krn)
 
             self.forward_krn = krn
 
     @staticmethod
-    def get_RGB_to_LAB_body(R,G,B,L,a,b, declare_out_type=False) -> str:
+    def get_RGB_to_LAB_body(R, G, B, L, a, b, declare_out_type=False) -> str:
         return f"""
 {_CvtColor32Op.get_sRGB_to_XYZ_body(R,G,B,'X','Y','Z', declare_out_type=True)}
 {_CvtColor32Op.get_XYZ_to_LAB_body('X','Y','Z',L,a,b, declare_out_type=declare_out_type)}
 """
 
     @staticmethod
-    def get_LAB_to_RGB_body(L,a,b,R,G,B, declare_out_type=False) -> str:
+    def get_LAB_to_RGB_body(L, a, b, R, G, B, declare_out_type=False) -> str:
         return f"""
 {_CvtColor32Op.get_LAB_to_XYZ_body(L,a,b,'X','Y','Z', declare_out_type=True)}
 {_CvtColor32Op.get_XYZ_to_sRGB_body('X','Y','Z',R,G,B, declare_out_type=declare_out_type)}
 """
 
     @staticmethod
-    def get_sRGB_to_XYZ_body(R,G,B,X,Y,Z, declare_out_type=False) -> str:
+    def get_sRGB_to_XYZ_body(R, G, B, X, Y, Z, declare_out_type=False) -> str:
         return f"""
 {R} = ({R} > 0.04045)*( pow( ({R}+0.055)/1.055, 2.4) ) + ({R} <= 0.04045)*({R} / 12.92);
 {G} = ({G} > 0.04045)*( pow( ({G}+0.055)/1.055, 2.4) ) + ({G} <= 0.04045)*({G} / 12.92);
@@ -124,7 +141,7 @@ class _CvtColor32Op():
 """
 
     @staticmethod
-    def get_RGB_to_XYZ_body(R,G,B,X,Y,Z, declare_out_type=False) -> str:
+    def get_RGB_to_XYZ_body(R, G, B, X, Y, Z, declare_out_type=False) -> str:
         return f"""
 {'float' if declare_out_type else ''} {X} = {R}*0.412453 + {G}*0.357580 + {B}*0.180423;
 {'float' if declare_out_type else ''} {Y} = {R}*0.212671 + {G}*0.715160 + {B}*0.072169;
@@ -132,7 +149,7 @@ class _CvtColor32Op():
 """
 
     @staticmethod
-    def get_XYZ_to_sRGB_body(X,Y,Z,R,G,B, declare_out_type=False) -> str:
+    def get_XYZ_to_sRGB_body(X, Y, Z, R, G, B, declare_out_type=False) -> str:
         return f"""
 {_CvtColor32Op.get_XYZ_to_RGB_body(X,Y,Z,R,G,B,declare_out_type=declare_out_type) }
 {R} = ({R} > 0.0031308)*( 1.055*pow({R},1.0/2.4)-0.055 ) + ({R} <= 0.0031308)*({R} * 12.92);
@@ -141,7 +158,7 @@ class _CvtColor32Op():
 """
 
     @staticmethod
-    def get_XYZ_to_RGB_body(X,Y,Z,R,G,B, declare_out_type=False) -> str:
+    def get_XYZ_to_RGB_body(X, Y, Z, R, G, B, declare_out_type=False) -> str:
         return f"""
 {'float' if declare_out_type else ''} {R} = clamp( {X}* 3.240479 + {Y}*-1.53715  + {Z}*-0.498535, 0.0, 1.0 );
 {'float' if declare_out_type else ''} {G} = clamp( {X}*-0.969256 + {Y}* 1.875991 + {Z}* 0.041556, 0.0, 1.0 );
@@ -149,7 +166,7 @@ class _CvtColor32Op():
 """
 
     @staticmethod
-    def get_RGB_to_BGR_body(R,G,B,b,g,r, declare_out_type=False) -> str:
+    def get_RGB_to_BGR_body(R, G, B, b, g, r, declare_out_type=False) -> str:
         return f"""
 {'float' if declare_out_type else ''} {b} = {R};
 {'float' if declare_out_type else ''} {g} = {G};
@@ -157,7 +174,7 @@ class _CvtColor32Op():
 """
 
     @staticmethod
-    def get_BGR_to_RGB_body(B,G,R,r,g,b, declare_out_type=False) -> str:
+    def get_BGR_to_RGB_body(B, G, R, r, g, b, declare_out_type=False) -> str:
         return f"""
 {'float' if declare_out_type else ''} {r} = {B};
 {'float' if declare_out_type else ''} {g} = {G};
@@ -165,10 +182,10 @@ class _CvtColor32Op():
 """
 
     @staticmethod
-    def get_XYZ_to_LAB_body(X,Y,Z,L,A,B, declare_out_type=False) -> str:
-        beta3 = '((6.0/29.0)*(6.0/29.0)*(6.0/29.0))'
-        xyz_xn = '(0.950456)'
-        xyz_zn = '(1.088754)'
+    def get_XYZ_to_LAB_body(X, Y, Z, L, A, B, declare_out_type=False) -> str:
+        beta3 = "((6.0/29.0)*(6.0/29.0)*(6.0/29.0))"
+        xyz_xn = "(0.950456)"
+        xyz_zn = "(1.088754)"
         return f"""
 {X} /= {xyz_xn};
 {Z} /= {xyz_zn};
@@ -181,12 +198,13 @@ class _CvtColor32Op():
 {'float' if declare_out_type else ''} {A} = 500.0*({X}-{Y});
 {'float' if declare_out_type else ''} {B} = 200.0*({Y}-{Z});
 """
+
     @staticmethod
-    def get_LAB_to_XYZ_body(L,A,B,X,Y,Z, declare_out_type=False) -> str:
-        beta = '(6.0/29.0)'
-        beta2 = '((6.0/29.0)*(6.0/29.0))'
-        xyz_xn = '(0.950456)'
-        xyz_zn = '(1.088754)'
+    def get_LAB_to_XYZ_body(L, A, B, X, Y, Z, declare_out_type=False) -> str:
+        beta = "(6.0/29.0)"
+        beta2 = "((6.0/29.0)*(6.0/29.0))"
+        xyz_xn = "(0.950456)"
+        xyz_zn = "(1.088754)"
         return f"""
 {'float' if declare_out_type else ''} {Y} = ({L} + 16.0) / 116.0;
 {'float' if declare_out_type else ''} {X} = {Y} + {A} / 500.0;
@@ -198,8 +216,8 @@ class _CvtColor32Op():
 """
 
     @staticmethod
-    def fused_kernel(i_ch : int, i_dtype, o_ch : int, o_dtype, body : str) -> str:
-        line_sep = '\n'
+    def fused_kernel(i_ch: int, i_dtype, o_ch: int, o_dtype, body: str) -> str:
+        line_sep = "\n"
         return f"""
 {HKernel.define_ndim_idx(o_ch)}
 {HKernel.define_ndim_idx(i_ch)}
@@ -223,20 +241,18 @@ size_t gid = get_global_id(0);
 }}
 """
 
+
 _modes_to_body_func = {
-        ('RGB','BGR') : _CvtColor32Op.get_RGB_to_BGR_body,
-        ('BGR','RGB') : _CvtColor32Op.get_BGR_to_RGB_body,
-
-        ('RGB','XYZ') : _CvtColor32Op.get_RGB_to_XYZ_body,
-        ('RGB','LAB') : _CvtColor32Op.get_RGB_to_LAB_body,
-        ('BGR','XYZ') : _CvtColor32Op.get_RGB_to_XYZ_body,
-        ('BGR','LAB') : _CvtColor32Op.get_RGB_to_LAB_body,
-
-        ('XYZ','RGB') : _CvtColor32Op.get_XYZ_to_RGB_body,
-        ('LAB','RGB') : _CvtColor32Op.get_LAB_to_RGB_body,
-        ('XYZ','BGR') : _CvtColor32Op.get_XYZ_to_RGB_body,
-        ('LAB','BGR') : _CvtColor32Op.get_LAB_to_RGB_body,
-
-        ('XYZ','LAB') : _CvtColor32Op.get_XYZ_to_LAB_body,
-        ('LAB','XYZ') : _CvtColor32Op.get_LAB_to_XYZ_body,
-    }
+    ("RGB", "BGR"): _CvtColor32Op.get_RGB_to_BGR_body,
+    ("BGR", "RGB"): _CvtColor32Op.get_BGR_to_RGB_body,
+    ("RGB", "XYZ"): _CvtColor32Op.get_RGB_to_XYZ_body,
+    ("RGB", "LAB"): _CvtColor32Op.get_RGB_to_LAB_body,
+    ("BGR", "XYZ"): _CvtColor32Op.get_RGB_to_XYZ_body,
+    ("BGR", "LAB"): _CvtColor32Op.get_RGB_to_LAB_body,
+    ("XYZ", "RGB"): _CvtColor32Op.get_XYZ_to_RGB_body,
+    ("LAB", "RGB"): _CvtColor32Op.get_LAB_to_RGB_body,
+    ("XYZ", "BGR"): _CvtColor32Op.get_XYZ_to_RGB_body,
+    ("LAB", "BGR"): _CvtColor32Op.get_LAB_to_RGB_body,
+    ("XYZ", "LAB"): _CvtColor32Op.get_XYZ_to_LAB_body,
+    ("LAB", "XYZ"): _CvtColor32Op.get_LAB_to_XYZ_body,
+}

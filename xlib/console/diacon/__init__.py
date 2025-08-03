@@ -1,1 +1,1 @@
-from .Diacon import Diacon, Dlg, DlgChoice, DlgChoices, EDlgMode, DlgNumber
+from .Diacon import Diacon, Dlg, DlgChoice, DlgChoices, DlgNumber, EDlgMode

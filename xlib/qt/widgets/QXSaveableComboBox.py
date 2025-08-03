@@ -1,15 +1,23 @@
+from typing import Iterable
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from typing import Iterable
+from ..core.widget import BlockSignals
 from .QXComboBox import QXComboBox
 from .QXMainApplication import QXMainApplication
-from ..core.widget import BlockSignals
+
 
 class QXSaveableComboBox(QXComboBox):
-    
-    def __init__(self, db_key, choices : Iterable, default_choice, choices_names=None, on_choice_selected = None):
+    def __init__(
+        self,
+        db_key,
+        choices: Iterable,
+        default_choice,
+        choices_names=None,
+        on_choice_selected=None,
+    ):
         """
         a saveable QXComboBox
         """
@@ -21,14 +29,14 @@ class QXSaveableComboBox(QXComboBox):
         self._choices_names = choices_names
 
         if len(self._choices) != len(self._choices_names):
-            raise ValueError('mismatch len of choices and choices_names')
+            raise ValueError("mismatch len of choices and choices_names")
 
         self._db_key = db_key
         self._on_choice_selected = on_choice_selected
 
         super().__init__(choices=choices_names, on_index_changed=self._index_changed)
 
-        self.set_choice( QXMainApplication.inst.get_app_data (db_key) )
+        self.set_choice(QXMainApplication.inst.get_app_data(db_key))
 
     def set_choice(self, choice):
         if choice not in self._choices:
@@ -45,4 +53,4 @@ class QXSaveableComboBox(QXComboBox):
             self.setCurrentIndex(idx)
 
     def _index_changed(self, idx):
-        self.set_choice( self._choices[idx] )
+        self.set_choice(self._choices[idx])

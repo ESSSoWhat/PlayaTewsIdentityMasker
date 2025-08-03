@@ -2,6 +2,7 @@ class SCacheton:
     """
     Static class for caching classes and vars by hashable arguments
     """
+
     cachetons = {}
     cachevars = {}
 
@@ -18,7 +19,7 @@ class SCacheton:
         if cls_multitons is None:
             cls_multitons = SCacheton.cachetons[cls] = {}
 
-        key = (args, tuple(kwargs.items()) )
+        key = (args, tuple(kwargs.items()))
 
         data = cls_multitons.get(key, None)
         if data is None:

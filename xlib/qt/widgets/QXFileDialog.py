@@ -2,13 +2,15 @@ from PyQt5.QtWidgets import *
 
 
 class QXFileDialog(QFileDialog):
-    def __init__(self, parent=None,
-                       multi_files=False,
-                       existing_only=False,
-                       is_save=False,
-                       filter=None,
-                       accepted=None):
-
+    def __init__(
+        self,
+        parent=None,
+        multi_files=False,
+        existing_only=False,
+        is_save=False,
+        filter=None,
+        accepted=None,
+    ):
         super().__init__(parent=parent, filter=filter)
         self.setOption(QFileDialog.Option.DontUseNativeDialog)
 

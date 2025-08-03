@@ -1,5 +1,6 @@
 from .BroadcastInfo import BroadcastInfo
 from .ConcatInfo import ConcatInfo
+from .Conv2DInfo import Conv2DInfo
 from .PadInfo import PadInfo
 from .ReductionInfo import ReductionInfo
 from .ReshapeInfo import ReshapeInfo
@@ -7,4 +8,3 @@ from .SliceInfo import SliceInfo
 from .StackInfo import StackInfo
 from .TileInfo import TileInfo
 from .TransposeInfo import TransposeInfo
-from .Conv2DInfo import Conv2DInfo

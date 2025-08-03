@@ -1,12 +1,31 @@
 import ctypes
 import uuid
-from ctypes import (POINTER, WINFUNCTYPE, c_char_p, c_int16, c_int32, c_float, c_double, c_uint8,
-                    c_int64, c_int8, c_size_t, c_ubyte, c_uint, c_uint16,
-                    c_uint32, c_uint64, c_ulong, c_void_p, c_wchar_p)
+from ctypes import (
+    POINTER,
+    WINFUNCTYPE,
+    c_char_p,
+    c_double,
+    c_float,
+    c_int8,
+    c_int16,
+    c_int32,
+    c_int64,
+    c_size_t,
+    c_ubyte,
+    c_uint,
+    c_uint8,
+    c_uint16,
+    c_uint32,
+    c_uint64,
+    c_ulong,
+    c_void_p,
+    c_wchar_p,
+)
 from ctypes.util import find_library
 from enum import IntEnum
 
 dlls_by_name = {}
+
 
 def dll_import(dll_name):
     """
@@ -34,9 +53,11 @@ def dll_import(dll_name):
 
         def wrapper(*args):
             if dll_func is None:
-                raise RuntimeError(f'Unable to load {dll_name} library.')
+                raise RuntimeError(f"Unable to load {dll_name} library.")
             return dll_func(*args)
+
         return wrapper
+
     return decorator
 
 
@@ -54,33 +75,40 @@ def interface(cls_obj):
         parent_cls_obj = parent_cls_obj.__bases__[0]
         if parent_cls_obj is object:
             break
-        virtual_idx = getattr(parent_cls_obj, '_virtual_idx', None)
+        virtual_idx = getattr(parent_cls_obj, "_virtual_idx", None)
         if virtual_idx is not None:
             break
     if virtual_idx is None:
         virtual_idx = 0
 
-    if 'IID' not in list(cls_obj.__dict__.keys()):
-        raise Exception(f'class {cls_obj} declared as @interface, but no IID variable found.')
+    if "IID" not in list(cls_obj.__dict__.keys()):
+        raise Exception(
+            f"class {cls_obj} declared as @interface, but no IID variable found."
+        )
 
     for key, value in list(cls_obj.__dict__.items()):
-        if len(key) >= 2 and key[0:2] == '__':
+        if len(key) >= 2 and key[0:2] == "__":
             continue
-        if key == 'IID':
+        if key == "IID":
             break
 
         anno_list = list(value.__annotations__.values())
 
         func_type = WINFUNCTYPE(anno_list[-1], c_void_p, *anno_list[:-1])
-        def wrapper(self, *args, _key=key, _virtual_idx=virtual_idx, _func_type=func_type):
-            func = getattr(self, '_func_'+_key, None)
+
+        def wrapper(
+            self, *args, _key=key, _virtual_idx=virtual_idx, _func_type=func_type
+        ):
+            func = getattr(self, "_func_" + _key, None)
             if func is None:
                 if self.value is None:
-                    raise Exception(f'{self} is not initialized.')
+                    raise Exception(f"{self} is not initialized.")
 
-                vf_table = ctypes.cast( c_void_p( ctypes.cast(self, POINTER(c_void_p))[0] ), POINTER(c_void_p))
+                vf_table = ctypes.cast(
+                    c_void_p(ctypes.cast(self, POINTER(c_void_p))[0]), POINTER(c_void_p)
+                )
                 func = _func_type(vf_table[_virtual_idx])
-                setattr(self, '_func_'+key, func)
+                setattr(self, "_func_" + key, func)
             return func(self, *args)
 
         setattr(cls_obj, key, wrapper)
@@ -98,10 +126,12 @@ class ERROR(IntEnum):
 
     DXGI_ERROR_NOT_FOUND = 0x887A0002
 
+
 class MMERROR(IntEnum):
     # http://pinvoke.net/default.aspx/winmm/MMRESULT.html
     NOERROR = 0
     ERROR = 1
+
 
 class MMRESULT(c_ulong):
     def __eq__(self, other):
@@ -111,17 +141,22 @@ class MMRESULT(c_ulong):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
         try:
-            return f'MMRESULT ({str(MMERROR(self.value))})'
+            return f"MMRESULT ({str(MMERROR(self.value))})"
         except:
-            return f'MMRESULT ({self.value})'
+            return f"MMRESULT ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class HRESULT(c_ulong):
     def __eq__(self, other):
@@ -131,17 +166,22 @@ class HRESULT(c_ulong):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
         try:
-            return f'HRESULT ({str(ERROR(self.value))})'
+            return f"HRESULT ({str(ERROR(self.value))})"
         except:
-            return f'HRESULT ({self.value})'
+            return f"HRESULT ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class HANDLE(c_void_p):
     def __eq__(self, other):
@@ -149,12 +189,16 @@ class HANDLE(c_void_p):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'HANDLE ({self.value})'
+        return f"HANDLE ({self.value})"
+
     def __repr__(self):
         return self.__str__()
 
@@ -167,14 +211,19 @@ class BOOL(c_size_t):
             return (self.value != 0) == other
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'BOOL ({self.value != 0})'
+        return f"BOOL ({self.value != 0})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class CHAR(c_int8):
     def __eq__(self, other):
@@ -182,14 +231,19 @@ class CHAR(c_int8):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'CHAR ({self.value})'
+        return f"CHAR ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class BYTE(c_uint8):
     def __eq__(self, other):
@@ -197,14 +251,19 @@ class BYTE(c_uint8):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'BYTE ({self.value})'
+        return f"BYTE ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class SHORT(c_int16):
     def __eq__(self, other):
@@ -212,14 +271,19 @@ class SHORT(c_int16):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'SHORT ({self.value})'
+        return f"SHORT ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class USHORT(c_uint16):
     def __eq__(self, other):
@@ -227,14 +291,19 @@ class USHORT(c_uint16):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'USHORT ({self.value})'
+        return f"USHORT ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class LONG(c_int32):
     def __eq__(self, other):
@@ -242,14 +311,19 @@ class LONG(c_int32):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'LONG ({self.value})'
+        return f"LONG ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class ULONG(c_uint32):
     def __eq__(self, other):
@@ -257,14 +331,19 @@ class ULONG(c_uint32):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'ULONG ({self.value})'
+        return f"ULONG ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class INT(c_int32):
     def __eq__(self, other):
@@ -272,14 +351,19 @@ class INT(c_int32):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'INT ({self.value})'
+        return f"INT ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class UINT(c_uint32):
     def __eq__(self, other):
@@ -287,14 +371,19 @@ class UINT(c_uint32):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'UINT ({self.value})'
+        return f"UINT ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class WORD(c_uint16):
     def __eq__(self, other):
@@ -302,14 +391,19 @@ class WORD(c_uint16):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'WORD ({self.value})'
+        return f"WORD ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class DWORD(c_uint):
     def __eq__(self, other):
@@ -317,14 +411,19 @@ class DWORD(c_uint):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'DWORD ({self.value})'
+        return f"DWORD ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class LARGE_INTEGER(c_int64):
     def __eq__(self, other):
@@ -332,14 +431,19 @@ class LARGE_INTEGER(c_int64):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'LARGE_INTEGER ({self.value})'
+        return f"LARGE_INTEGER ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class LONGLONG(c_int64):
     def __eq__(self, other):
@@ -347,14 +451,19 @@ class LONGLONG(c_int64):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'LONGLONG ({self.value})'
+        return f"LONGLONG ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class ULONGLONG(c_uint64):
     def __eq__(self, other):
@@ -362,14 +471,19 @@ class ULONGLONG(c_uint64):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'ULONGLONG ({self.value})'
+        return f"ULONGLONG ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class ULARGE_INTEGER(c_uint64):
     def __eq__(self, other):
@@ -377,14 +491,19 @@ class ULARGE_INTEGER(c_uint64):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'ULARGE_INTEGER ({self.value})'
+        return f"ULARGE_INTEGER ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class FLOAT(c_float):
     def __eq__(self, other):
@@ -392,14 +511,19 @@ class FLOAT(c_float):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'FLOAT ({self.value})'
+        return f"FLOAT ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class DOUBLE(c_double):
     def __eq__(self, other):
@@ -407,14 +531,19 @@ class DOUBLE(c_double):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'DOUBLE ({self.value})'
+        return f"DOUBLE ({self.value})"
+
     def __repr__(self):
         return self.__str__()
+
 
 class PVOID(c_void_p):
     def __eq__(self, other):
@@ -422,43 +551,62 @@ class PVOID(c_void_p):
             return self.value == other.value
         else:
             return False
+
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
+
     def __hash__(self):
         return self.value.__hash__()
+
     def __str__(self):
-        return f'PVOID ({self.value})'
+        return f"PVOID ({self.value})"
+
     def __repr__(self):
         return self.__str__()
 
-class GUID (ctypes.Structure):
-    _fields_ = [('data', c_ubyte * 16)]
+
+class GUID(ctypes.Structure):
+    _fields_ = [("data", c_ubyte * 16)]
+
     def __init__(self, hexstr=None):
         super().__init__()
         self.data[:] = uuid.UUID(hexstr).bytes_le
 
+
 class CSTR(c_char_p):
-    def __init__(self, s : str):
-        super().__init__(s.encode('utf-8'))
+    def __init__(self, s: str):
+        super().__init__(s.encode("utf-8"))
+
 
 class CLSID(GUID): ...
+
+
 class LPCOLESTR(c_wchar_p): ...
+
+
 class BSTR(c_wchar_p): ...
+
 
 IID = GUID
 REFIID = POINTER(IID)
 REFGUID = POINTER(GUID)
 REFCLSID = POINTER(CLSID)
-#LPOLESTR = POINTER(OLESTR)
+# LPOLESTR = POINTER(OLESTR)
+
 
 @interface
 class IUnknown(c_void_p):
-    def QueryInterface(self, iid : REFIID, out_IUnknown : POINTER(c_void_p)) -> HRESULT: ...
-    def AddRef(self) -> c_ulong: ...
-    def Release(self) -> c_ulong: ...
-    IID = GUID('00000000-0000-0000-C000-000000000046')
+    def QueryInterface(
+        self, iid: REFIID, out_IUnknown: POINTER(c_void_p)
+    ) -> HRESULT: ...
 
-    def query_interface(self, iid : IID) -> 'IUnknown':
+    def AddRef(self) -> c_ulong: ...
+
+    def Release(self) -> c_ulong: ...
+
+    IID = GUID("00000000-0000-0000-C000-000000000046")
+
+    def query_interface(self, iid: IID) -> "IUnknown":
         out_IUnknown = IUnknown()
         hr = self.QueryInterface(iid, out_IUnknown)
         if hr == ERROR.SUCCESS:
@@ -511,91 +659,94 @@ class VARTYPE(SHORT):
     VT_CF = 71
     VT_CLSID = 72
     VT_VERSIONED_STREAM = 73
-    VT_BSTR_BLOB = 0xfff
+    VT_BSTR_BLOB = 0xFFF
     VT_VECTOR = 0x1000
     VT_ARRAY = 0x2000
     VT_BYREF = 0x4000
     VT_RESERVED = 0x8000
-    VT_ILLEGAL = 0xffff
-    VT_ILLEGALMASKED = 0xfff
-    VT_TYPEMASK = 0xff
+    VT_ILLEGAL = 0xFFFF
+    VT_ILLEGALMASKED = 0xFFF
+    VT_TYPEMASK = 0xFF
+
 
 class _VARIANT_RECORD(ctypes.Structure):
-    _fields_ = [ ('pvRecord', PVOID),
-                 ('pRecInfo', IUnknown ) ] #IRecordInfo
+    _fields_ = [("pvRecord", PVOID), ("pRecInfo", IUnknown)]  # IRecordInfo
+
 
 class _VARIANT_NAME_3(ctypes.Union):
-    _fields_ = [ ('llVal', LONGLONG),
-                 ('lVal', LONG),
-                 ('bVal', BYTE),
-                 ('iVal', SHORT),
-                 ('fltVal', FLOAT),
-                 ('dblVal', DOUBLE),
-                    #VARIANT_BOOL boolVal;
-                    #VARIANT_BOOL __OBSOLETE__VARIANT_BOOL;
-                    #SCODE        scode;
-                    #CY           cyVal;
-                    #DATE         date;
-                 ('bstrVal', BSTR),
-                 ('punkVal', IUnknown),
-                    #IDispatch    *pdispVal;
-                    #SAFEARRAY    *parray;
-                 ('pbVal', POINTER(BYTE)),
-                 ('piVal', POINTER(SHORT)),
-                 ('plVal', POINTER(LONG)),
-                 ('pllVal', POINTER(LONGLONG)),
-                 ('pfltVal', POINTER(FLOAT)),
-                 ('pdblVal', POINTER(DOUBLE)),
-                    # VARIANT_BOOL *pboolVal;
-                    # VARIANT_BOOL *__OBSOLETE__VARIANT_PBOOL;
-                    # SCODE        *pscode;
-                    # CY           *pcyVal;
-                    # DATE         *pdate;
-                 ('pbstrVal', POINTER(BSTR) ),
-                 ('ppunkVal', POINTER(IUnknown) ),
-                    # IDispatch    **ppdispVal;
-                    # SAFEARRAY    **pparray;
-                    # VARIANT      *pvarVal;
-                 ('byref', PVOID),
-                 ('cVal', CHAR),
-                 ('uiVal', USHORT),
-                 ('ulVal', ULONG),
-                 ('ullVal', ULONGLONG),
-                 ('intVal', INT),
-                 ('uintVal', UINT),
-                    #DECIMAL      *pdecVal;
-                 ('pcVal', POINTER(CHAR)),
-                 ('puiVal', POINTER(USHORT)),
-                 ('pulVal', POINTER(ULONG)),
-                 ('pullVal', POINTER(ULONGLONG)),
-                 ('pintVal', POINTER(INT)),
-                 ('puintVal', POINTER(UINT)),
+    _fields_ = [
+        ("llVal", LONGLONG),
+        ("lVal", LONG),
+        ("bVal", BYTE),
+        ("iVal", SHORT),
+        ("fltVal", FLOAT),
+        ("dblVal", DOUBLE),
+        # VARIANT_BOOL boolVal;
+        # VARIANT_BOOL __OBSOLETE__VARIANT_BOOL;
+        # SCODE        scode;
+        # CY           cyVal;
+        # DATE         date;
+        ("bstrVal", BSTR),
+        ("punkVal", IUnknown),
+        # IDispatch    *pdispVal;
+        # SAFEARRAY    *parray;
+        ("pbVal", POINTER(BYTE)),
+        ("piVal", POINTER(SHORT)),
+        ("plVal", POINTER(LONG)),
+        ("pllVal", POINTER(LONGLONG)),
+        ("pfltVal", POINTER(FLOAT)),
+        ("pdblVal", POINTER(DOUBLE)),
+        # VARIANT_BOOL *pboolVal;
+        # VARIANT_BOOL *__OBSOLETE__VARIANT_PBOOL;
+        # SCODE        *pscode;
+        # CY           *pcyVal;
+        # DATE         *pdate;
+        ("pbstrVal", POINTER(BSTR)),
+        ("ppunkVal", POINTER(IUnknown)),
+        # IDispatch    **ppdispVal;
+        # SAFEARRAY    **pparray;
+        # VARIANT      *pvarVal;
+        ("byref", PVOID),
+        ("cVal", CHAR),
+        ("uiVal", USHORT),
+        ("ulVal", ULONG),
+        ("ullVal", ULONGLONG),
+        ("intVal", INT),
+        ("uintVal", UINT),
+        # DECIMAL      *pdecVal;
+        ("pcVal", POINTER(CHAR)),
+        ("puiVal", POINTER(USHORT)),
+        ("pulVal", POINTER(ULONG)),
+        ("pullVal", POINTER(ULONGLONG)),
+        ("pintVal", POINTER(INT)),
+        ("puintVal", POINTER(UINT)),
+        ("record", _VARIANT_RECORD),
+    ]
 
-                 ('record', _VARIANT_RECORD ),
-                ]
 
 class VARIANT(ctypes.Structure):
-    _fields_ = [('vt', VARTYPE ),
-                ('wReserved1', WORD),
-                ('wReserved2', WORD),
-                ('wReserved3', WORD),
-                ('value', _VARIANT_NAME_3),
-               ]
+    _fields_ = [
+        ("vt", VARTYPE),
+        ("wReserved1", WORD),
+        ("wReserved2", WORD),
+        ("wReserved3", WORD),
+        ("value", _VARIANT_NAME_3),
+    ]
+
     def __init__(self):
         """
         by default initialized to VT_EMPTY
         """
 
-        self.vt : VARTYPE = VARTYPE.VT_EMPTY
-        #self.wReserved1 : WORD = WORD()
-        #self.wReserved2 : WORD = WORD()
-        #self.wReserved3 : WORD = WORD()
-        #self.value : _VARIANT_NAME_3 = _VARIANT_NAME_3()
+        self.vt: VARTYPE = VARTYPE.VT_EMPTY
+        # self.wReserved1 : WORD = WORD()
+        # self.wReserved2 : WORD = WORD()
+        # self.wReserved3 : WORD = WORD()
+        # self.value : _VARIANT_NAME_3 = _VARIANT_NAME_3()
         super().__init__()
 
-    def __repr__(self): return self.__str__()
+    def __repr__(self):
+        return self.__str__()
+
     def __str__(self):
-        return f'VARIANT object: { self.vt }'
-
-
-
+        return f"VARIANT object: { self.vt }"

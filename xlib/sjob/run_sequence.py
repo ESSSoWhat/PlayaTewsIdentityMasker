@@ -14,21 +14,26 @@ def _run_sequence(barrier, init_func, init_kwargs, final_func, process_func, pip
     while True:
         if pipe.poll(0.05):
             obj = pipe.recv()
-            cmd = obj['cmd']
-            if cmd == 'job':
-                result = process_func(state, obj['data'])
-                pipe.send({'cmd':'result', 'data': result})
-            elif cmd == 'finalize':
+            cmd = obj["cmd"]
+            if cmd == "job":
+                result = process_func(state, obj["data"])
+                pipe.send({"cmd": "result", "data": result})
+            elif cmd == "finalize":
                 break
 
     if final_func is not None:
         final_func(state)
 
-def run_sequence(data_list : List,
-                 process_func : Callable,
-                 init_func : Callable = None, init_kwargs : dict = None,
-                 final_func : Callable = None,
-                 mp_count : int = None, progress_bar_desc='Processing'):
+
+def run_sequence(
+    data_list: List,
+    process_func: Callable,
+    init_func: Callable = None,
+    init_kwargs: dict = None,
+    final_func: Callable = None,
+    mp_count: int = None,
+    progress_bar_desc="Processing",
+):
     """
     Simple Job to process list of picklable data.
 
@@ -43,13 +48,17 @@ def run_sequence(data_list : List,
 
     barrier = multiprocessing.Barrier(mp_count)
 
-    n_data_sent = [0]*mp_count
-    conn_list = [None]*mp_count
-    p_list = [None]*mp_count
+    n_data_sent = [0] * mp_count
+    conn_list = [None] * mp_count
+    p_list = [None] * mp_count
 
     for i in range(mp_count):
         s_pipe, c_pipe = conn_list[i] = multiprocessing.Pipe()
-        p = p_list[i] = multiprocessing.Process(target=_run_sequence, args=(barrier, init_func, init_kwargs, final_func, process_func, c_pipe), daemon=True )
+        p = p_list[i] = multiprocessing.Process(
+            target=_run_sequence,
+            args=(barrier, init_func, init_kwargs, final_func, process_func, c_pipe),
+            daemon=True,
+        )
         p.start()
 
     data_list_len = len(data_list)
@@ -59,9 +68,7 @@ def run_sequence(data_list : List,
     lib_con.progress_bar_print(0, data_list_len, desc=progress_bar_desc)
     result = []
     while n_data_done != data_list_len:
-
         for n_conn, (s_pipe, _) in enumerate(conn_list):
-
             if i_data < data_list_len:
                 if n_data_sent[n_conn] < 2:
                     n_data_sent[n_conn] += 1
@@ -69,23 +76,25 @@ def run_sequence(data_list : List,
                     data = data_list[i_data]
                     i_data += 1
 
-                    s_pipe.send( {'cmd':'job', 'data':data} )
+                    s_pipe.send({"cmd": "job", "data": data})
 
             if s_pipe.poll(0):
                 obj = s_pipe.recv()
 
-                cmd = obj['cmd']
-                if cmd == 'result':
+                cmd = obj["cmd"]
+                if cmd == "result":
                     n_data_done += 1
-                    lib_con.progress_bar_print(n_data_done, data_list_len, desc=progress_bar_desc)
+                    lib_con.progress_bar_print(
+                        n_data_done, data_list_len, desc=progress_bar_desc
+                    )
 
                     n_data_sent[n_conn] -= 1
 
-                    data = obj['data']
+                    data = obj["data"]
                     if data is not None:
                         result.append(data)
 
     for n_conn, (s_pipe, _) in enumerate(conn_list):
-        s_pipe.send( {'cmd':'finalize'} )
+        s_pipe.send({"cmd": "finalize"})
 
     return result

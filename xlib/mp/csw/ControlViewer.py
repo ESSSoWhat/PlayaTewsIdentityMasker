@@ -1,7 +1,6 @@
-from typing import Union, List
+from typing import List, Union
 
 from ...python import EventListener
-
 from .CSWBase import ControlClient, ControlHost
 
 
@@ -9,6 +8,7 @@ class ControlViewer:
     """
     Control for viewing data without modification
     """
+
     class Config:
         def __init__(self, value=None):
             self.value = value
@@ -18,7 +18,7 @@ class ControlViewer:
             ControlClient.__init__(self)
 
             self._on_config_evl = EventListener()
-            self._call_on_msg('_cfg', self._on_msg_config)
+            self._call_on_msg("_cfg", self._on_msg_config)
 
         def _on_msg_config(self, cfg):
             self._on_config_evl.call(cfg)
@@ -36,8 +36,8 @@ class ControlViewer:
         def __init__(self):
             ControlHost.__init__(self)
 
-        def set_config(self, cfg : 'ControlViewer.Config'):
+        def set_config(self, cfg: "ControlViewer.Config"):
             """
             Set configuration
             """
-            self._send_msg('_cfg', cfg) 
+            self._send_msg("_cfg", cfg)

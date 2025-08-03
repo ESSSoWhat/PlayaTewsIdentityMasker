@@ -16,13 +16,14 @@ class FormattedIOBase:
         seek
         tell
     """
+
     def get_file_size(self):
         c = self.tell()
-        result = self.seek(0,2)
+        result = self.seek(0, 2)
         self.seek(c)
         return result
 
-    def fill(self, byte, size : int):
+    def fill(self, byte, size: int):
         """fills a byte with length of size"""
         c_size = 16384
         n_count = size // c_size
@@ -38,22 +39,22 @@ class FormattedIOBase:
 
     def write_bytes(self, b_bytes):
         """writes compact bytes() object"""
-        self.write_fmt('Q', len(b_bytes))
+        self.write_fmt("Q", len(b_bytes))
         self.write(b_bytes)
 
     def read_bytes(self):
         """reads bytes() object"""
-        return self.read( self.read_fmt('Q')[0] )
+        return self.read(self.read_fmt("Q")[0])
 
     def write_utf8(self, s):
         """write compact string as utf8. Length must be not larger than 4Gb"""
-        b = s.encode('utf-8')
-        self.write_fmt('I', len(b))
+        b = s.encode("utf-8")
+        self.write_fmt("I", len(b))
         self.write(b)
 
     def read_utf8(self):
         """read string from utf8"""
-        return self.read(self.read_fmt('I')[0]).decode('utf-8')
+        return self.read(self.read_fmt("I")[0]).decode("utf-8")
 
     def calc_fmt(self, fmt):
         """calc size for _fmt functions"""
@@ -64,7 +65,7 @@ class FormattedIOBase:
         write_fmt at offset and return cursor where it was
         """
         c = self.tell()
-        self.seek(offset,0)
+        self.seek(offset, 0)
         n = self.write_fmt(fmt, *args)
         self.seek(c)
         return n
@@ -76,7 +77,7 @@ class FormattedIOBase:
         b = struct.pack(fmt, *args)
         n_written = self.write(b)
         if n_written != len(b):
-            raise IOError('Not enough room for write_fmt')
+            raise IOError("Not enough room for write_fmt")
         return n_written
 
     def get_fmt(self, fmt):
@@ -94,9 +95,9 @@ class FormattedIOBase:
 
         b = self.read(size)
         if size != len(b):
-            raise IOError('Not enough room for read_fmt')
+            raise IOError("Not enough room for read_fmt")
 
-        return struct.unpack (fmt, b)
+        return struct.unpack(fmt, b)
 
     def read_backward_fmt(self, fmt):
         """
@@ -105,27 +106,27 @@ class FormattedIOBase:
         size = struct.calcsize(fmt)
 
         cursor = self.tell()
-        new_cursor = self.seek(-size,1)
+        new_cursor = self.seek(-size, 1)
 
-        if size != cursor-new_cursor:
-            raise IOError('Not enough room for read_backward_fmt')
+        if size != cursor - new_cursor:
+            raise IOError("Not enough room for read_backward_fmt")
 
         b = self.read(size)
-        self.seek(-size,1)
+        self.seek(-size, 1)
 
-        return struct.unpack (fmt, b)
+        return struct.unpack(fmt, b)
 
     def write_pickled(self, obj):
         """
         write pickled obj
         """
         c = self.tell()
-        self.write_fmt('Q', 0)
+        self.write_fmt("Q", 0)
 
         pickle.dump(obj, self, 4)
         size = self.tell() - c
 
-        self.write_fmt_at(c, 'Q', size)
+        self.write_fmt_at(c, "Q", size)
         return size
 
     def read_pickled(self, suppress_error=True):
@@ -136,7 +137,7 @@ class FormattedIOBase:
                                     the stream will not be corrupted
         """
         c = self.tell()
-        size, = self.read_fmt('Q')
+        (size,) = self.read_fmt("Q")
 
         if suppress_error:
             try:
@@ -148,7 +149,7 @@ class FormattedIOBase:
         else:
             obj = pickle.load(self)
 
-        self.seek(c+size)
+        self.seek(c + size)
 
         return obj
 
@@ -157,18 +158,17 @@ class FormattedFileIO(io.FileIO, FormattedIOBase):
     """
     FileIO to use with formatting methods
     """
-    def __init__(self, file, mode: str, closefd: bool = True, opener = None):
+
+    def __init__(self, file, mode: str, closefd: bool = True, opener=None):
         filepath = Path(file)
-        plus = '+' if '+' in mode else ''
-        if 'a' in mode:
+        plus = "+" if "+" in mode else ""
+        if "a" in mode:
             if filepath.exists():
-                mode = 'r' + plus
+                mode = "r" + plus
             else:
-                mode = 'w' + plus
+                mode = "w" + plus
 
         io.FileIO.__init__(self, file, mode, closefd=closefd, opener=opener)
-
-
 
     def seek(self, offset, whence=0):
         """
@@ -183,7 +183,7 @@ class FormattedFileIO(io.FileIO, FormattedIOBase):
         # reimplement method to allow to expand with zeros
 
         offset_cur = self.tell()
-        offset_max = io.FileIO.seek(self, 0,2)
+        offset_max = io.FileIO.seek(self, 0, 2)
 
         if whence == 1:
             offset += offset_cur
@@ -198,12 +198,12 @@ class FormattedFileIO(io.FileIO, FormattedIOBase):
 
         return io.FileIO.seek(self, offset)
 
-    def readinto (self, bytes_like : Union[bytearray, memoryview], size : int = 0):
+    def readinto(self, bytes_like: Union[bytearray, memoryview], size: int = 0):
         """read size amount of bytes into mutable bytes_like"""
         if size == 0:
             return io.FileIO.readinto(self, bytes_like)
         else:
-            return io.FileIO.readinto(self, memoryview(bytes_like).cast('B')[:size] )
+            return io.FileIO.readinto(self, memoryview(bytes_like).cast("B")[:size])
 
     def write(self, b: Union[bytes, bytearray, memoryview]):
         b_len = len(b)
@@ -212,16 +212,16 @@ class FormattedFileIO(io.FileIO, FormattedIOBase):
         m_count = b_len % 16384
         if n_count > 0:
             for i in range(n_count):
-                acc += io.FileIO.write(self, b[i*16384:(i+1)*16384])
+                acc += io.FileIO.write(self, b[i * 16384 : (i + 1) * 16384])
         if m_count > 0:
-            acc += io.FileIO.write(self, b[n_count*16384:])
+            acc += io.FileIO.write(self, b[n_count * 16384 :])
         return acc
-
 
 
 class FormattedMemoryViewIO(io.RawIOBase, FormattedIOBase):
     """file-IO-like to memoryview"""
-    def __init__(self, mv : memoryview):
+
+    def __init__(self, mv: memoryview):
         super().__init__()
         self._mv = mv
         self._mv_size = self._c_max = mv.nbytes
@@ -239,16 +239,16 @@ class FormattedMemoryViewIO(io.RawIOBase, FormattedIOBase):
         """
         # memoryview is not expandable, thus just clip the cursor
         if whence == 0:
-            self._c = min( max(cursor,0), self._mv_size)
+            self._c = min(max(cursor, 0), self._mv_size)
             self._c_max = max(self._c, self._c_max)
         elif whence == 1:
-            self._c = min( max(self._c + cursor, 0), self._mv_size)
+            self._c = min(max(self._c + cursor, 0), self._mv_size)
             self._c_max = max(self._c, self._c_max)
         elif whence == 2:
-            self._c = min( max(self._c_max + cursor, 0), self._mv_size)
+            self._c = min(max(self._c_max + cursor, 0), self._mv_size)
             self._c_max = max(self._c, self._c_max)
         else:
-            raise ValueError('whence != 0,1,2')
+            raise ValueError("whence != 0,1,2")
 
         return self._c
 
@@ -264,23 +264,22 @@ class FormattedMemoryViewIO(io.RawIOBase, FormattedIOBase):
             self._c_max = self._c
         return self._c_max
 
-
-    def write(self, b : Union[bytes, bytearray, memoryview], size=0):
+    def write(self, b: Union[bytes, bytearray, memoryview], size=0):
         if isinstance(b, memoryview):
-            b = b.cast('B')
+            b = b.cast("B")
             size = b.nbytes
         else:
             size = len(b)
 
         size = min(size, self._mv_size - self._c)
 
-        self._mv[self._c:self._c+size] = b[:size]
+        self._mv[self._c : self._c + size] = b[:size]
         self._c += size
         return size
 
     def read_memoryview(self, size) -> memoryview:
         size = min(size, self._c_max - self._c)
-        result = self._mv[self._c:self._c+size]
+        result = self._mv[self._c : self._c + size]
         self._c += size
         return result
 
@@ -292,15 +291,17 @@ class FormattedMemoryViewIO(io.RawIOBase, FormattedIOBase):
 
         result = bytearray(size)
 
-        memoryview(result)[:] = self._mv[self._c:self._c+size]
+        memoryview(result)[:] = self._mv[self._c : self._c + size]
 
         self._c += size
         return result
 
-    def readinto (self, bytes_like_or_io : Union[bytearray, memoryview, io.IOBase], size):
+    def readinto(self, bytes_like_or_io: Union[bytearray, memoryview, io.IOBase], size):
         """read size amount of bytes into mutable bytes_like or io"""
         if isinstance(bytes_like_or_io, io.IOBase):
-            bytes_like_or_io.write( self._mv[self._c:self._c+size] )
+            bytes_like_or_io.write(self._mv[self._c : self._c + size])
         else:
-            memoryview(bytes_like_or_io).cast('B')[:size] = self._mv[self._c:self._c+size]
+            memoryview(bytes_like_or_io).cast("B")[:size] = self._mv[
+                self._c : self._c + size
+            ]
         self._c += size

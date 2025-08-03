@@ -7,7 +7,8 @@ from ..info import BroadcastInfo
 from ..SCacheton import SCacheton
 from ..Tensor import Tensor
 
-def remap (input_t : Tensor, coords_t : Tensor, dtype=None) -> Tensor:
+
+def remap(input_t: Tensor, coords_t: Tensor, dtype=None) -> Tensor:
     """
     remap input_t in spatial axes using coords_t
 
@@ -25,27 +26,34 @@ def remap (input_t : Tensor, coords_t : Tensor, dtype=None) -> Tensor:
     ...-head part of shapes will be broadcasted to each other
     """
 
-    op = SCacheton.get(_RemapOp, input_t.shape, input_t.dtype, coords_t.shape, coords_t.dtype, dtype)
+    op = SCacheton.get(
+        _RemapOp, input_t.shape, input_t.dtype, coords_t.shape, coords_t.dtype, dtype
+    )
 
-    output_t = Tensor( op.o_shape, op.o_dtype, device=input_t.get_device() )
+    output_t = Tensor(op.o_shape, op.o_dtype, device=input_t.get_device())
 
-    input_t.get_device().run_kernel(op.forward_krn, output_t.get_buffer(), input_t.get_buffer(), coords_t.get_buffer())
+    input_t.get_device().run_kernel(
+        op.forward_krn,
+        output_t.get_buffer(),
+        input_t.get_buffer(),
+        coords_t.get_buffer(),
+    )
 
     return output_t
 
 
-class _RemapOp():
-    def __init__(self, i_shape : AShape, i_dtype, c_shape : AShape, c_dtype, o_dtype):
+class _RemapOp:
+    def __init__(self, i_shape: AShape, i_dtype, c_shape: AShape, c_dtype, o_dtype):
         if np.dtype(i_dtype).type == np.bool_:
-            raise ValueError('np.bool_ dtype of i_dtype is not supported.')
+            raise ValueError("np.bool_ dtype of i_dtype is not supported.")
         if np.dtype(c_dtype).type == np.bool_:
-            raise ValueError('np.bool_ dtype of c_dtype is not supported.')
+            raise ValueError("np.bool_ dtype of c_dtype is not supported.")
         if i_shape.ndim < 2:
-            raise ValueError('i_shape.ndim must be >= 2 (...,H,W)')
+            raise ValueError("i_shape.ndim must be >= 2 (...,H,W)")
         if c_shape.ndim < 3:
-            raise ValueError(f'Coords shape ndim must be >= 3(...,H,W,D)')
+            raise ValueError(f"Coords shape ndim must be >= 3(...,H,W,D)")
         if c_shape[-1] != 2:
-            raise ValueError('Last coords dim must be == 2 (x,y)')
+            raise ValueError("Last coords dim must be == 2 (x,y)")
 
         self.o_dtype = o_dtype = o_dtype if o_dtype is not None else i_dtype
 
@@ -57,7 +65,7 @@ class _RemapOp():
 
             o_shape = c_shape[-3:-1]
         else:
-            op = BroadcastInfo([ i_shape[:-2], c_shape[:-3] ])
+            op = BroadcastInfo([i_shape[:-2], c_shape[:-3]])
 
             i_br_shape = op.br_shapes[0] + i_shape[-2:]
             c_br_shape = op.br_shapes[1] + c_shape[-3:]
@@ -66,7 +74,9 @@ class _RemapOp():
 
         self.o_shape = o_shape
 
-        self.forward_krn = Kernel(global_shape=(o_shape.size,), kernel_text=f"""
+        self.forward_krn = Kernel(
+            global_shape=(o_shape.size,),
+            kernel_text=f"""
 
 {HKernel.define_tensor('O', o_shape, o_dtype)}
 {HKernel.define_tensor('I', i_br_shape, i_dtype)}
@@ -100,4 +110,5 @@ __kernel void impl(__global O_PTR_TYPE* O_PTR_NAME, __global const I_PTR_TYPE* I
 
     O_GLOBAL_STORE(gid, p00 + p01 + p10 + p11);
 }}
-""")
+""",
+        )

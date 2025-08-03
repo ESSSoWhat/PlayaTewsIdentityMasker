@@ -1,7 +1,6 @@
 from typing import Union
 
 from ...python import EventListener
-
 from .CSWBase import ControlClient, ControlHost
 
 
@@ -16,7 +15,7 @@ class Error:
             ControlClient.__init__(self)
 
             self._on_error_evl = EventListener()
-            self._call_on_msg('error', self._on_msg_error)
+            self._call_on_msg("error", self._on_msg_error)
 
         def _on_msg_error(self, text):
             self._on_error_evl.call(text)
@@ -32,13 +31,11 @@ class Error:
         def _on_reset(self):
             self._on_msg_error(None)
 
-
     class Host(ControlHost):
         def __init__(self):
             ControlHost.__init__(self)
 
-
-        def set_error(self, text : Union[str, None]):
+        def set_error(self, text: Union[str, None]):
             """
             set tex
 
@@ -48,6 +45,4 @@ class Error:
                 self.disable()
             else:
                 self.enable()
-                self._send_msg('error', text)
-
-
+                self._send_msg("error", text)

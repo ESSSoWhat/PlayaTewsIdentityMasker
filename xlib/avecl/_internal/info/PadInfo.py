@@ -28,23 +28,27 @@ class PadInfo:
 
     """
 
-    __slots__ = ['o_shape','axes_paddings']
+    __slots__ = ["o_shape", "axes_paddings"]
 
-    def __init__(self, shape, axes_paddings : List):
-
+    def __init__(self, shape, axes_paddings: List):
         if Ellipsis in axes_paddings:
             if sum(1 if x == Ellipsis else 0 for x in axes_paddings) > 1:
-                raise ValueError('only 1 ...(ellipsis) allowed in axes_paddings')
+                raise ValueError("only 1 ...(ellipsis) allowed in axes_paddings")
             if axes_paddings[0] == Ellipsis:
-                axes_paddings = ((0,0),)*(shape.ndim-(len(axes_paddings)-1))+ axes_paddings[1:]
+                axes_paddings = ((0, 0),) * (
+                    shape.ndim - (len(axes_paddings) - 1)
+                ) + axes_paddings[1:]
             elif axes_paddings[-1] == Ellipsis:
-                axes_paddings = axes_paddings[:-1] + ((0,0),)*(shape.ndim-(len(axes_paddings)-1))
+                axes_paddings = axes_paddings[:-1] + ((0, 0),) * (
+                    shape.ndim - (len(axes_paddings) - 1)
+                )
             else:
-                raise ValueError('...(ellipsis) must be at the begin or the end of axes_paddings')
+                raise ValueError(
+                    "...(ellipsis) must be at the begin or the end of axes_paddings"
+                )
 
         if len(axes_paddings) != shape.ndim:
-            raise ValueError(f'axes_paddings should match shape.ndim {shape.ndim}')
-
+            raise ValueError(f"axes_paddings should match shape.ndim {shape.ndim}")
 
         self.axes_paddings = axes_paddings
         o_shape = []

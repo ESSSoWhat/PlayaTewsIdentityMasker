@@ -1,8 +1,8 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from ...python import EventListener
 
+from ...python import EventListener
 from .forward_declarations import forward_declarations
 from .QXMainApplication import QXMainApplication
 from .QXWidget import QXWidget
@@ -16,10 +16,10 @@ class QXWindow(QXWidget):
         super().__init__(**kwargs)
         self._save_load_state = save_load_state
 
-        #QXMainApplication.inst.register_QXWindow(self)
+        # QXMainApplication.inst.register_QXWindow(self)
 
-        #self.keyPressEvent_listeners = []
-        #self.keyReleaseEvent_listeners = []
+        # self.keyPressEvent_listeners = []
+        # self.keyReleaseEvent_listeners = []
 
         self._QXW = True
         self._closeEvent_ev = EventListener()
@@ -46,15 +46,18 @@ class QXWindow(QXWidget):
         widget_width, widget_height = self.size().width(), self.size().height()
         screen_size = QXMainApplication.inst.primaryScreen().size()
 
-        self.move( (screen_size.width() - widget_width) // 2,  (screen_size.height() - widget_height) // 2 )
+        self.move(
+            (screen_size.width() - widget_width) // 2,
+            (screen_size.height() - widget_height) // 2,
+        )
 
-    #def resizeEvent(self, ev : QResizeEvent):
+    # def resizeEvent(self, ev : QResizeEvent):
     #    super().resizeEvent(ev)
 
     def showEvent(self, ev: QShowEvent):
         super().showEvent(ev)
         if self._save_load_state:
-            geo = self.get_widget_data('geometry')
+            geo = self.get_widget_data("geometry")
             if geo is not None:
                 pos, size = geo
                 self.move(pos)
@@ -65,21 +68,23 @@ class QXWindow(QXWidget):
     def hideEvent(self, ev: QHideEvent):
         super().hideEvent(ev)
         if self._save_load_state:
-            self.set_widget_data('geometry', ( self.pos(), self.size() ) )
+            self.set_widget_data("geometry", (self.pos(), self.size()))
 
-    def closeEvent(self, ev : QCloseEvent):
+    def closeEvent(self, ev: QCloseEvent):
         super().closeEvent(ev)
         if ev.isAccepted():
             self._closeEvent_ev.call()
 
     def is_minimized(self) -> bool:
         state = self.windowState()
-        return (state & Qt.WindowState.WindowMinimized) == Qt.WindowState.WindowMinimized
+        return (
+            state & Qt.WindowState.WindowMinimized
+        ) == Qt.WindowState.WindowMinimized
 
-    def paintEvent(self, ev : QPaintEvent):
+    def paintEvent(self, ev: QPaintEvent):
         qp = self._qp
         qp.begin(self)
-        qp.fillRect(self.rect(), self._bg_color )
+        qp.fillRect(self.rect(), self._bg_color)
         qp.end()
 
     # def keyPressEvent(self, ev):
@@ -91,5 +96,6 @@ class QXWindow(QXWidget):
     #     super().keyReleaseEvent(ev)
     #     for func in self.keyReleaseEvent_listeners:
     #         func(ev)
+
 
 forward_declarations.QXWindow = QXWindow

@@ -13,12 +13,14 @@ class QXVBoxLayout(QVBoxLayout):
             for widget in widgets:
                 alignment = None
                 if isinstance(widget, int):
-                    thickness=widget
+                    thickness = widget
                     widget = QWidget()
                     widget.setFixedHeight(thickness)
-                    widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+                    widget.setSizePolicy(
+                        QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+                    )
 
-                if isinstance(widget, (tuple,list)):
+                if isinstance(widget, (tuple, list)):
                     widget, alignment = widget
 
                 if isinstance(widget, QLayout):

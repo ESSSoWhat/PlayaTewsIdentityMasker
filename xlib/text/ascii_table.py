@@ -1,7 +1,8 @@
 import re
-from typing import Union, List
-_opts_halign = {'l':0,'c':1,'r':2}
-_opts_valign = {'t':0,'m':1,'b':2}
+from typing import List, Union
+
+_opts_halign = {"l": 0, "c": 1, "r": 2}
+_opts_valign = {"t": 0, "m": 1, "b": 2}
 
 """
 test = [
@@ -17,19 +18,30 @@ test = [
         ]
 """
 
+
 class Column:
-    __slots__ = ['halign', 'valign', 'span', 'content']
+    __slots__ = ["halign", "valign", "span", "content"]
 
-    def __init__(self, halign : int = 0, valign : int = 0, span : int = 1, content : str = None):
-        self.halign, self.valign, self.span, self.content = halign, valign, span, content
+    def __init__(
+        self, halign: int = 0, valign: int = 0, span: int = 1, content: str = None
+    ):
+        self.halign, self.valign, self.span, self.content = (
+            halign,
+            valign,
+            span,
+            content,
+        )
 
-    def __str__(self):  return f'{self.content} s:{self.span}'
-    def __repr__(self): return self.__str__()
+    def __str__(self):
+        return f"{self.content} s:{self.span}"
 
-    def split(self, sep : Union[str,int], maxsplit=-1) -> List['Column']:
+    def __repr__(self):
+        return self.__str__()
+
+    def split(self, sep: Union[str, int], maxsplit=-1) -> List["Column"]:
         result = []
         if isinstance(sep, int):
-            c_split = [ self.content[:sep], self.content[sep:] ]
+            c_split = [self.content[:sep], self.content[sep:]]
         else:
             c_split = self.content.split(sep, maxsplit=maxsplit)
 
@@ -46,7 +58,7 @@ class Column:
 
     def copy(self, content=...):
         if content is Ellipsis:
-            content=self.content
+            content = self.content
 
         column = Column()
         column.halign = self.halign
@@ -55,17 +67,19 @@ class Column:
         column.content = content
         return column
 
-def ascii_table(table_def : List[str],
-                min_table_width : int = None,
-                max_table_width : int = None,
-                fixed_table_width : int = None,
-                style_borderless = False,
-                left_border : str= '|',
-                right_border : str = '|',
-                border : str= '|',
-                row_symbol : str = '-',
-                col_def_delim = '|',
-                ) -> str:
+
+def ascii_table(
+    table_def: List[str],
+    min_table_width: int = None,
+    max_table_width: int = None,
+    fixed_table_width: int = None,
+    style_borderless=False,
+    left_border: str = "|",
+    right_border: str = "|",
+    border: str = "|",
+    row_symbol: str = "-",
+    col_def_delim="|",
+) -> str:
     """
 
     arguments
@@ -83,39 +97,41 @@ def ascii_table(table_def : List[str],
                       '|l first col |r second col']
     """
     if style_borderless:
-        left_border, right_border, border, row_symbol = None, None, ' | ', None
-        
+        left_border, right_border, border, row_symbol = None, None, " | ", None
+
     if fixed_table_width is not None:
         min_table_width = fixed_table_width
         max_table_width = fixed_table_width
-        
+
     if min_table_width is not None and max_table_width is not None:
         if min_table_width > max_table_width:
-            raise ValueError('min_table_width > max_table_width')
+            raise ValueError("min_table_width > max_table_width")
 
     col_spacing = len(border) if border is not None else 0
     cols_count = 0
-    
+
     # Parse columns in table_def
-    rows : List[List[Column]] = []
+    rows: List[List[Column]] = []
     for raw_line in table_def:
         # Line must starts with column definition
         if len(raw_line) == 0 or raw_line[0] != col_def_delim:
-            raise ValueError(f'Line does not start with | symbol, content: "{raw_line}"')
+            raise ValueError(
+                f'Line does not start with | symbol, content: "{raw_line}"'
+            )
 
         # Parsing raw columns
-        row : List[Column] = []
+        row: List[Column] = []
         i_raw_col = 0
         raw_line_split = raw_line.split(col_def_delim)[1:]
         raw_line_split_len = len(raw_line_split)
 
         for n_raw_col, raw_col in enumerate(raw_line_split):
             # split column options and content
-            col_opts, col_content = ( raw_col.split(' ', maxsplit=1) + [''] )[:2]
+            col_opts, col_content = (raw_col.split(" ", maxsplit=1) + [""])[:2]
 
             # Parse column options
             col = Column(content=col_content)
-            for col_opt in re.findall('[lcr]|[tmb]|[0-9]+', col_opts.lower()):
+            for col_opt in re.findall("[lcr]|[tmb]|[0-9]+", col_opts.lower()):
                 h = _opts_halign.get(col_opt, None)
                 if h is not None:
                     col.halign = h
@@ -127,11 +143,11 @@ def ascii_table(table_def : List[str],
                 col.span = max(1, int(col_opt))
             row.append(col)
 
-            if n_raw_col != raw_line_split_len-1:
+            if n_raw_col != raw_line_split_len - 1:
                 i_raw_col += col.span
             else:
                 # total max columns, by last column without span
-                cols_count = max(cols_count, i_raw_col+1)
+                cols_count = max(cols_count, i_raw_col + 1)
 
         rows.append(row)
 
@@ -140,15 +156,17 @@ def ascii_table(table_def : List[str],
         row[-1].span = cols_count - (sum(col.span for col in row) - row[-1].span)
 
     # Compute cols border indexes
-    cols_border = [0]*cols_count
-    for i_col_max in range(cols_count+1):
+    cols_border = [0] * cols_count
+    for i_col_max in range(cols_count + 1):
         for row in rows:
             i_col = 0
             col_border = 0
             for col in row:
                 i_col += col.span
-                col_max_len = max([ len(x.strip()) for x in col.content.split('\n')])
-                col_border = cols_border[i_col-1] = max(cols_border[i_col-1], col_border + col_max_len)
+                col_max_len = max([len(x.strip()) for x in col.content.split("\n")])
+                col_border = cols_border[i_col - 1] = max(
+                    cols_border[i_col - 1], col_border + col_max_len
+                )
                 if i_col >= i_col_max:
                     break
                 col_border += col_spacing
@@ -156,12 +174,15 @@ def ascii_table(table_def : List[str],
     # fix zero cols border
     for i_col, col_border in enumerate(cols_border):
         if i_col != 0 and col_border == 0:
-            cols_border[i_col] = cols_border[i_col-1]
+            cols_border[i_col] = cols_border[i_col - 1]
 
-    table_width = cols_border[-1] + (len(left_border) if left_border is not None else 0) + \
-                                    (len(right_border) if right_border is not None else 0)
-                                    
-    # Determine size of table width 
+    table_width = (
+        cols_border[-1]
+        + (len(left_border) if left_border is not None else 0)
+        + (len(right_border) if right_border is not None else 0)
+    )
+
+    # Determine size of table width
     table_width_diff = 0
     if max_table_width is not None:
         table_width_diff = max(table_width_diff, table_width - max_table_width)
@@ -170,29 +191,34 @@ def ascii_table(table_def : List[str],
 
     if table_width_diff != 0:
         # >0 :shrink, <0 :expand table
-        diffs = [ x-y for x,y in zip(cols_border, [0]+cols_border[:-1] ) ]
+        diffs = [x - y for x, y in zip(cols_border, [0] + cols_border[:-1])]
 
         while table_width_diff != 0:
             if table_width_diff > 0:
                 max_diff = max(diffs)
                 if max_diff <= col_spacing:
-                    raise Exception('Unable to shrink the table to fit max_table_width.')
+                    raise Exception(
+                        "Unable to shrink the table to fit max_table_width."
+                    )
 
-                diffs[ diffs.index(max_diff) ] -= 1
+                diffs[diffs.index(max_diff)] -= 1
             else:
-                diffs[ diffs.index(min(diffs)) ] += 1
+                diffs[diffs.index(min(diffs))] += 1
 
             table_width_diff += 1 if table_width_diff < 0 else -1
 
         for i in range(len(cols_border)):
-            cols_border[i] = diffs[i] if i == 0 else cols_border[i-1] + diffs[i]
+            cols_border[i] = diffs[i] if i == 0 else cols_border[i - 1] + diffs[i]
 
         # recompute new table_width
-        table_width = cols_border[-1] + (len(left_border) if left_border is not None else 0) + \
-                                        (len(right_border) if right_border is not None else 0)
+        table_width = (
+            cols_border[-1]
+            + (len(left_border) if left_border is not None else 0)
+            + (len(right_border) if right_border is not None else 0)
+        )
 
     # Process columns for \n and col width
-    new_rows : List[List[List[Column]]] = []
+    new_rows: List[List[List[Column]]] = []
     for row in rows:
         row_len = len(row)
 
@@ -203,14 +229,19 @@ def ascii_table(table_def : List[str],
         col_border = 0
         for col in row:
             i_col += col.span
-            col_border_next = cols_border[i_col-1]
+            col_border_next = cols_border[i_col - 1]
 
-            col_width = col_border_next-col_border
+            col_width = col_border_next - col_border
 
             # slice col to sub rows by \n separator and col_width
-            col_content_split = [ x.strip() for x in col.content.split('\n') ]
-            cols_sub_rows.append([ x[i:i+col_width].strip() for x in col_content_split
-                                                            for i in range(0, len(x), col_width) ])
+            col_content_split = [x.strip() for x in col.content.split("\n")]
+            cols_sub_rows.append(
+                [
+                    x[i : i + col_width].strip()
+                    for x in col_content_split
+                    for i in range(0, len(x), col_width)
+                ]
+            )
 
             col_border = col_border_next + col_spacing
 
@@ -219,19 +250,19 @@ def ascii_table(table_def : List[str],
         for n, (col, col_sub_rows) in enumerate(zip(row, cols_sub_rows)):
             valign = col.valign
 
-            unfilled_rows = cols_sub_rows_max-len(col_sub_rows)
-            if valign == 0: # top
-                col_sub_rows = col_sub_rows + ['']*unfilled_rows
-            elif valign == 1: # center
+            unfilled_rows = cols_sub_rows_max - len(col_sub_rows)
+            if valign == 0:  # top
+                col_sub_rows = col_sub_rows + [""] * unfilled_rows
+            elif valign == 1:  # center
                 top_pad = unfilled_rows // 2
                 bottom_pad = unfilled_rows - top_pad
-                col_sub_rows = ['']*top_pad + col_sub_rows + ['']*bottom_pad
-            elif valign == 2: # bottom
-                col_sub_rows = ['']*unfilled_rows + col_sub_rows
+                col_sub_rows = [""] * top_pad + col_sub_rows + [""] * bottom_pad
+            elif valign == 2:  # bottom
+                col_sub_rows = [""] * unfilled_rows + col_sub_rows
 
             cols_sub_rows[n] = col_sub_rows
 
-        sub_rows = [ [None]*row_len for _ in range(cols_sub_rows_max) ]
+        sub_rows = [[None] * row_len for _ in range(cols_sub_rows_max)]
         for n_col, col in enumerate(row):
             for i in range(cols_sub_rows_max):
                 sub_rows[i][n_col] = col.copy(content=cols_sub_rows[n_col][i])
@@ -243,14 +274,12 @@ def ascii_table(table_def : List[str],
     # Composing final lines
     lines = []
 
-    row_line = row_symbol[0]*table_width if row_symbol is not None else None
+    row_line = row_symbol[0] * table_width if row_symbol is not None else None
     if row_line is not None:
         lines.append(row_line)
     for sub_rows in rows:
-        
-        
         for row in sub_rows:
-            line = ''
+            line = ""
 
             if left_border is not None:
                 line += left_border
@@ -264,24 +293,24 @@ def ascii_table(table_def : List[str],
                 else:
                     if border is not None:
                         line += border
-                    col_border0 = cols_border[i_col-1] + col_spacing
+                    col_border0 = cols_border[i_col - 1] + col_spacing
 
                 i_col += col.span
 
-                col_border1 = cols_border[i_col-1]
+                col_border1 = cols_border[i_col - 1]
 
                 col_space = col_border1 - col_border0
-                col_remain_space = col_space-len(col_content)
+                col_remain_space = col_space - len(col_content)
 
                 halign = col.halign
-                if halign == 0: # left
-                    col_content = col_content + ' '*col_remain_space
-                elif halign == 1: # center
+                if halign == 0:  # left
+                    col_content = col_content + " " * col_remain_space
+                elif halign == 1:  # center
                     col_left_pad = col_remain_space // 2
                     col_right_pad = col_remain_space - col_left_pad
-                    col_content = ' '*col_left_pad + col_content + ' '*col_right_pad
-                elif halign == 2: # right
-                    col_content = ' '*col_remain_space + col_content
+                    col_content = " " * col_left_pad + col_content + " " * col_right_pad
+                elif halign == 2:  # right
+                    col_content = " " * col_remain_space + col_content
 
                 line += col_content
 
@@ -289,8 +318,8 @@ def ascii_table(table_def : List[str],
                 line += right_border
 
             lines.append(line)
-            
+
         if len(sub_rows) != 0 and row_line is not None:
             lines.append(row_line)
 
-    return '\n'.join(lines)
+    return "\n".join(lines)

@@ -4,6 +4,7 @@ import numpy as np
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+
 from ..gui.from_np import QImage_from_np
 from .QXWidget import QXWidget
 
@@ -14,22 +15,23 @@ class QXFixedLayeredImages(QXWidget):
 
     all images must have the same aspect ratio
     """
+
     def __init__(self, fwidth, height):
         super().__init__()
         self._fwidth = fwidth
         self._height = height
         self._qp = QPainter()
-        self._images : List = []
+        self._images: List = []
 
     def clear_images(self):
-        self._images : List = []
+        self._images: List = []
         self.update()
 
     def add_image(self, image, name=None):
         """
-         image  QImage
-                QPixmap
-                np.ndarray  of uint8 dtype
+        image  QImage
+               QPixmap
+               np.ndarray  of uint8 dtype
         """
         saved_ref = None
 
@@ -38,9 +40,9 @@ class QXFixedLayeredImages(QXWidget):
                 saved_ref = image
                 image = QImage_from_np(image)
             else:
-                raise ValueError(f'Unsupported type of image {image.__class__}')
+                raise ValueError(f"Unsupported type of image {image.__class__}")
 
-        self._images.append( (image, saved_ref) )
+        self._images.append((image, saved_ref))
         self.update()
 
     def sizeHint(self):
@@ -56,21 +58,20 @@ class QXFixedLayeredImages(QXWidget):
         w = self._fwidth
         h = self._height
 
-        w_half = w /2
-        h_half = h /2
-        a = w/h
+        w_half = w / 2
+        h_half = h / 2
+        a = w / h
 
         for image, _ in self._images:
-
             size = image.size()
             ap = size.width() / size.height()
 
             if ap > a:
                 ph_fit = h * (a / ap)
-                rect = QRect(0, int(h_half-ph_fit/2), w, int(ph_fit))
+                rect = QRect(0, int(h_half - ph_fit / 2), w, int(ph_fit))
             elif ap < a:
                 pw_fit = w * (ap / a)
-                rect = QRect(int(w_half-pw_fit/2), 0, int(pw_fit), h)
+                rect = QRect(int(w_half - pw_fit / 2), 0, int(pw_fit), h)
             else:
                 rect = self.rect()
 

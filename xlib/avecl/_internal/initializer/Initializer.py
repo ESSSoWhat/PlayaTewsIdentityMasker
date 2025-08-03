@@ -1,10 +1,12 @@
 from ..Tensor import Tensor
 
+
 class Initializer:
     """
     Base class for tensor inititalizers
     """
-    def initialize_tensor(self, tensor : Tensor):
+
+    def initialize_tensor(self, tensor: Tensor):
         """
         Implement initialization of tensor
 
@@ -13,5 +15,8 @@ class Initializer:
         """
         raise NotImplementedError()
 
-    def __str__(self): return 'Initializer'
-    def __repr__(self): return self.__str__()
+    def __str__(self):
+        return "Initializer"
+
+    def __repr__(self):
+        return self.__str__()

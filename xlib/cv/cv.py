@@ -2,7 +2,9 @@ import cv2
 import numpy as np
 
 
-def imread(filepath, flags=cv2.IMREAD_UNCHANGED, loader_func=None, raise_on_error=True) -> np.ndarray:
+def imread(
+    filepath, flags=cv2.IMREAD_UNCHANGED, loader_func=None, raise_on_error=True
+) -> np.ndarray:
     """
     same as cv2.imread but allows to open non-english characters path
 
@@ -29,11 +31,12 @@ def imread(filepath, flags=cv2.IMREAD_UNCHANGED, loader_func=None, raise_on_erro
             raise e
         return None
 
+
 def imwrite(filepath, img, *args):
     ret, buf = cv2.imencode(filepath.suffix, img, *args)
     if ret == True:
         try:
             with open(filepath, "wb") as stream:
-                stream.write( buf )
+                stream.write(buf)
         except:
             pass

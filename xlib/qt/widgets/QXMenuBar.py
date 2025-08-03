@@ -8,17 +8,19 @@ class QXMenuBar(QMenuBar, _part_QXWidget):
     def __init__(self, **kwargs):
         QMenuBar.__init__(self)
         _part_QXWidget.__init__(self, **kwargs)
-        self.setStyleSheet(f"""
+        self.setStyleSheet(
+            f"""
 QMenuBar {{
     border: 0px;
     background-color: #444444;
 }}
-""")
+"""
+        )
 
-    def focusInEvent(self, ev : QFocusEvent):
+    def focusInEvent(self, ev: QFocusEvent):
         super().focusInEvent(ev)
         _part_QXWidget.focusInEvent(self, ev)
 
-    def resizeEvent(self, ev : QResizeEvent):
+    def resizeEvent(self, ev: QResizeEvent):
         super().resizeEvent(ev)
         _part_QXWidget.resizeEvent(self, ev)

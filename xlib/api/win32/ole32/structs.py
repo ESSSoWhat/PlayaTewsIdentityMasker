@@ -1,10 +1,12 @@
 from ..wintypes import DWORD
 
+
 class COINIT(DWORD):
     APARTMENTTHREADED = 0x2
     MULTITHREADED = 0x2
     DISABLE_OLE1DDE = 0x4
     SPEED_OVER_MEMORY = 0x8
+
 
 class CLSCTX(DWORD):
     CLSCTX_INPROC_SERVER = 0x1

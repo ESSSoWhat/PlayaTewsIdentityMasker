@@ -1,5 +1,6 @@
 from ..AShape import AShape
 
+
 class ReshapeInfo:
     """
     Reshape info.
@@ -18,7 +19,7 @@ class ReshapeInfo:
      o_shape      (2, 512, 4096)
     """
 
-    __slots__ = ['o_shape']
+    __slots__ = ["o_shape"]
 
     def __init__(self, shape, target_shape):
         o_shape = []
@@ -31,13 +32,13 @@ class ReshapeInfo:
             if t_size != -1:
                 mod = remain_size % t_size
                 if mod != 0:
-                    raise ValueError(f'Cannot reshape {shape} to {target_shape}.')
+                    raise ValueError(f"Cannot reshape {shape} to {target_shape}.")
                 remain_size /= t_size
             else:
                 if unk_axis is not None:
-                    raise ValueError('Can specify only one unknown dimension.')
+                    raise ValueError("Can specify only one unknown dimension.")
                 unk_axis = len(o_shape)
-            o_shape.append( t_size )
+            o_shape.append(t_size)
 
         if unk_axis is not None:
             o_shape[unk_axis] = int(remain_size)

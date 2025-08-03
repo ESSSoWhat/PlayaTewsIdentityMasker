@@ -5,7 +5,9 @@ from xlib.mp import csw as lib_csw
 
 
 class QCSWControl(qtx.QXWidget):
-    def __init__(self, csw_control : lib_csw.Control, reflect_state_widgets=None, **kwargs):
+    def __init__(
+        self, csw_control: lib_csw.Control, reflect_state_widgets=None, **kwargs
+    ):
         """
         base qt widget class for CSWControl
         """
@@ -20,7 +22,7 @@ class QCSWControl(qtx.QXWidget):
 
     def _on_csw_state_change(self, state):
         """overridable"""
-        self._state_to_widget( self._csw_state_widgets+[self] )
+        self._state_to_widget(self._csw_state_widgets + [self])
 
     def reflect_state_to_widget(self, widget_or_list):
         """reflect CSW Control state to widgets"""
@@ -46,5 +48,3 @@ class QCSWControl(qtx.QXWidget):
             for widget in widgets:
                 widget.setEnabled(False)
                 widget.hide()
-
-

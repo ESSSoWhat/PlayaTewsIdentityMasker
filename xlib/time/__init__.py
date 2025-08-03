@@ -1,1 +1,1 @@
-from .time_ import timeit, measure, FPSCounter, AverageMeasurer
+from .time_ import AverageMeasurer, FPSCounter, measure, timeit

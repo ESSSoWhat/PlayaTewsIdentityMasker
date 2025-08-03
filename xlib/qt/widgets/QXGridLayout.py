@@ -6,7 +6,13 @@ from ..core.widget import set_contents_margins
 
 
 class QXGridLayout(QGridLayout):
-    def __init__(self, contents_margins=0, spacing=None, horizontal_spacing=None, vertical_spacing=None):
+    def __init__(
+        self,
+        contents_margins=0,
+        spacing=None,
+        horizontal_spacing=None,
+        vertical_spacing=None,
+    ):
         super().__init__()
         set_contents_margins(self, contents_margins)
 
@@ -18,4 +24,3 @@ class QXGridLayout(QGridLayout):
 
         if vertical_spacing is not None:
             self.setVerticalSpacing(vertical_spacing)
-

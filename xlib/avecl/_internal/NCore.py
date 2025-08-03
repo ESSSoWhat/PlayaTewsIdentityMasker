@@ -1,6 +1,7 @@
+from .backend import *
 from .SCacheton import SCacheton
 from .Tensor import Tensor
-from .backend import *
+
 
 class NCore:
     """
@@ -17,4 +18,5 @@ class NCore:
         SCacheton.cleanup()
         cleanup_devices()
 
-__all__ = ['NCore']
+
+__all__ = ["NCore"]

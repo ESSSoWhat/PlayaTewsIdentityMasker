@@ -2,7 +2,6 @@ from PyQt5.QtCore import *
 
 
 class QXTimer(QTimer):
-
     def __init__(self, interval=None, timeout=None, single_shot=False, start=False):
         super().__init__()
 

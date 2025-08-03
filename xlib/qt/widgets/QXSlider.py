@@ -6,16 +6,19 @@ from ._part_QXWidget import _part_QXWidget
 
 
 class QXSlider(QSlider, _part_QXWidget):
-
-    def __init__(self, orientation=None,
-                       min=None, max=None,
-                       tick_position=None,
-                       tick_interval=None,
-                       valueChanged=None,
-                       sliderMoved=None,
-                       sliderPressed=None,
-                       sliderReleased=None,
-                       **kwargs):
+    def __init__(
+        self,
+        orientation=None,
+        min=None,
+        max=None,
+        tick_position=None,
+        tick_interval=None,
+        valueChanged=None,
+        sliderMoved=None,
+        sliderPressed=None,
+        sliderReleased=None,
+        **kwargs,
+    ):
         if orientation is not None:
             super().__init__(orientation)
         else:
@@ -35,10 +38,10 @@ class QXSlider(QSlider, _part_QXWidget):
         if tick_interval is not None:
             self.setTickInterval(tick_interval)
 
-    def focusInEvent(self, ev : QFocusEvent):
+    def focusInEvent(self, ev: QFocusEvent):
         super().focusInEvent(ev)
         _part_QXWidget.focusInEvent(self, ev)
 
-    def resizeEvent(self, ev : QResizeEvent):
+    def resizeEvent(self, ev: QResizeEvent):
         super().resizeEvent(ev)
         _part_QXWidget.resizeEvent(self, ev)

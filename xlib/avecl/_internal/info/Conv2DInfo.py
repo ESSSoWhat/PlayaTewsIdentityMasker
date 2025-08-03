@@ -1,5 +1,6 @@
-from collections.abc import Iterable
 import math
+from collections.abc import Iterable
+
 
 class Conv2DInfo:
     """
@@ -35,24 +36,24 @@ class Conv2DInfo:
                     it is None if padding != 'valid','same'
     """
 
-    __slots__ = ['PADL', 'PADR', 'PADT', 'PADB', 'OH', 'OW', 'OH_T', 'OW_T']
+    __slots__ = ["PADL", "PADR", "PADT", "PADB", "OH", "OW", "OH_T", "OW_T"]
 
     def __init__(self, H, W, KH, KW, stride, dilation, padding):
         # Effective kernel sizes with dilation
-        EKH = (KH-1)*dilation + 1
-        EKW = (KW-1)*dilation + 1
+        EKH = (KH - 1) * dilation + 1
+        EKW = (KW - 1) * dilation + 1
 
         # Determine pad size of sides
         OH_T = OW_T = None
-        if padding == 'valid':
+        if padding == "valid":
             PADL = PADT = PADR = PADB = 0
-            OH_T =  H * stride + max(EKH - stride, 0)
-            OW_T =  W * stride + max(EKW - stride, 0)
-        elif padding == 'same':
-            PADL = int(math.floor((EKW - 1)/2))
-            PADT = int(math.floor((EKH - 1)/2))
-            PADR = int(math.ceil((EKW - 1)/2))
-            PADB = int(math.ceil((EKH - 1)/2))
+            OH_T = H * stride + max(EKH - stride, 0)
+            OW_T = W * stride + max(EKW - stride, 0)
+        elif padding == "same":
+            PADL = int(math.floor((EKW - 1) / 2))
+            PADT = int(math.floor((EKH - 1) / 2))
+            PADR = int(math.ceil((EKW - 1) / 2))
+            PADB = int(math.ceil((EKH - 1) / 2))
             OH_T = H * stride
             OW_T = W * stride
         elif isinstance(padding, int):
@@ -70,9 +71,7 @@ class Conv2DInfo:
         self.PADR = PADR
         self.PADB = PADB
 
-        self.OH = max(1, int((H + PADT + PADB - EKH) / stride + 1) )
-        self.OW = max(1, int((W + PADL + PADR - EKW) / stride + 1) )
+        self.OH = max(1, int((H + PADT + PADB - EKH) / stride + 1))
+        self.OW = max(1, int((W + PADL + PADR - EKW) / stride + 1))
         self.OH_T = OH_T
         self.OW_T = OW_T
-
-

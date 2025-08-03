@@ -8,7 +8,9 @@ from ..SCacheton import SCacheton
 from ..Tensor import Tensor
 
 
-def depthwise_conv2D (input_t : Tensor, kernel_t : Tensor, stride=1, dilation=1, padding='same', dtype=None):
+def depthwise_conv2D(
+    input_t: Tensor, kernel_t: Tensor, stride=1, dilation=1, padding="same", dtype=None
+):
     """
     Depthwise Conv2D operator.
 
@@ -30,25 +32,51 @@ def depthwise_conv2D (input_t : Tensor, kernel_t : Tensor, stride=1, dilation=1,
     ...-head part of shapes will be broadcasted to each other
     """
 
-    op = SCacheton.get(_DepthwiseConv2DOp, input_t.shape, input_t.dtype, kernel_t.shape, kernel_t.dtype, dtype, int(stride), int(dilation), padding)
+    op = SCacheton.get(
+        _DepthwiseConv2DOp,
+        input_t.shape,
+        input_t.dtype,
+        kernel_t.shape,
+        kernel_t.dtype,
+        dtype,
+        int(stride),
+        int(dilation),
+        padding,
+    )
 
-    output_t = Tensor( op.o_shape, op.o_dtype, device=input_t.get_device() )
-    output_t.get_device().run_kernel(op.forward_krn, output_t.get_buffer(), input_t.get_buffer(), kernel_t.get_buffer())
+    output_t = Tensor(op.o_shape, op.o_dtype, device=input_t.get_device())
+    output_t.get_device().run_kernel(
+        op.forward_krn,
+        output_t.get_buffer(),
+        input_t.get_buffer(),
+        kernel_t.get_buffer(),
+    )
 
     return output_t
 
-class _DepthwiseConv2DOp():
-    def __init__(self, i_shape : AShape, i_dtype, k_shape : AShape, k_dtype, o_dtype, stride, dilation, padding):
+
+class _DepthwiseConv2DOp:
+    def __init__(
+        self,
+        i_shape: AShape,
+        i_dtype,
+        k_shape: AShape,
+        k_dtype,
+        o_dtype,
+        stride,
+        dilation,
+        padding,
+    ):
         self.o_dtype = o_dtype = o_dtype if o_dtype is not None else i_dtype
 
         if i_shape.ndim < 2:
-            raise ValueError(f'i_shape.ndim must be >= 2')
+            raise ValueError(f"i_shape.ndim must be >= 2")
 
         if k_shape.ndim < 2:
-            raise ValueError(f'k_shape.ndim must be >= 2')
+            raise ValueError(f"k_shape.ndim must be >= 2")
 
-        IH,IW = i_shape[-2:]
-        KH,KW = k_shape[-2:]
+        IH, IW = i_shape[-2:]
+        KH, KW = k_shape[-2:]
 
         ci = Conv2DInfo(IH, IW, KH, KW, stride, dilation, padding)
 
@@ -59,7 +87,7 @@ class _DepthwiseConv2DOp():
 
             o_shape = AShape([ci.OH, ci.OW])
         else:
-            op = BroadcastInfo([ i_shape[:-2], k_shape[:-2] ])
+            op = BroadcastInfo([i_shape[:-2], k_shape[:-2]])
 
             i_br_shape = op.br_shapes[0] + i_shape[-2:]
             k_br_shape = op.br_shapes[1] + k_shape[-2:]
@@ -68,7 +96,9 @@ class _DepthwiseConv2DOp():
 
         self.o_shape = o_shape
 
-        self.forward_krn = Kernel(global_shape=(o_shape.size,), kernel_text=f"""
+        self.forward_krn = Kernel(
+            global_shape=(o_shape.size,),
+            kernel_text=f"""
 {HKernel.define_tensor('O', o_shape, o_dtype)}
 {HKernel.define_tensor('I', i_br_shape, i_dtype)}
 {HKernel.define_tensor('K', k_br_shape, k_dtype)}
@@ -102,6 +132,5 @@ __kernel void impl(__global O_PTR_TYPE* O_PTR_NAME, __global const I_PTR_TYPE* I
 
     O_GLOBAL_STORE(gid, (O_TYPE) v);
 }}
-""")
-
-
+""",
+        )

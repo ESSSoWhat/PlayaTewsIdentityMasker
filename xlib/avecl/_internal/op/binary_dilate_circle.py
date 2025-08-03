@@ -6,7 +6,9 @@ from ..SCacheton import SCacheton
 from ..Tensor import Tensor
 
 
-def binary_dilate_circle (input_t : Tensor, radius : int = 1, iterations : int = 1, dtype=None):
+def binary_dilate_circle(
+    input_t: Tensor, radius: int = 1, iterations: int = 1, dtype=None
+):
     """
     Binary dilate operator using circle kernel with radius.
 
@@ -15,7 +17,9 @@ def binary_dilate_circle (input_t : Tensor, radius : int = 1, iterations : int =
     per-element of H,W, set 1 if any neighbor elements inside circle with radius != 0.
     otherwise set 0.
     """
-    op = SCacheton.get(_BinaryDilateOp, input_t.shape, input_t.dtype, int(radius), dtype)
+    op = SCacheton.get(
+        _BinaryDilateOp, input_t.shape, input_t.dtype, int(radius), dtype
+    )
 
     device = input_t.get_device()
 
@@ -28,26 +32,29 @@ def binary_dilate_circle (input_t : Tensor, radius : int = 1, iterations : int =
             else:
                 buf_in, buf_out = buf_out, buf_in
             if i <= 1:
-                buf_out = Tensor( op.o_shape, op.o_dtype, device=device )
-            device.run_kernel(op.forward_krn, buf_out.get_buffer(), buf_in.get_buffer() )
+                buf_out = Tensor(op.o_shape, op.o_dtype, device=device)
+            device.run_kernel(op.forward_krn, buf_out.get_buffer(), buf_in.get_buffer())
 
     return buf_out
 
-class _BinaryDilateOp():
-    def __init__(self, i_shape : AShape, i_dtype, radius, o_dtype):
+
+class _BinaryDilateOp:
+    def __init__(self, i_shape: AShape, i_dtype, radius, o_dtype):
         self.o_dtype = o_dtype = o_dtype if o_dtype is not None else i_dtype
 
         if i_shape.ndim < 2:
-            raise ValueError(f'i_shape.ndim must be >= 2')
+            raise ValueError(f"i_shape.ndim must be >= 2")
 
-        KS = radius*2+1
-        IH,IW = i_shape[-2:]
+        KS = radius * 2 + 1
+        IH, IW = i_shape[-2:]
 
-        ci = Conv2DInfo(IH, IW, KS, KS, stride=1, dilation=1, padding='same')
+        ci = Conv2DInfo(IH, IW, KS, KS, stride=1, dilation=1, padding="same")
 
         self.o_shape = o_shape = i_shape
 
-        self.forward_krn = Kernel(global_shape=(o_shape.size,), kernel_text=f"""
+        self.forward_krn = Kernel(
+            global_shape=(o_shape.size,),
+            kernel_text=f"""
 {HKernel.define_tensor('O', o_shape, o_dtype)}
 {HKernel.define_tensor('I', i_shape, i_dtype)}
 
@@ -86,6 +93,5 @@ __kernel void impl(__global O_PTR_TYPE* O_PTR_NAME, __global const I_PTR_TYPE* I
 
     O_GLOBAL_STORE(gid, (O_TYPE) 0 );
 }}
-""")
-
-
+""",
+        )

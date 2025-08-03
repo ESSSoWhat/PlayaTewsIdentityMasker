@@ -14,6 +14,7 @@ from typing import List
 #         p.unlink()
 #     p_tmp.rename (p)
 
+
 def scantree(path):
     """Recursively yield DirEntry objects for given directory."""
     for entry in scandir(path):
@@ -27,20 +28,22 @@ def get_files_paths(dir_path, extensions=None, subdirs=False) -> List[Path]:
     """
     returns array of Path() of files
     """
-    dir_path = Path (dir_path)
+    dir_path = Path(dir_path)
 
     result = []
     if dir_path.exists():
-
         if subdirs:
             gen = scantree(str(dir_path))
         else:
             gen = scandir(str(dir_path))
 
         for x in list(gen):
-            if extensions is None or any([x.name.lower().endswith(ext) for ext in extensions]):
-                result.append( Path(x.path) )
+            if extensions is None or any(
+                [x.name.lower().endswith(ext) for ext in extensions]
+            ):
+                result.append(Path(x.path))
     return sorted(result)
+
 
 # def get_image_unique_filestem_paths(dir_path, verbose_print_func=None):
 #     result = get_image_paths(dir_path)

@@ -8,7 +8,15 @@ from ..SCacheton import SCacheton
 from ..Tensor import Tensor
 
 
-def remap_np_affine (input_t : Tensor, affine_n : np.ndarray, interpolation : EInterpolation = None, inverse=False, output_size=None, post_op_text=None, dtype=None) -> Tensor:
+def remap_np_affine(
+    input_t: Tensor,
+    affine_n: np.ndarray,
+    interpolation: EInterpolation = None,
+    inverse=False,
+    output_size=None,
+    post_op_text=None,
+    dtype=None,
+) -> Tensor:
     """
     remap affine operator for all channels using single numpy affine mat
 
@@ -23,61 +31,86 @@ def remap_np_affine (input_t : Tensor, affine_n : np.ndarray, interpolation : EI
         post_op_text    cl kernel
                         post operation with output float value named 'O'
                         example 'O = 2*O;'
-        
+
         output_size     (w,h)
-        
+
         dtype
     """
-    if affine_n.shape != (2,3):
-        raise ValueError('affine_n.shape must be (2,3)')
+    if affine_n.shape != (2, 3):
+        raise ValueError("affine_n.shape must be (2,3)")
 
-    op = SCacheton.get(_RemapAffineOp, input_t.shape, input_t.dtype, interpolation, output_size, post_op_text, dtype)
+    op = SCacheton.get(
+        _RemapAffineOp,
+        input_t.shape,
+        input_t.dtype,
+        interpolation,
+        output_size,
+        post_op_text,
+        dtype,
+    )
 
-    output_t = Tensor( op.o_shape, op.o_dtype, device=input_t.get_device() )
+    output_t = Tensor(op.o_shape, op.o_dtype, device=input_t.get_device())
 
-    ((a, b, c),
-     (d, e, f)) = affine_n
+    ((a, b, c), (d, e, f)) = affine_n
     if not inverse:
         # do inverse by default, match cv2.warpAffine behaviour
-        D = a*e - b*d
+        D = a * e - b * d
         D = 1.0 / D if D != 0.0 else 0.0
-        a, b, c, d, e, f = (  e*D, -b*D, (b*f-e*c)*D ,
-                             -d*D,  a*D, (d*c-a*f)*D )
+        a, b, c, d, e, f = (
+            e * D,
+            -b * D,
+            (b * f - e * c) * D,
+            -d * D,
+            a * D,
+            (d * c - a * f) * D,
+        )
 
-    input_t.get_device().run_kernel(op.forward_krn, output_t.get_buffer(), input_t.get_buffer(),
-                                    np.float32(a), np.float32(b), np.float32(c), np.float32(d), np.float32(e), np.float32(f) )
+    input_t.get_device().run_kernel(
+        op.forward_krn,
+        output_t.get_buffer(),
+        input_t.get_buffer(),
+        np.float32(a),
+        np.float32(b),
+        np.float32(c),
+        np.float32(d),
+        np.float32(e),
+        np.float32(f),
+    )
 
     return output_t
 
 
-class _RemapAffineOp():
-    def __init__(self, i_shape : AShape, i_dtype, interpolation, o_size, post_op_text, o_dtype):
+class _RemapAffineOp:
+    def __init__(
+        self, i_shape: AShape, i_dtype, interpolation, o_size, post_op_text, o_dtype
+    ):
         if np.dtype(i_dtype).type == np.bool_:
-            raise ValueError('np.bool_ dtype of i_dtype is not supported.')
+            raise ValueError("np.bool_ dtype of i_dtype is not supported.")
         if i_shape.ndim < 2:
-            raise ValueError('i_shape.ndim must be >= 2 (...,H,W)')
+            raise ValueError("i_shape.ndim must be >= 2 (...,H,W)")
         if interpolation is None:
             interpolation = EInterpolation.LINEAR
 
-        IH,IW = i_shape[-2:]
+        IH, IW = i_shape[-2:]
         if o_size is not None:
-            OH,OW = o_size
+            OH, OW = o_size
         else:
-            OH,OW = IH,IW
+            OH, OW = IH, IW
 
-        o_shape = AShape( (OH,OW) )
+        o_shape = AShape((OH, OW))
         if i_shape.ndim > 2:
             o_shape = i_shape[:-2] + o_shape
 
         self.o_shape = o_shape
         self.o_dtype = o_dtype = o_dtype if o_dtype is not None else i_dtype
-        
+
         if post_op_text is None:
-            post_op_text = ''
-            
-        
+            post_op_text = ""
+
         if interpolation == EInterpolation.LINEAR:
-            self.forward_krn = Kernel(global_shape=(o_shape.size,), kernel_text=f"""
+            self.forward_krn = Kernel(
+                global_shape=(o_shape.size,),
+                kernel_text=f"""
 
 {HKernel.define_tensor('O', o_shape, o_dtype)}
 {HKernel.define_tensor('I', i_shape, i_dtype)}
@@ -114,9 +147,12 @@ __kernel void impl(__global O_PTR_TYPE* O_PTR_NAME, __global const I_PTR_TYPE* I
     
     O_GLOBAL_STORE(gid, O);
 }}
-""")
+""",
+            )
         elif interpolation == EInterpolation.CUBIC:
-            self.forward_krn = Kernel(global_shape=(o_shape.size,), kernel_text=f"""
+            self.forward_krn = Kernel(
+                global_shape=(o_shape.size,),
+                kernel_text=f"""
 
 {HKernel.define_tensor('O', o_shape, o_dtype)}
 {HKernel.define_tensor('I', i_shape, i_dtype)}
@@ -167,10 +203,13 @@ __kernel void impl(__global O_PTR_TYPE* O_PTR_NAME, __global const I_PTR_TYPE* I
     {post_op_text}
     O_GLOBAL_STORE(gid, O);
 }}
-""")
+""",
+            )
         elif interpolation in [EInterpolation.LANCZOS3, EInterpolation.LANCZOS4]:
             RAD = 3 if interpolation == EInterpolation.LANCZOS3 else 4
-            self.forward_krn = Kernel(global_shape=(o_shape.size,), kernel_text=f"""
+            self.forward_krn = Kernel(
+                global_shape=(o_shape.size,),
+                kernel_text=f"""
 
 {HKernel.define_tensor('O', o_shape, o_dtype)}
 {HKernel.define_tensor('I', i_shape, i_dtype)}
@@ -230,6 +269,7 @@ __kernel void impl(__global O_PTR_TYPE* O_PTR_NAME, __global const I_PTR_TYPE* I
     {post_op_text}
     O_GLOBAL_STORE(gid, O);
 }}
-""")
+""",
+            )
         else:
-            raise ValueError(f'Unsupported interpolation type {interpolation}')
+            raise ValueError(f"Unsupported interpolation type {interpolation}")

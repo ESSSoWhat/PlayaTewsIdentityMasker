@@ -1,11 +1,11 @@
 from typing import Iterable
 
-from ..Tensor import Tensor
-from ..SCacheton import SCacheton
 from ..info import ReshapeInfo
+from ..SCacheton import SCacheton
+from ..Tensor import Tensor
 
 
-def reshape(input_t : Tensor, new_shape : Iterable, copy=True) -> Tensor:
+def reshape(input_t: Tensor, new_shape: Iterable, copy=True) -> Tensor:
     """
     reshape operator
 
@@ -18,9 +18,10 @@ def reshape(input_t : Tensor, new_shape : Iterable, copy=True) -> Tensor:
 
     Produces reference Tensor with new shape.
     """
-    info = SCacheton.get(ReshapeInfo, input_t.shape, tuple(int(x) for x in new_shape) )
+    info = SCacheton.get(ReshapeInfo, input_t.shape, tuple(int(x) for x in new_shape))
 
     if copy:
-        return Tensor(info.o_shape, input_t.dtype, device=input_t.get_device()).set(input_t)
-    return input_t.as_shape( info.o_shape )
-
+        return Tensor(info.o_shape, input_t.dtype, device=input_t.get_device()).set(
+            input_t
+        )
+    return input_t.as_shape(info.o_shape)

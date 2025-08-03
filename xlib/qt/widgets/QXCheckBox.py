@@ -14,12 +14,12 @@ class QXCheckBox(QCheckBox, _part_QXWidget):
         if text is not None:
             self.setText(text)
         if color is not None:
-            self.setStyleSheet(f'QCheckBox {{ color: {color};}}')
+            self.setStyleSheet(f"QCheckBox {{ color: {color};}}")
 
-    def focusInEvent(self, ev : QFocusEvent):
+    def focusInEvent(self, ev: QFocusEvent):
         super().focusInEvent(ev)
         _part_QXWidget.focusInEvent(self, ev)
 
-    def resizeEvent(self, ev : QResizeEvent):
+    def resizeEvent(self, ev: QResizeEvent):
         super().resizeEvent(ev)
         _part_QXWidget.resizeEvent(self, ev)

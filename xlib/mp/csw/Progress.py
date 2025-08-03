@@ -1,7 +1,6 @@
 from typing import Union
 
 from ...python import EventListener
-
 from .CSWBase import ControlClient, ControlHost
 
 
@@ -9,7 +8,7 @@ class _ProgressBase:
     def __init__(self):
         self._progress = None
         self._on_progress_evl = EventListener()
-        self._call_on_msg('progress', self._on_msg_progress)
+        self._call_on_msg("progress", self._on_msg_progress)
 
     def _on_msg_progress(self, progress):
         self._set_progress(progress)
@@ -29,7 +28,9 @@ class _ProgressBase:
         """Call when the progress is changed."""
         self._on_progress_evl.add(func_or_list)
 
-    def get_progress(self): return self._progress
+    def get_progress(self):
+        return self._progress
+
 
 class Progress:
     """
@@ -54,25 +55,25 @@ class Progress:
             self._config = Progress.Config()
 
         def _send_progress(self):
-            self._send_msg('progress', self._progress)
+            self._send_msg("progress", self._progress)
 
         def set_progress(self, progress, block_event=False):
             """
-             progress   number      0..100
-             block_event(False)     on_progress event will not be called on this side
+            progress   number      0..100
+            block_event(False)     on_progress event will not be called on this side
             """
             if self._set_progress(progress, block_event=block_event):
                 self._send_progress()
 
-        def set_config(self, config : 'Progress.Config'):
-            self._send_msg('config', config)
+        def set_config(self, config: "Progress.Config"):
+            self._send_msg("config", config)
 
     class Client(ControlClient, _ProgressBase):
         def __init__(self):
             ControlClient.__init__(self)
             _ProgressBase.__init__(self)
             self._on_config_evl = EventListener()
-            self._call_on_msg('config', self._on_msg_config)
+            self._call_on_msg("config", self._on_msg_config)
 
         def _on_reset(self):
             self._set_progress(None)
