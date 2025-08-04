@@ -12,18 +12,18 @@ from PyQt5.QtWidgets import QApplication
 sys.path.insert(0, str(Path(__file__).parent / "apps" / "PlayaTewsIdentityMasker"))
 
 try:
-    from ui.QNewLayoutUI import QNewLayoutUI
-    from backend.StreamOutput import StreamOutput
+    # Import the new layout UI
+    from apps.PlayaTewsIdentityMasker.ui.QNewLayoutUI import QNewLayoutUI
+    
+    # Create a mock StreamOutput class since we can't import the real one
+    class MockStreamOutput:
+        def __init__(self):
+            self.is_streaming = False
+            self.is_recording = False
     
     def main():
         """Main function to test the new layout UI"""
         app = QApplication(sys.argv)
-        
-        # Create a mock stream output backend
-        class MockStreamOutput:
-            def __init__(self):
-                self.is_streaming = False
-                self.is_recording = False
         
         # Create the new layout UI
         userdata_path = Path("userdata")
