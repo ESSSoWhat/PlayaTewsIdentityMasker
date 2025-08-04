@@ -309,26 +309,30 @@ class QUnifiedLiveSwap(QXWidget):
         return panel
 
     def create_center_panel(self):
-        """Create center panel with main processing and viewers"""
+        """Create center panel with enhanced output window prominently displayed"""
         panel = QXWidget()
 
-        # Create tab widget for better organization
-        tab_widget = QXTabWidget()
+        # Create main layout with enhanced output in the center
+        main_layout = qtx.QXVBoxLayout()
 
-        # Processing tab
-        processing_tab = self.create_processing_tab()
-        tab_widget.addTab(processing_tab, "Processing")
+        # Top section - Processing components
+        processing_section = self.create_processing_section()
+        main_layout.addWidget(processing_section)
 
-        # Viewers tab
-        viewers_tab = self.create_viewers_tab()
-        tab_widget.addTab(viewers_tab, "Viewers")
+        # Center section - Enhanced Output Window (MAIN FOCUS)
+        enhanced_output_section = self.create_enhanced_output_section()
+        main_layout.addWidget(enhanced_output_section, 1)  # Takes most space
 
-        panel.setLayout(qtx.QXVBoxLayout([tab_widget]))
+        # Bottom section - Viewers and controls
+        viewers_section = self.create_viewers_section()
+        main_layout.addWidget(viewers_section)
+
+        panel.setLayout(main_layout)
         return panel
 
-    def create_processing_tab(self):
-        """Create processing tab with face processing components"""
-        tab = QXWidget()
+    def create_processing_section(self):
+        """Create the top processing section with face processing components"""
+        section = QXWidget()
         layout = qtx.QXHBoxLayout()
 
         # Detection column
@@ -371,12 +375,68 @@ class QUnifiedLiveSwap(QXWidget):
         enhancement_group.setLayout(enhancement_layout)
         layout.addWidget(enhancement_group)
 
-        tab.setLayout(layout)
-        return tab
+        section.setLayout(layout)
+        return section
 
-    def create_viewers_tab(self):
-        """Create viewers tab with all preview components including enhanced output"""
-        tab = QXWidget()
+    def create_enhanced_output_section(self):
+        """Create the center enhanced output section - MAIN FOCUS"""
+        section = QXWidget()
+        layout = qtx.QXVBoxLayout()
+
+        # Enhanced Output Window - CENTRAL FOCUS
+        try:
+            from .widgets.QEnhancedPreviewWidget import QEnhancedPreviewWidget
+            enhanced_preview = QEnhancedPreviewWidget("🎬 Live Face Swap Output")
+            
+            # Connect signals
+            enhanced_preview.fullscreen_requested.connect(self.on_fullscreen_requested)
+            enhanced_preview.maximize_requested.connect(self.on_maximize_requested)
+            enhanced_preview.settings_requested.connect(self.on_settings_requested)
+            
+            # Store reference for later use
+            self.enhanced_preview = enhanced_preview
+            
+            # Create a prominent frame for the enhanced output
+            output_frame = QXGroupBox(title="🎬 ENHANCED OUTPUT PREVIEW - LIVE FACE SWAP")
+            output_frame.setStyleSheet("""
+                QGroupBox {
+                    font-weight: bold;
+                    font-size: 14px;
+                    color: #ffffff;
+                    background-color: #2a2a2a;
+                    border: 2px solid #666666;
+                    border-radius: 10px;
+                    padding: 10px;
+                    margin: 5px;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 10px;
+                    padding: 0 5px 0 5px;
+                }
+            """)
+            
+            output_layout = qtx.QXVBoxLayout()
+            output_layout.addWidget(enhanced_preview)
+            output_frame.setLayout(output_layout)
+            
+            layout.addWidget(output_frame)
+            
+        except ImportError:
+            # Fallback to original stream output if enhanced preview is not available
+            if hasattr(self, "q_stream_output") and self.q_stream_output:
+                fallback_frame = QXGroupBox(title="Stream Output")
+                fallback_layout = qtx.QXVBoxLayout()
+                fallback_layout.addWidget(self.q_stream_output)
+                fallback_frame.setLayout(fallback_layout)
+                layout.addWidget(fallback_frame)
+
+        section.setLayout(layout)
+        return section
+
+    def create_viewers_section(self):
+        """Create the bottom viewers section with camera and processing viewers"""
+        section = QXWidget()
         layout = qtx.QXHBoxLayout()
 
         # Left side - Camera and processing viewers
@@ -408,40 +468,11 @@ class QUnifiedLiveSwap(QXWidget):
         left_layout.addLayout(viewers_grid)
         left_viewers.setLayout(left_layout)
 
-        # Right side - Enhanced Output Preview
-        right_viewers = QXWidget()
+        # Right side - Stream controls
+        right_controls = QXWidget()
         right_layout = qtx.QXVBoxLayout()
 
-        # Import and create enhanced preview widget
-        try:
-            from .widgets.QEnhancedPreviewWidget import QEnhancedPreviewWidget
-            enhanced_preview = QEnhancedPreviewWidget("Enhanced Output Preview")
-            
-            # Connect signals
-            enhanced_preview.fullscreen_requested.connect(self.on_fullscreen_requested)
-            enhanced_preview.maximize_requested.connect(self.on_maximize_requested)
-            enhanced_preview.settings_requested.connect(self.on_settings_requested)
-            
-            # Add enhanced preview as the main display
-            enhanced_group = QXGroupBox(title="🎬 Enhanced Output Preview")
-            enhanced_layout = qtx.QXVBoxLayout()
-            enhanced_layout.addWidget(enhanced_preview)
-            enhanced_group.setLayout(enhanced_layout)
-            right_layout.addWidget(enhanced_group)
-            
-            # Store reference for later use
-            self.enhanced_preview = enhanced_preview
-            
-        except ImportError:
-            # Fallback to original stream output if enhanced preview is not available
-            if hasattr(self, "q_stream_output") and self.q_stream_output:
-                enhanced_group = QXGroupBox(title="Enhanced Output Preview")
-                enhanced_layout = qtx.QXVBoxLayout()
-                enhanced_layout.addWidget(self.q_stream_output)
-                enhanced_group.setLayout(enhanced_layout)
-                right_layout.addWidget(enhanced_group)
-
-        # Add original stream output controls below the enhanced preview
+        # Add stream output controls
         if hasattr(self, "q_stream_output") and self.q_stream_output:
             controls_group = QXGroupBox(title="Stream Controls")
             controls_layout = qtx.QXVBoxLayout()
@@ -449,32 +480,24 @@ class QUnifiedLiveSwap(QXWidget):
             controls_group.setLayout(controls_layout)
             right_layout.addWidget(controls_group)
 
-        right_viewers.setLayout(right_layout)
+        right_controls.setLayout(right_layout)
 
-        # Add both sides to main layout with enhanced preview getting more space
-        layout.addWidget(left_viewers, 1)  # 1 part width
-        layout.addWidget(right_viewers, 3)  # 3 parts width (larger for enhanced output)
+        # Add both sides to main layout
+        layout.addWidget(left_viewers, 2)  # 2 parts width
+        layout.addWidget(right_controls, 1)  # 1 part width
 
-        tab.setLayout(layout)
-        return tab
+        section.setLayout(layout)
+        return section
 
     def create_right_panel(self):
-        """Create right panel with output and settings"""
+        """Create right panel with settings and additional controls"""
         panel = QXWidget()
         panel.setMaximumWidth(300)
         panel.setMinimumWidth(250)
 
         layout = qtx.QXVBoxLayout()
 
-        # Output Group
-        output_group = QXGroupBox(title="Output")
-        output_layout = qtx.QXVBoxLayout()
-        if self.q_stream_output:
-            output_layout.addWidget(self.q_stream_output)
-        output_group.setLayout(output_layout)
-        layout.addWidget(output_group)
-
-        # Settings placeholder (for future use)
+        # Settings Group (for future use)
         settings_group = QXGroupBox(title="Settings")
         settings_layout = qtx.QXVBoxLayout()
         settings_label = QXLabel(text="Settings panel\n(Coming soon)")
@@ -482,6 +505,18 @@ class QUnifiedLiveSwap(QXWidget):
         settings_layout.addWidget(settings_label)
         settings_group.setLayout(settings_layout)
         layout.addWidget(settings_group)
+
+        # Additional Controls Group
+        controls_group = QXGroupBox(title="Additional Controls")
+        controls_layout = qtx.QXVBoxLayout()
+        
+        # Add any additional controls here
+        info_label = QXLabel(text="Additional controls\nwill appear here")
+        info_label.setAlignment(Qt.AlignCenter)
+        controls_layout.addWidget(info_label)
+        
+        controls_group.setLayout(controls_layout)
+        layout.addWidget(controls_group)
 
         layout.addStretch()
         panel.setLayout(layout)
