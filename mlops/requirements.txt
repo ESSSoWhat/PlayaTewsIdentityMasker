@@ -1,0 +1,162 @@
+# Core ML and Data Science
+numpy==1.24.3
+pandas==2.0.3
+scikit-learn==1.5.0
+scipy==1.11.1
+matplotlib==3.7.2
+seaborn==0.12.2
+jupyter==1.0.0
+ipykernel==6.25.0
+
+# Deep Learning (optional)
+torch==2.7.1
+tensorflow==2.13.0
+transformers==4.52.1
+
+# MLOps Tools
+mlflow==3.1.0
+dvc==3.20.1
+dagster==1.10.16
+prefect==2.20.17
+kubeflow==1.8.0
+
+# Model Serving
+fastapi==0.103.1
+uvicorn[standard]==0.23.2
+gunicorn==23.0.0
+pydantic==2.4.0
+
+# Monitoring and Observability
+prometheus-client==0.17.1
+grafana-api==1.0.3
+opentelemetry-api==1.20.0
+opentelemetry-sdk==1.20.0
+opentelemetry-instrumentation-fastapi==0.41b0
+
+# Logging
+structlog==23.1.0
+python-json-logger==2.0.7
+
+# Feature Store
+hopsworks==3.3.0
+featurestore==0.1.0
+
+# Data Validation
+great-expectations==0.17.23
+pandera==0.14.0
+cerberus==1.3.5
+
+# Testing
+pytest==7.4.2
+pytest-cov==4.1.0
+pytest-asyncio==0.21.1
+pytest-mock==3.11.1
+httpx==0.24.1
+
+# Configuration Management
+pyyaml==6.0.1
+python-dotenv==1.0.0
+hydra-core==1.3.2
+
+# Database and Storage
+sqlalchemy==2.0.21
+alembic==1.12.0
+redis==4.6.0
+pymongo==4.6.3
+
+# Cloud and Infrastructure
+boto3==1.28.44
+google-cloud-storage==2.10.0
+azure-storage-blob==12.17.0
+kubernetes==27.2.0
+
+# Security
+cryptography==44.0.1
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Utilities
+click==8.1.7
+rich==13.5.2
+tqdm==4.66.3
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Development Tools
+black==24.3.0
+isort==5.12.0
+flake8==6.0.0
+mypy==1.5.1
+pre-commit==3.3.3
+
+# Documentation
+sphinx==7.2.4
+sphinx-rtd-theme==1.3.0
+myst-parser==2.0.0
+
+# Performance and Optimization
+numba==0.57.1
+cython==3.0.4
+joblib==1.3.2
+
+# A/B Testing
+ab-testing==0.1.0
+statsmodels==0.14.0
+
+# Model Explainability
+shap==0.42.1
+lime==0.2.0.1
+interpret==0.4.1
+
+# Data Processing
+apache-beam==2.46.0
+pyspark==3.4.1
+dask==2023.8.0
+vaex==4.17.0
+
+# Time Series
+prophet==1.1.4
+statsmodels==0.14.0
+arch==6.2.0
+
+# Computer Vision (if needed)
+opencv-python==4.8.1.78
+pillow==10.3.0
+
+# NLP (if needed)
+nltk==3.9
+spacy==3.6.1
+textblob==0.17.1
+
+# API Documentation
+fastapi-pydantic==1.10.1
+fastapi-utils==0.2.1
+
+# Health Checks
+healthcheck==1.3.3
+
+# Rate Limiting
+slowapi==0.1.8
+
+# Caching
+redis==4.6.0
+cachetools==5.3.1
+
+# Background Tasks
+celery==5.3.1
+rq==1.15.1
+
+# Web Scraping (if needed)
+requests==2.32.4
+beautifulsoup4==4.12.2
+selenium==4.11.2
+
+# Data Sources
+pymongo==4.6.3
+psycopg2-binary==2.9.7
+pymysql==1.1.1
+sqlite3
+
+# Serialization
+pickle5==0.0.12
+joblib==1.3.2
