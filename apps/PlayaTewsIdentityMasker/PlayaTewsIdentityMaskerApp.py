@@ -3,27 +3,30 @@ PlayaTewsIdentityMasker - Professional Face-Swapping & Streaming Application
 
 This application is built upon the excellent work of the open source community:
 
-Core Technologies:
-- DeepFaceLive by @iperov (https://github.com/iperov/DeepFaceLive.git) - Real-time face swap technology
-- DeepFaceLab by @iperov (https://github.com/iperov/DeepFaceLab) - Face model training framework
-- Voice Changer Technology - Real-time audio processing and effects
+Core Technologies Used:
+- DeepFaceLive by @iperov  
+  (https://github.com/iperov/DeepFaceLive.git): Real-time face swap technology
+- DeepFaceLab by @iperov  
+  (https://github.com/iperov/DeepFaceLab): Face model training framework
+- Voice Changer Technology: Real-time audio processing and effects
 
-For complete attribution information, see CREDITS_AND_ATTRIBUTIONS.md
+For full attribution details, see CREDITS_AND_ATTRIBUTIONS.md
 
 License: GPL-3.0 (based on DeepFaceLive)
 """
 
 from pathlib import Path
+<<<<<<< Updated upstream
 from typing import List
 from xlib import qt as qtx
+=======
+from typing import List, Optional
+>>>>>>> Stashed changes
 
-from localization import L, Localization
-from resources.fonts import QXFontDB
-from resources.gfx import QXImageDB
 from xlib import os as lib_os
 from xlib import qt as qtx
-from xlib.qt.widgets.QXLabel import QXLabel
 
+<<<<<<< Updated upstream
 from . import backend
 from .ui.QCameraSource import QCameraSource
 from .ui.QFaceAligner import QFaceAligner
@@ -42,6 +45,45 @@ from .ui.widgets.QBCFaceAlignViewer import QBCFaceAlignViewer
 from .ui.widgets.QBCFaceSwapViewer import QBCFaceSwapViewer
 from .ui.widgets.QBCFrameViewer import QBCFrameViewer
 from .ui.widgets.QBCMergedFrameViewer import QBCMergedFrameViewer
+=======
+from apps.PlayaTewsIdentityMasker import backend
+from apps.PlayaTewsIdentityMasker.ui.QCameraSource import QCameraSource
+from apps.PlayaTewsIdentityMasker.ui.QFaceAligner import QFaceAligner
+from apps.PlayaTewsIdentityMasker.ui.QFaceAnimator import QFaceAnimator
+from apps.PlayaTewsIdentityMasker.ui.QFaceDetector import QFaceDetector
+from apps.PlayaTewsIdentityMasker.ui.QFaceMarker import QFaceMarker
+from apps.PlayaTewsIdentityMasker.ui.QFaceMerger import QFaceMerger
+from apps.PlayaTewsIdentityMasker.ui.QFaceSwapDFM import QFaceSwapDFM
+from apps.PlayaTewsIdentityMasker.ui.QFaceSwapInsight import QFaceSwapInsight
+from apps.PlayaTewsIdentityMasker.ui.QFileSource import QFileSource
+from apps.PlayaTewsIdentityMasker.ui.QFrameAdjuster import QFrameAdjuster
+from apps.PlayaTewsIdentityMasker.ui.QUnifiedLiveSwap import QUnifiedLiveSwap, UIMode
+from apps.PlayaTewsIdentityMasker.ui.QVoiceChanger import QVoiceChanger
+from apps.PlayaTewsIdentityMasker.ui.widgets.QBCFaceAlignViewer import (
+    QBCFaceAlignViewer,
+)
+from apps.PlayaTewsIdentityMasker.ui.widgets.QBCFaceSwapViewer import (
+    QBCFaceSwapViewer,
+)
+from apps.PlayaTewsIdentityMasker.ui.widgets.QBCFrameViewer import (
+    QBCFrameViewer,
+)
+from apps.PlayaTewsIdentityMasker.ui.widgets.QBCMergedFrameViewer import (
+    QBCMergedFrameViewer,
+)
+from localization.localization import Localization
+
+# Break up long import lines
+from apps.PlayaTewsIdentityMasker.backend.MemoryOptimizedFaceSwap import (
+    MemoryOptimizedFaceSwap,
+)
+from apps.PlayaTewsIdentityMasker.backend.EnhancedStreamOutput import (
+    EnhancedStreamOutput,
+)
+from apps.PlayaTewsIdentityMasker.ui.QEnhancedStreamOutput import (
+    QEnhancedStreamOutput,
+)
+>>>>>>> Stashed changes
 
 
 class QLiveSwap(qtx.QXWidget):
@@ -81,8 +123,19 @@ class QLiveSwap(qtx.QXWidget):
         
         # Use Memory-Optimized Face Swap DFM for better performance
         try:
+<<<<<<< Updated upstream
             from .backend.MemoryOptimizedFaceSwap import MemoryOptimizedFaceSwap
             face_swap_dfm   = self.face_swap_dfm   = MemoryOptimizedFaceSwap  (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_aligner_bc_out, bc_out=face_swapper_bc_out, dfm_models_path=dfm_models_path, backend_db=backend_db )
+=======
+            face_swap_dfm = self.face_swap_dfm = MemoryOptimizedFaceSwap(
+                weak_heap=backend_weak_heap,
+                reemit_frame_signal=reemit_frame_signal,
+                bc_in=face_aligner_bc_out,
+                bc_out=face_swapper_bc_out,
+                dfm_models_path=dfm_models_path,
+                backend_db=backend_db,
+            )
+>>>>>>> Stashed changes
             print("🧠 Memory-optimized face swap backend loaded successfully")
         except Exception as e:
             print(f"⚠️ Could not load memory-optimized backend: {e}")
@@ -93,12 +146,25 @@ class QLiveSwap(qtx.QXWidget):
         face_merger    = self.face_merger    = backend.FaceMerger   (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=frame_adjuster_bc_out, bc_out=face_merger_bc_out, backend_db=backend_db )
         
         # Use enhanced streaming output for OBS-style functionality
+<<<<<<< Updated upstream
         from .backend.EnhancedStreamOutput import EnhancedStreamOutput
         stream_output  = self.stream_output  = EnhancedStreamOutput (weak_heap=backend_weak_heap, reemit_frame_signal=reemit_frame_signal, bc_in=face_merger_bc_out, save_default_path=userdata_path, backend_db=backend_db)
 
         # Add voice changer backend
         from .backend.VoiceChanger import VoiceChanger
         voice_changer = self.voice_changer = VoiceChanger(weak_heap=backend_weak_heap, backend_db=backend_db)
+=======
+        stream_output = self.stream_output = EnhancedStreamOutput(
+            weak_heap=backend_weak_heap,
+            reemit_frame_signal=reemit_frame_signal,
+            bc_in=face_merger_bc_out,
+            save_default_path=userdata_path,
+            backend_db=backend_db,
+        )
+
+        # Add voice changer backend
+        from apps.PlayaTewsIdentityMasker.backend.VoiceChanger import VoiceChanger
+>>>>>>> Stashed changes
 
         self.all_backends : List[backend.BackendHost] = [file_source, camera_source, face_detector, face_marker, face_aligner, face_animator, face_swap_insight, face_swap_dfm, frame_adjuster, face_merger, stream_output, voice_changer]
 
@@ -114,11 +180,24 @@ class QLiveSwap(qtx.QXWidget):
         self.q_face_merger    = QFaceMerger(self.face_merger)
         
         # Use enhanced streaming output UI
+<<<<<<< Updated upstream
         from .ui.QEnhancedStreamOutput import QEnhancedStreamOutput
         self.q_stream_output  = QEnhancedStreamOutput(self.stream_output)
         
         # Add voice changer UI
         self.q_voice_changer = QVoiceChanger(self.voice_changer.get_control_sheet())
+=======
+        self.q_stream_output = QEnhancedStreamOutput(self.stream_output)
+
+        # Add voice changer UI (optional - skip if there are issues)
+        try:
+            self.q_voice_changer = QVoiceChanger(self.voice_changer.get_control_sheet())
+            print("✅ Voice changer UI created successfully")
+        except Exception as e:
+            print(f"⚠️ Voice changer UI creation failed: {e}")
+            print("   Continuing without voice changer UI")
+            self.q_voice_changer = None
+>>>>>>> Stashed changes
 
         self.q_ds_frame_viewer = QBCFrameViewer(backend_weak_heap, multi_sources_bc_out)
         self.q_ds_fa_viewer    = QBCFaceAlignViewer(backend_weak_heap, face_aligner_bc_out, preview_width=256)
@@ -154,7 +233,7 @@ class QLiveSwap(qtx.QXWidget):
         main_layout.addWidget(self.q_unified_live_swap)
         self.setLayout(main_layout)
 
-    def _configure_memory_optimization(self):
+    def _configure_memory_optimization(self) -> None:
         """Configure memory optimization settings for the face swap DFM"""
         try:
             # Check if we're using the memory-optimized backend
@@ -164,7 +243,8 @@ class QLiveSwap(qtx.QXWidget):
                 # Check if memory optimization controls are available
                 if hasattr(cs, 'ram_cache_size'):
                     # Set memory optimization settings
-                    # RAM Cache Size: 2GB (2048 MB) - can be increased to 4GB for your 64GB system
+                    # RAM Cache Size: 2GB (2048 MB)
+                    # Can be increased to 4GB for your 64GB system
                     cs.ram_cache_size.set_number(2048)
                     
                     # Enable preprocessing cache
@@ -178,8 +258,15 @@ class QLiveSwap(qtx.QXWidget):
                     # Enable parallel processing
                     if hasattr(cs, 'parallel_processing'):
                         cs.parallel_processing.set_flag(True)
+<<<<<<< Updated upstream
                     
                     print("🧠 Memory Optimization Configured:")
+=======
+
+                    print(
+                        "🧠 Memory Optimization Configured:"
+                    )
+>>>>>>> Stashed changes
                     print("  • RAM Cache Size: 2GB")
                     print("  • Preprocessing Cache: Enabled")
                     print("  • Postprocessing Cache: Enabled")
@@ -192,29 +279,55 @@ class QLiveSwap(qtx.QXWidget):
         except Exception as e:
             print(f"⚠️ Warning: Could not configure memory optimization: {e}")
 
-    def _process_messages(self):
+    def _process_messages(self) -> None:
         self.q_unified_live_swap._process_messages()
 
-    def _on_timer_5ms(self):
+    def _on_timer_5ms(self) -> None:
         self.q_unified_live_swap._on_timer_5ms()
 
-    def clear_backend_db(self):
+    def clear_backend_db(self) -> None:
         self.backend_db.clear()
 
-    def initialize(self):
+    def initialize(self) -> None:
         # Initialize all backends
         for backend_host in self.all_backends:
             backend_host.start()
 
-    def finalize(self):
+    def finalize(self) -> None:
         # Gracefully stop the backend
         for backend_host in self.all_backends:
             backend_host.stop()
 
 
 class QDFLAppWindow(qtx.QXWindow):
+<<<<<<< Updated upstream
     def __init__(self, userdata_path, settings_dirpath):
         super().__init__(save_load_state=True)
+=======
+    def __init__(
+        self,
+        userdata_path: Path,
+        settings_dirpath: Path,
+        q_file_source,
+        q_camera_source,
+        q_face_detector,
+        q_face_marker,
+        q_face_aligner,
+        q_face_animator,
+        q_face_swap_insight,
+        q_face_swap_dfm,
+        q_frame_adjuster,
+        q_face_merger,
+        q_stream_output,
+        q_voice_changer: Optional[QVoiceChanger],
+        q_ds_frame_viewer,
+        q_ds_fa_viewer,
+        q_ds_fc_viewer,
+        q_ds_merged_frame_viewer,
+    ) -> None:
+        super().__init__()
+
+>>>>>>> Stashed changes
         self.userdata_path = userdata_path
         self.settings_dirpath = settings_dirpath
 
@@ -231,10 +344,11 @@ class QDFLAppWindow(qtx.QXWindow):
 
         # Set window icon
         try:
+            from resources.gfx import QXImageDB
             icon = QXImageDB.app_icon()
             if icon:
                 self.setWindowIcon(icon.as_QIcon())
-        except:
+        except Exception:
             pass
 
         # Create timer for processing messages
@@ -244,18 +358,18 @@ class QDFLAppWindow(qtx.QXWindow):
         # Initialize the application
         self.q_live_swap.initialize()
 
-    def create_menu_bar(self):
+    def create_menu_bar(self) -> None:
         """Create menu bar with memory optimization options"""
         # Note: QXWindow doesn't have built-in menu bar support
         # Menu functionality can be implemented using custom widgets if needed
         pass
 
-    def _on_reset_modules_settings(self):
+    def _on_reset_modules_settings(self) -> None:
         """Reset all module settings"""
         self.q_live_swap.clear_backend_db()
         print("✅ All module settings have been reset")
 
-    def _on_start_memory_monitor(self):
+    def _on_start_memory_monitor(self) -> None:
         """Start memory monitoring"""
         try:
             import subprocess
@@ -265,7 +379,7 @@ class QDFLAppWindow(qtx.QXWindow):
         except Exception as e:
             print(f"❌ Could not start memory monitoring: {e}")
 
-    def _on_generate_memory_report(self):
+    def _on_generate_memory_report(self) -> None:
         """Generate memory optimization report"""
         try:
             import subprocess
@@ -275,7 +389,7 @@ class QDFLAppWindow(qtx.QXWindow):
         except Exception as e:
             print(f"❌ Could not generate memory report: {e}")
 
-    def _on_clear_all_caches(self):
+    def _on_clear_all_caches(self) -> None:
         """Clear all caches"""
         try:
             # Clear backend weak heap
@@ -289,7 +403,7 @@ class QDFLAppWindow(qtx.QXWindow):
         except Exception as e:
             print(f"❌ Could not clear caches: {e}")
 
-    def _on_optimize_cache_size(self):
+    def _on_optimize_cache_size(self) -> None:
         """Optimize cache size based on available memory"""
         try:
             import psutil
@@ -313,10 +427,11 @@ class QDFLAppWindow(qtx.QXWindow):
         except Exception as e:
             print(f"❌ Could not optimize cache size: {e}")
 
-    def _on_show_memory_guide(self):
+    def _on_show_memory_guide(self) -> None:
         """Show memory optimization guide"""
         try:
             import webbrowser
+<<<<<<< Updated upstream
             import os
             guide_path = os.path.abspath("MEMORY_OPTIMIZATION_GUIDE.md")
             webbrowser.open(f"file://{guide_path}")
@@ -327,12 +442,29 @@ class QDFLAppWindow(qtx.QXWindow):
         """Show performance tips"""
         tips = """
 🚀 Performance Tips for Memory-Optimized Face Swap:
+=======
+
+            webbrowser.open(
+                "https://github.com/PlayaTews/PlayaTewsIdentityMasker/wiki/Memory-Optimization"
+            )
+            print(
+                "📖 Memory optimization guide opened in browser"
+            )
+        except Exception as e:
+            print(f"❌ Could not open memory guide: {e}")
+
+    def _on_show_performance_tips(self) -> None:
+        """Show performance optimization tips"""
+        try:
+            import webbrowser
+>>>>>>> Stashed changes
 
 1. 🧠 RAM Usage:
    • Keep RAM usage below 80%
    • Monitor cache hit rates (should be 70-90%)
    • Adjust cache size based on available RAM
 
+<<<<<<< Updated upstream
 2. 📦 Cache Optimization:
    • Enable preprocessing cache for 30-50% CPU reduction
    • Enable postprocessing cache for 20-40% CPU reduction
@@ -359,19 +491,38 @@ class QDFLAppWindow(qtx.QXWindow):
         """Set process priority"""
         lib_os.set_process_priority(prio)
         print(f"✅ Process priority set to: {prio.name}")
+=======
+    def _on_cb_process_priority_choice(
+        self, prio: lib_os.ProcessPriority, _: object
+    ) -> None:
+        """Handle process priority changes"""
+        try:
+            import psutil
 
-    def finalize(self):
+            current_process = psutil.Process()
+            if prio == lib_os.ProcessPriority.HIGH:
+                current_process.nice(psutil.HIGH_PRIORITY_CLASS)
+            elif prio == lib_os.ProcessPriority.NORMAL:
+                current_process.nice(psutil.NORMAL_PRIORITY_CLASS)
+            elif prio == lib_os.ProcessPriority.BELOW_NORMAL:
+                current_process.nice(psutil.BELOW_NORMAL_PRIORITY_CLASS)
+            print(f"🎯 Process priority set to {prio.name}")
+        except Exception as e:
+            print(f"❌ Could not set process priority: {e}")
+>>>>>>> Stashed changes
+
+    def finalize(self) -> None:
         """Finalize the application"""
         self.q_live_swap.finalize()
 
-    def _on_closeEvent(self):
+    def _on_closeEvent(self) -> None:
         """Handle window close event"""
         self.finalize()
         self.close()
 
 
 class PlayaTewsIdentityMaskerApp(qtx.QXMainApplication):
-    def __init__(self, userdata_path):
+    def __init__(self, userdata_path: Path) -> None:
         super().__init__()
         self.userdata_path = userdata_path
         self.settings_dirpath = userdata_path / 'settings'
@@ -388,6 +539,7 @@ class PlayaTewsIdentityMaskerApp(qtx.QXMainApplication):
         # Show splash screen
         self.show_splash_screen()
 
+<<<<<<< Updated upstream
     def show_splash_screen(self):
         """Show memory optimization splash screen"""
         try:
@@ -469,3 +621,35 @@ class PlayaTewsIdentityMaskerApp(qtx.QXMainApplication):
     def _on_splash_wnd_expired(self):
         """Handle splash window expiration"""
         self.main_window.show()
+=======
+        # Don't automatically show splash screen or window
+        # Let the launcher handle window display
+
+    def initialize(self) -> None:
+        """Initialize the application"""
+        try:
+            # Initialize the QLiveSwap instance
+            if hasattr(self, 'q_live_swap'):
+                self.q_live_swap.initialize()
+                print("✅ QLiveSwap initialized successfully")
+            
+            # Initialize the main window
+            if hasattr(self, 'main_window'):
+                self.main_window.show()
+                print("✅ Main window displayed successfully")
+            
+            print("✅ PlayaTewsIdentityMaskerApp initialized successfully")
+            
+        except Exception as e:
+            print(f"❌ Error initializing application: {e}")
+            raise
+    
+    def run(self) -> int:
+        """Run the application"""
+        try:
+            # Start the Qt event loop
+            return self.exec_()
+        except Exception as e:
+            print(f"❌ Error running application: {e}")
+            raise
+>>>>>>> Stashed changes

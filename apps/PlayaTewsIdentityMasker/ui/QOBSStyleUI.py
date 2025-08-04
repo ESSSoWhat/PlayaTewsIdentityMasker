@@ -836,7 +836,72 @@ class QOBSStyleUI(qtx.QXWindow):
         layout.addStretch()
         tab.setLayout(layout)
         return tab
+<<<<<<< Updated upstream
         
+=======
+
+
+def ensure_component_state_persistence(self):
+    """Ensure all component states are properly saved and loaded"""
+    try:
+        # Load module states
+        module_state_file = Path("settings/module_states.json")
+        if module_state_file.exists():
+            with open(module_state_file, 'r', encoding='utf-8') as f:
+                module_states = json.load(f)
+            
+            # Apply checkbox states
+            checkbox_states = module_states.get("ui_state", {}).get("checkboxes", {})
+            
+            # Find and update checkboxes
+            for checkbox_name, state in checkbox_states.items():
+                # Look for checkboxes in the UI
+                for attr_name in dir(self):
+                    attr = getattr(self, attr_name, None)
+                    if hasattr(attr, 'setChecked') and checkbox_name.lower() in attr_name.lower():
+                        attr.setChecked(state)
+                        print(f"✅ Set {checkbox_name} to {state}")
+            
+            print("✅ Component states applied successfully")
+        else:
+            print("⚠️ Module state file not found, creating default states")
+            create_module_state_settings()
+            
+    except Exception as e:
+        print(f"❌ Error ensuring component state persistence: {e}")
+
+def save_component_states(self):
+    """Save current component states to persistent storage"""
+    try:
+        # Collect current checkbox states
+        checkbox_states = {}
+        
+        # Find all checkboxes in the UI
+        for attr_name in dir(self):
+            attr = getattr(self, attr_name, None)
+            if hasattr(attr, 'isChecked'):
+                checkbox_states[attr_name] = attr.isChecked()
+        
+        # Update module states
+        module_state_file = Path("settings/module_states.json")
+        if module_state_file.exists():
+            with open(module_state_file, 'r', encoding='utf-8') as f:
+                module_states = json.load(f)
+        else:
+            module_states = {"ui_state": {"checkboxes": {}}}
+        
+        module_states["ui_state"]["checkboxes"] = checkbox_states
+        
+        # Save updated states
+        with open(module_state_file, 'w', encoding='utf-8') as f:
+            json.dump(module_states, f, indent=2)
+        
+        print("✅ Component states saved successfully")
+        
+    except Exception as e:
+        print(f"❌ Error saving component states: {e}")
+
+>>>>>>> Stashed changes
     def closeEvent(self, event):
         """Handle close event - ensure processing window is closed"""
         if self.processing_window and self.processing_window.isVisible():
