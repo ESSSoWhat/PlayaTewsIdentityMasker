@@ -185,30 +185,39 @@ def monitor_module_performance() -> Dict[str, float]:
     Returns:
         Dictionary mapping module names to their CPU usage
     """
-    import psutil
-    import os
-    
     performance_data = {}
-    current_process = psutil.Process(os.getpid())
     
-    # Get current CPU usage
-    cpu_percent = current_process.cpu_percent(interval=1)
-    
-    # Check for high CPU usage indicating spinning
-    if cpu_percent > 80:
-        print(f"Warning: High CPU usage detected: {cpu_percent}%")
-        performance_data['high_cpu_warning'] = cpu_percent
-    
-    # Memory usage check
-    memory_info = current_process.memory_info()
-    memory_mb = memory_info.rss / 1024 / 1024
-    
-    if memory_mb > 500:  # More than 500MB
-        print(f"Warning: High memory usage: {memory_mb:.1f} MB")
-        performance_data['high_memory_warning'] = memory_mb
-    
-    performance_data['cpu_percent'] = cpu_percent
-    performance_data['memory_mb'] = memory_mb
+    try:
+        import psutil
+        import os
+        
+        current_process = psutil.Process(os.getpid())
+        
+        # Get current CPU usage
+        cpu_percent = current_process.cpu_percent(interval=1)
+        
+        # Check for high CPU usage indicating spinning
+        if cpu_percent > 80:
+            print(f"Warning: High CPU usage detected: {cpu_percent}%")
+            performance_data['high_cpu_warning'] = cpu_percent
+        
+        # Memory usage check
+        memory_info = current_process.memory_info()
+        memory_mb = memory_info.rss / 1024 / 1024
+        
+        if memory_mb > 500:  # More than 500MB
+            print(f"Warning: High memory usage: {memory_mb:.1f} MB")
+            performance_data['high_memory_warning'] = memory_mb
+        
+        performance_data['cpu_percent'] = cpu_percent
+        performance_data['memory_mb'] = memory_mb
+        
+    except ImportError:
+        print("Note: psutil not available, skipping detailed performance monitoring")
+        performance_data['status'] = 'monitoring_unavailable'
+    except Exception as e:
+        print(f"Performance monitoring error: {e}")
+        performance_data['error'] = str(e)
     
     return performance_data
 
