@@ -1,30 +1,11 @@
 from pathlib import Path
-from typing import List, Dict, Optional
-import cv2
-import numpy as np
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QPalette, QColor, QFont, QIcon
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, 
-                            QPushButton, QLabel, QComboBox, QSpinBox, QLineEdit,
-                            QCheckBox, QGroupBox, QTabWidget, QSplitter, 
-                            QListWidget, QListWidgetItem, QSlider, QFrame,
-                            QTextEdit, QProgressBar, QScrollArea, QSizePolicy)
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QGroupBox,
+    QTabWidget, QSplitter, QListWidget, QSizePolicy, QDialog
+)
 
-from localization import L
-from resources.fonts import QXFontDB
 from xlib import qt as qtx
-from xlib.qt.widgets.QXLabel import QXLabel
-
-from .widgets.QBackendPanel import QBackendPanel
-from .widgets.QCheckBoxCSWFlag import QCheckBoxCSWFlag
-from .widgets.QComboBoxCSWDynamicSingleSwitch import QComboBoxCSWDynamicSingleSwitch
-from .widgets.QErrorCSWError import QErrorCSWError
-from .widgets.QLabelCSWNumber import QLabelCSWNumber
-from .widgets.QLabelPopupInfo import QLabelPopupInfo
-from .widgets.QLineEditCSWText import QLineEditCSWText
-from .widgets.QPathEditCSWPaths import QPathEditCSWPaths
-from .widgets.QSpinBoxCSWNumber import QSpinBoxCSWNumber
-from .widgets.QXPushButtonCSWSignal import QXPushButtonCSWSignal
 
 from ..backend import StreamOutput
 from ..backend.StreamOutput import SourceType
@@ -836,72 +817,7 @@ class QOBSStyleUI(qtx.QXWindow):
         layout.addStretch()
         tab.setLayout(layout)
         return tab
-<<<<<<< Updated upstream
-        
-=======
 
-
-def ensure_component_state_persistence(self):
-    """Ensure all component states are properly saved and loaded"""
-    try:
-        # Load module states
-        module_state_file = Path("settings/module_states.json")
-        if module_state_file.exists():
-            with open(module_state_file, 'r', encoding='utf-8') as f:
-                module_states = json.load(f)
-            
-            # Apply checkbox states
-            checkbox_states = module_states.get("ui_state", {}).get("checkboxes", {})
-            
-            # Find and update checkboxes
-            for checkbox_name, state in checkbox_states.items():
-                # Look for checkboxes in the UI
-                for attr_name in dir(self):
-                    attr = getattr(self, attr_name, None)
-                    if hasattr(attr, 'setChecked') and checkbox_name.lower() in attr_name.lower():
-                        attr.setChecked(state)
-                        print(f"✅ Set {checkbox_name} to {state}")
-            
-            print("✅ Component states applied successfully")
-        else:
-            print("⚠️ Module state file not found, creating default states")
-            create_module_state_settings()
-            
-    except Exception as e:
-        print(f"❌ Error ensuring component state persistence: {e}")
-
-def save_component_states(self):
-    """Save current component states to persistent storage"""
-    try:
-        # Collect current checkbox states
-        checkbox_states = {}
-        
-        # Find all checkboxes in the UI
-        for attr_name in dir(self):
-            attr = getattr(self, attr_name, None)
-            if hasattr(attr, 'isChecked'):
-                checkbox_states[attr_name] = attr.isChecked()
-        
-        # Update module states
-        module_state_file = Path("settings/module_states.json")
-        if module_state_file.exists():
-            with open(module_state_file, 'r', encoding='utf-8') as f:
-                module_states = json.load(f)
-        else:
-            module_states = {"ui_state": {"checkboxes": {}}}
-        
-        module_states["ui_state"]["checkboxes"] = checkbox_states
-        
-        # Save updated states
-        with open(module_state_file, 'w', encoding='utf-8') as f:
-            json.dump(module_states, f, indent=2)
-        
-        print("✅ Component states saved successfully")
-        
-    except Exception as e:
-        print(f"❌ Error saving component states: {e}")
-
->>>>>>> Stashed changes
     def closeEvent(self, event):
         """Handle close event - ensure processing window is closed"""
         if self.processing_window and self.processing_window.isVisible():

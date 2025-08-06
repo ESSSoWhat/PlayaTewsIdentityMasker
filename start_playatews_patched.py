@@ -5,8 +5,8 @@ Applies camera preview fixes before launching the main application
 """
 
 import sys
-import os
 from pathlib import Path
+
 
 def main():
     """Main startup function with camera fixes"""
@@ -15,14 +15,15 @@ def main():
     
     # Apply camera integration patches
     try:
-        from camera_integration_patch import apply_patches
+        from camera_integration_patch import apply_patches  # type: ignore
         apply_patches()
         print("Camera patches applied")
+    except Exception as e:
+        print(f"Camera patches failed: {e}")
 
     # Import state persistence
     try:
         import json
-        from pathlib import Path
         print("✅ State persistence modules imported")
     except Exception as e:
         print(f"❌ Error importing state persistence: {e}")
@@ -32,18 +33,19 @@ def main():
         module_state_file = Path("settings/module_states.json")
         if module_state_file.exists():
             with open(module_state_file, 'r', encoding='utf-8') as f:
-                module_states = json.load(f)
+                json.load(f)  # Load but don't store if not used
             print("✅ Module states loaded successfully")
         else:
-            print("⚠️ Module state file not found, will be created on first run")
+            print("⚠️ Module state file not found, "
+                  "will be created on first run")
     except Exception as e:
         print(f"❌ Error loading module states: {e}")
-    except Exception as e:
-        print(f"Camera patches failed: {e}")
     
     # Import and run the main application
     try:
-        from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import PlayaTewsIdentityMaskerApp
+        from apps.PlayaTewsIdentityMasker.PlayaTewsIdentityMaskerApp import (
+            PlayaTewsIdentityMaskerApp
+        )
         
         # Get userdata path
         userdata_path = Path.cwd()
@@ -56,6 +58,7 @@ def main():
     except Exception as e:
         print(f"Failed to start application: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

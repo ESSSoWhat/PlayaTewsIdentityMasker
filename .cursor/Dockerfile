@@ -8,8 +8,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV CUDA_HOME=/usr/local/cuda
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64
 ENV PATH=${CUDA_HOME}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
 # Background agent specific environment variables
 ENV AGENT_ENV=production
@@ -34,7 +34,6 @@ RUN apt-get update && apt-get install -y \
     python3-wheel \
     build-essential \
     pkg-config \
-    
     # Minimal GUI dependencies (only if PyQt5 is actually needed)
     libgl1-mesa-glx \
     libglib2.0-0 \
@@ -45,11 +44,9 @@ RUN apt-get update && apt-get install -y \
     libqt5core5a \
     libqt5gui5 \
     libqt5widgets5 \
-    
     # Core OpenCV dependencies only
     libopencv-dev \
     libopencv-contrib-dev \
-    
     # Essential image processing libraries
     libjpeg-dev \
     libpng-dev \
@@ -57,11 +54,9 @@ RUN apt-get update && apt-get install -y \
     libavcodec-dev \
     libavformat-dev \
     libswscale-dev \
-    
     # Minimal audio processing (only if voice features are used)
     libasound2-dev \
     portaudio19-dev \
-    
     # Essential system utilities only
     git \
     curl \
@@ -69,11 +64,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     nano \
     jq \
-    
     # Essential network tools
     net-tools \
     iputils-ping \
-    
     # Clean up in the same layer
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -95,35 +88,34 @@ RUN pip install --upgrade pip setuptools wheel
 
 # Install only core Python dependencies needed for background agents
 RUN pip install \
-    numpy>=1.21.0,<1.28.0 \
-    opencv-python>=4.5.0,<4.10.0 \
-    opencv-contrib-python>=4.5.0,<4.10.0 \
-    PyQt5>=5.15.0,<5.16.0 \
-    psutil>=5.8.0,<6.0.0 \
-    Pillow>=8.0.0,<11.0.0 \
-    pyyaml>=6.0,<7.0 \
-    requests>=2.25.0 \
-    tqdm>=4.60.0 \
-    # Background agent specific packages
-    python-dotenv>=0.19.0 \
-    structlog>=23.0.0 \
-    schedule>=1.2.0 \
-    watchdog>=3.0.0
+    "numpy>=1.21.0,<1.28.0" \
+    "opencv-python>=4.5.0,<4.10.0" \
+    "opencv-contrib-python>=4.5.0,<4.10.0" \
+    "PyQt5>=5.15.0,<5.16.0" \
+    "psutil>=5.8.0,<6.0.0" \
+    "Pillow>=8.0.0,<11.0.0" \
+    "pyyaml>=6.0,<7.0" \
+    "requests>=2.25.0" \
+    "tqdm>=4.60.0" \
+    "python-dotenv>=0.19.0" \
+    "structlog>=23.0.0" \
+    "schedule>=1.2.0" \
+    "watchdog>=3.0.0"
 
 # Install only essential development tools (comment out if not needed)
 # RUN pip install \
-#     pytest>=7.0.0,<8.0.0 \
-#     black>=23.0.0,<24.0.0 \
-#     flake8>=6.0.0,<7.0.0
+#     "pytest>=7.0.0,<8.0.0" \
+#     "black>=23.0.0,<24.0.0" \
+#     "flake8>=6.0.0,<7.0.0"
 
 # Install optional ML dependencies (commented out to keep image smaller)
 # Uncomment if ML features are needed
 # RUN pip install \
-#     torch>=2.0.0,<2.3.0 \
-#     torchvision>=0.15.0,<0.18.0 \
-#     onnxruntime-gpu>=1.15.0,<1.18.0 \
-#     gputil>=1.4.0,<2.0.0 \
-#     pynvml>=11.4.0,<12.0.0
+#     "torch>=2.0.0,<2.3.0" \
+#     "torchvision>=0.15.0,<0.18.0" \
+#     "onnxruntime-gpu>=1.15.0,<1.18.0" \
+#     "gputil>=1.4.0,<2.0.0" \
+#     "pynvml>=11.4.0,<12.0.0"
 
 # Set up git configuration
 RUN git config --global init.defaultBranch main && \
