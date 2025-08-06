@@ -9,9 +9,9 @@ jupyter==1.0.0
 ipykernel==6.25.0
 
 # Deep Learning (optional)
-torch==2.7.1
+torch==2.8.0
 tensorflow==2.13.0
-transformers==4.52.1
+transformers==4.53.0
 
 # MLOps Tools
 mlflow==3.1.0
