@@ -8,12 +8,12 @@ opencv-contrib-python>=4.5.0,<4.10.0
 Pillow>=8.0.0,<11.0.0
 
 # Video processing
-yt-dlp>=2023.12.30,<2024.1.0
+yt-dlp>=2023.12.30,<2025.11.0
 ffmpeg-python>=0.2.0,<1.0.0
 
 # Face detection and processing (from existing modelhub)
 onnxruntime-gpu>=1.15.0,<1.18.0
-torch>=2.0.0,<2.3.0
+torch>=2.0.0,<2.8.0
 torchvision>=0.15.0,<0.18.0
 --extra-index-url https://download.pytorch.org/whl/cu118
 

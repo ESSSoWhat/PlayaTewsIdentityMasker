@@ -9,12 +9,12 @@ jupyter==1.0.0
 ipykernel==6.25.0
 
 # Deep Learning (optional)
-torch==2.7.1
+torch==2.8.0
 tensorflow==2.13.0
-transformers==4.52.1
+transformers==4.53.0
 
 # MLOps Tools
-mlflow==3.1.0
+mlflow==3.5.0
 dvc==3.20.1
 dagster==1.10.16
 prefect==2.20.17
@@ -71,7 +71,7 @@ azure-storage-blob==12.17.0
 kubernetes==27.2.0
 
 # Security
-cryptography==44.0.1
+cryptography==46.0.5
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 
@@ -121,10 +121,10 @@ arch==6.2.0
 
 # Computer Vision (if needed)
 opencv-python==4.8.1.78
-pillow==10.3.0
+pillow==12.1.1
 
 # NLP (if needed)
-nltk==3.9
+nltk==3.9.2
 spacy==3.6.1
 textblob==0.17.1
 

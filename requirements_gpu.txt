@@ -8,7 +8,7 @@
 onnxruntime-gpu>=1.15.0,<1.17.0
 
 # PyTorch with CUDA support (for training and advanced processing)
-torch>=2.0.0,<2.2.0
+torch>=2.0.0,<2.8.0
 torchvision>=0.15.0,<0.17.0
 --extra-index-url https://download.pytorch.org/whl/cu118
 
